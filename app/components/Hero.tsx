@@ -90,7 +90,7 @@ export default function Hero({
             {settings?.hero_eyebrow || "Travel · Ocean · Photography · Life"}
           </div>
 
-          <h1 className="hero-title">
+          <h1 className="hero-title" style={{ whiteSpace: "nowrap" }}>
             <span className="hero-title-main">
               {settings?.hero_title_main || "Surface"}
             </span>{" "}

@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
 
-  const { data: posts } = await supabase
+  const { data: posts, error: postsError } = await supabase
     .from("posts")
     .select("*")
     .eq("status", "published")
@@ -52,13 +52,16 @@ export default async function HomePage() {
     .limit(1)
     .maybeSingle();
 
+  if (postsError) {
+    console.error("Homepage posts error:", postsError.message);
+  }
+
   const allPosts = (posts ?? []).map((post) => ({
     ...post,
     read_time: getDisplayReadTime(post.read_time, post.body),
   }));
 
-  const featuredPost =
-    allPosts.find((post) => post.is_featured) || null;
+  const featuredPost = allPosts.find((post) => post.is_featured) || null;
 
   const editorsPicks = allPosts
     .filter((post) => {
@@ -69,12 +72,9 @@ export default async function HomePage() {
     .sort((a, b) => {
       const aOrder = a.editors_pick_order ?? Number.MAX_SAFE_INTEGER;
       const bOrder = b.editors_pick_order ?? Number.MAX_SAFE_INTEGER;
-
       if (aOrder !== bOrder) return aOrder - bOrder;
-
       const aDate = a.published_at ? new Date(a.published_at).getTime() : 0;
       const bDate = b.published_at ? new Date(b.published_at).getTime() : 0;
-
       return bDate - aDate;
     })
     .slice(0, 3);
@@ -95,10 +95,7 @@ export default async function HomePage() {
 
       {featuredPost ? <FeatureBand featuredPost={featuredPost} /> : null}
 
-      <Stats
-        settings={settings}
-        postCount={allPosts.length}
-      />
+      <Stats settings={settings} postCount={allPosts.length} />
 
       <Footer settings={settings} />
     </>
