@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Header from "../components/Header";
 import { supabase } from "../lib/supabase";
@@ -11,16 +11,39 @@ export default function LoginPage() {
 
   const next = searchParams.get("next") || "/admin";
   const error = searchParams.get("error");
+  const mode = searchParams.get("mode");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState("");
+  const [message, setMessage] = useState("");
+  const [canRecover, setCanRecover] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session && mode === "recovery") {
+        setCanRecover(true);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") && session && mode === "recovery") {
+        setCanRecover(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [mode]);
 
   async function signInWithPassword(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setLocalError("");
+    setMessage("");
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -35,6 +58,46 @@ export default function LoginPage() {
 
     router.push(next);
     router.refresh();
+  }
+
+  async function sendResetEmail(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setLocalError("");
+    setMessage("");
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/login?mode=recovery`,
+    });
+
+    if (error) {
+      setLocalError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    setMessage("Password reset email sent.");
+    setLoading(false);
+  }
+
+  async function updatePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setLocalError("");
+    setMessage("");
+
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (error) {
+      setLocalError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    setMessage("Password updated. You can now use your new password.");
+    setLoading(false);
   }
 
   return (
@@ -55,31 +118,58 @@ export default function LoginPage() {
             </div>
           ) : null}
 
-          {localError ? (
-            <div className="login-error-box">{localError}</div>
-          ) : null}
+          {localError ? <div className="login-error-box">{localError}</div> : null}
+          {message ? <div className="editor-warning" style={{ maxWidth: 560, marginTop: 20 }}>{message}</div> : null}
 
-          <form onSubmit={signInWithPassword} className="login-form login-form-stack">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+          {mode === "recovery" ? (
+            <form onSubmit={updatePassword} className="login-form login-form-stack">
+              <input
+                type="password"
+                placeholder="New password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+              <button type="submit" disabled={loading || !canRecover}>
+                {loading ? "Updating..." : "Update Password"}
+              </button>
+            </form>
+          ) : (
+            <>
+              <form onSubmit={signInWithPassword} className="login-form login-form-stack">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button type="submit" disabled={loading}>
+                  {loading ? "Signing in..." : "Sign In"}
+                </button>
+              </form>
 
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-
-            <button type="submit" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
-            </button>
-          </form>
+              <form onSubmit={sendResetEmail} className="login-form login-form-stack" style={{ marginTop: 18 }}>
+                <input
+                  type="email"
+                  placeholder="Reset password for this email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <button type="submit" disabled={loading}>
+                  {loading ? "Sending..." : "Send Password Reset"}
+                </button>
+              </form>
+            </>
+          )}
         </div>
       </main>
     </>

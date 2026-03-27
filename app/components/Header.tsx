@@ -11,9 +11,7 @@ function isActive(pathname: string, href: string) {
 }
 
 function navLinkClass(pathname: string, href: string) {
-  return isActive(pathname, href)
-    ? "nav-link is-active"
-    : "nav-link";
+  return isActive(pathname, href) ? "nav-link is-active" : "nav-link";
 }
 
 export default function Header() {
@@ -35,7 +33,7 @@ export default function Header() {
         <div className="masthead-right">
           <nav className="nav">
             <Link href="/" className={navLinkClass(pathname, "/")}>
-              Front Page
+              Home
             </Link>
 
             <Link

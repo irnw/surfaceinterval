@@ -11,8 +11,11 @@ type Props = {
     excerpt?: string;
     body?: string;
     hero?: string;
+    heroCaption?: string;
     inline?: string;
+    inlineCaption?: string;
     galleryImages?: string[];
+    galleryCaptions?: string[];
     postType?: string;
     readTime?: string;
     status?: string;
@@ -35,9 +38,14 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [title, setTitle] = useState(initial?.title || "");
   const [slug, setSlug] = useState(initial?.slug || "");
   const [hero, setHero] = useState(initial?.hero || "");
+  const [heroCaption, setHeroCaption] = useState(initial?.heroCaption || "");
   const [inline, setInline] = useState(initial?.inline || "");
+  const [inlineCaption, setInlineCaption] = useState(initial?.inlineCaption || "");
   const [galleryImages, setGalleryImages] = useState(
     initial?.galleryImages?.join(", ") || ""
+  );
+  const [galleryCaptions, setGalleryCaptions] = useState(
+    initial?.galleryCaptions?.join("\n") || ""
   );
   const [postType, setPostType] = useState(initial?.postType || "standard");
   const [category, setCategory] = useState(initial?.category || "Diving");
@@ -65,8 +73,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
         title: initial?.title || "",
         slug: initial?.slug || "",
         hero: initial?.hero || "",
+        heroCaption: initial?.heroCaption || "",
         inline: initial?.inline || "",
+        inlineCaption: initial?.inlineCaption || "",
         galleryImages: initial?.galleryImages?.join(", ") || "",
+        galleryCaptions: initial?.galleryCaptions?.join("\n") || "",
         postType: initial?.postType || "standard",
         category: initial?.category || "Diving",
         readTime: initial?.readTime || "",
@@ -91,8 +102,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     title,
     slug,
     hero,
+    heroCaption,
     inline,
+    inlineCaption,
     galleryImages,
+    galleryCaptions,
     postType,
     category,
     readTime,
@@ -151,8 +165,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     formData.set("excerpt", excerpt);
     formData.set("body", body);
     formData.set("hero", hero);
+    formData.set("heroCaption", heroCaption);
     formData.set("inline", inline);
+    formData.set("inlineCaption", inlineCaption);
     formData.set("galleryImages", galleryImages);
+    formData.set("galleryCaptions", galleryCaptions);
     formData.set("postType", postType);
     formData.set("readTime", readTime);
     formData.set("status", status);
@@ -232,66 +249,37 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
         <div className="setting-item">
           <label>Series / Collection</label>
-          <input
-            value={series}
-            onChange={(e) => setSeries(e.target.value)}
-            placeholder="e.g. Maldives 2026"
-          />
+          <input value={series} onChange={(e) => setSeries(e.target.value)} />
         </div>
 
         <div className="setting-item">
           <label>Location</label>
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder="e.g. Addu Atoll, Maldives"
-          />
+          <input value={location} onChange={(e) => setLocation(e.target.value)} />
         </div>
 
         <div className="setting-item">
           <label>Gear</label>
-          <input
-            value={gear}
-            onChange={(e) => setGear(e.target.value)}
-            placeholder="e.g. Halcyon, wet notes, reef hook"
-          />
+          <input value={gear} onChange={(e) => setGear(e.target.value)} />
         </div>
 
         <div className="setting-item">
           <label>Camera</label>
-          <input
-            value={camera}
-            onChange={(e) => setCamera(e.target.value)}
-            placeholder="e.g. OM-1 + fisheye"
-          />
+          <input value={camera} onChange={(e) => setCamera(e.target.value)} />
         </div>
 
         <div className="setting-item is-full">
           <label>Dive Log / Field Note</label>
-          <textarea
-            rows={3}
-            value={diveLog}
-            onChange={(e) => setDiveLog(e.target.value)}
-            placeholder="Optional short field note block"
-          />
+          <textarea rows={3} value={diveLog} onChange={(e) => setDiveLog(e.target.value)} />
         </div>
 
         <div className="setting-item">
           <label>Featured</label>
-          <input
-            type="checkbox"
-            checked={featured}
-            onChange={(e) => setFeatured(e.target.checked)}
-          />
+          <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
         </div>
 
         <div className="setting-item">
           <label>Editor&apos;s Pick</label>
-          <input
-            type="checkbox"
-            checked={editorsPick}
-            onChange={(e) => setEditorsPick(e.target.checked)}
-          />
+          <input type="checkbox" checked={editorsPick} onChange={(e) => setEditorsPick(e.target.checked)} />
         </div>
 
         <div className="setting-item">
@@ -312,26 +300,17 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
         <div className="setting-item is-full">
           <label>Excerpt</label>
-          <textarea
-            value={excerpt}
-            onChange={(e) => setExcerpt(e.target.value)}
-            rows={3}
-          />
+          <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={3} />
         </div>
 
         <div className="setting-item is-full">
           <label>Body (one paragraph per line)</label>
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={10}
-          />
+          <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={10} />
         </div>
 
         <div className="setting-item is-full">
           <label>Hero Image URL</label>
           <input value={hero} onChange={(e) => setHero(e.target.value)} />
-
           <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
             <button type="button" onClick={() => openMediaPicker("hero")}>
               Select Hero Image
@@ -342,22 +321,20 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
               </button>
             ) : null}
           </div>
+        </div>
 
-          {hero ? (
-            <div style={{ marginTop: 14, maxWidth: 240 }}>
-              <img
-                src={hero}
-                alt="Hero preview"
-                style={{ borderRadius: 14, border: "1px solid #e7e3ef" }}
-              />
-            </div>
-          ) : null}
+        <div className="setting-item is-full">
+          <label>Hero Image Caption</label>
+          <input
+            value={heroCaption}
+            onChange={(e) => setHeroCaption(e.target.value)}
+            placeholder="e.g. Addu Atoll, Maldives · March 2026"
+          />
         </div>
 
         <div className="setting-item is-full">
           <label>Inline Image URL</label>
           <input value={inline} onChange={(e) => setInline(e.target.value)} />
-
           <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
             <button type="button" onClick={() => openMediaPicker("inline")}>
               Select Inline Image
@@ -368,16 +345,15 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
               </button>
             ) : null}
           </div>
+        </div>
 
-          {inline ? (
-            <div style={{ marginTop: 14, maxWidth: 240 }}>
-              <img
-                src={inline}
-                alt="Inline preview"
-                style={{ borderRadius: 14, border: "1px solid #e7e3ef" }}
-              />
-            </div>
-          ) : null}
+        <div className="setting-item is-full">
+          <label>Inline Image Caption</label>
+          <input
+            value={inlineCaption}
+            onChange={(e) => setInlineCaption(e.target.value)}
+            placeholder="Optional caption for the inline image"
+          />
         </div>
 
         <div className="setting-item is-full">
@@ -387,6 +363,16 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             onChange={(e) => setGalleryImages(e.target.value)}
             rows={4}
             placeholder="url1, url2, url3"
+          />
+        </div>
+
+        <div className="setting-item is-full">
+          <label>Gallery Captions (one per line, matching image order)</label>
+          <textarea
+            value={galleryCaptions}
+            onChange={(e) => setGalleryCaptions(e.target.value)}
+            rows={4}
+            placeholder={"Caption 1\nCaption 2\nCaption 3"}
           />
         </div>
 

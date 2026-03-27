@@ -25,6 +25,13 @@ function toImageArray(text: string) {
     .filter(Boolean);
 }
 
+function toCaptionArray(text: string) {
+  return text
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function parseEditorsPickOrder(value: FormDataEntryValue | null) {
   const raw = String(value || "").trim();
   if (!raw) return null;
@@ -60,8 +67,11 @@ export async function createPost(formData: FormData) {
     excerpt: String(formData.get("excerpt") || ""),
     body: toArray(String(formData.get("body") || "")),
     hero_image: textOrNull(formData.get("hero")),
+    hero_image_caption: textOrNull(formData.get("heroCaption")),
     inline_image: textOrNull(formData.get("inline")),
+    inline_image_caption: textOrNull(formData.get("inlineCaption")),
     gallery_images: toImageArray(String(formData.get("galleryImages") || "")),
+    gallery_captions: toCaptionArray(String(formData.get("galleryCaptions") || "")),
     post_type: String(formData.get("postType") || "standard"),
     read_time: String(formData.get("readTime") || ""),
     status,
@@ -79,9 +89,7 @@ export async function createPost(formData: FormData) {
 
   const { error } = await supabaseAdmin.from("posts").insert(payload);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/archive");
@@ -109,8 +117,11 @@ export async function updatePost(id: number, formData: FormData) {
     excerpt: String(formData.get("excerpt") || ""),
     body: toArray(String(formData.get("body") || "")),
     hero_image: textOrNull(formData.get("hero")),
+    hero_image_caption: textOrNull(formData.get("heroCaption")),
     inline_image: textOrNull(formData.get("inline")),
+    inline_image_caption: textOrNull(formData.get("inlineCaption")),
     gallery_images: toImageArray(String(formData.get("galleryImages") || "")),
+    gallery_captions: toCaptionArray(String(formData.get("galleryCaptions") || "")),
     post_type: String(formData.get("postType") || "standard"),
     read_time: String(formData.get("readTime") || ""),
     status,
@@ -127,14 +138,9 @@ export async function updatePost(id: number, formData: FormData) {
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await supabaseAdmin
-    .from("posts")
-    .update(payload)
-    .eq("id", id);
+  const { error } = await supabaseAdmin.from("posts").update(payload).eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/archive");
@@ -166,20 +172,36 @@ export async function quickUpdatePost(id: number, formData: FormData) {
 
   const { error } = await supabaseAdmin.from("posts").update(payload).eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/admin");
 }
 
+export async function createDashboardUser(formData: FormData) {
+  const email = String(formData.get("email") || "").trim().toLowerCase();
+  const password = String(formData.get("password") || "").trim();
+
+  if (!email || !password) {
+    throw new Error("Email and password are required.");
+  }
+
+  const { error } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  });
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/users");
+  redirect("/admin/users?created=1");
+}
+
 export async function deletePost(id: number) {
   const { error } = await supabaseAdmin.from("posts").delete().eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/archive");
@@ -216,9 +238,7 @@ export async function duplicatePost(id: number) {
 
   const { error } = await supabaseAdmin.from("posts").insert(payload);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/admin");

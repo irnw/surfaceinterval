@@ -40,6 +40,7 @@ export default async function AdminLayout({
               <Link href="/admin/media">Media</Link>
               <Link href="/admin/insights">Insights</Link>
               <Link href="/admin/settings">Settings</Link>
+              <Link href="/admin/users">Users</Link>
             </nav>
           </div>
         </aside>

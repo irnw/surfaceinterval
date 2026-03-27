@@ -1,88 +1,91 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-const slides = [
-  {
-    image:
-      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1800&q=80",
-    caption: "Addu Atoll, Maldives · March 2026",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?auto=format&fit=crop&w=1800&q=80",
-    caption: "Blue water descent · Indian Ocean",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1800&q=80",
-    caption: "Quiet coastal light · Red Sea",
-  },
-];
-
-type Settings = {
-  hero_eyebrow?: string | null;
-  hero_title?: string | null;
-  hero_subtitle?: string | null;
-  hero_description?: string | null;
-  hero_tags?: string | null;
+type HeroSlide = {
+  image: string;
+  caption: string;
 };
 
-function tagHref(tag: string) {
-  const normalized = tag.trim().toLowerCase();
+export default function Hero({
+  settings,
+}: {
+  settings: Record<string, any> | null;
+}) {
+  const slides = useMemo(() => {
+    const rawSlides = Array.isArray(settings?.hero_slides)
+      ? settings.hero_slides
+      : [];
 
-  if (normalized === "diving") return "/category/diving";
-  if (normalized === "travel") return "/category/travel";
-  if (normalized === "gear") return "/category/gear";
-  if (normalized === "personal") return "/category/personal";
+    const cleaned = rawSlides
+      .filter(
+        (item: any) =>
+          item &&
+          typeof item.image === "string" &&
+          item.image.trim().length > 0
+      )
+      .slice(0, 5)
+      .map((item: any) => ({
+        image: item.image,
+        caption: item.caption || "",
+      }));
 
-  return `/tags/${encodeURIComponent(tag.trim())}`;
-}
+    if (cleaned.length > 0) return cleaned;
 
-export default function Hero({ settings }: { settings: Settings | null }) {
-  const [active, setActive] = useState(0);
+    if (settings?.hero_image) {
+      return [
+        {
+          image: settings.hero_image,
+          caption: settings.hero_caption || "",
+        },
+      ];
+    }
+
+    return [];
+  }, [settings]);
+
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
-    const t = setInterval(() => {
-      setActive((i) => (i + 1) % slides.length);
-    }, 4800);
+    if (slides.length <= 1) return;
 
-    return () => clearInterval(t);
-  }, []);
+    const timer = window.setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % slides.length);
+    }, 4500);
 
-  const title = settings?.hero_title || "Surface Interval";
-  const words = title.split(" ");
-  const first = words[0];
-  const rest = words.slice(1).join(" ");
-
-  const tags = (settings?.hero_tags || "Diving,Travel,Gear,Personal")
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
+    return () => window.clearInterval(timer);
+  }, [slides.length]);
 
   return (
     <section className="hero">
       <div className="hero-layout">
         <div className="hero-media">
-          {slides.map((s, i) => (
+          {slides.map((slide, index) => (
             <div
-              key={i}
-              className={`hero-slide${i === active ? " is-active" : ""}`}
-              style={{ backgroundImage: `url(${s.image})` }}
+              key={`${slide.image}-${index}`}
+              className={`hero-slide ${index === activeIndex ? "is-active" : ""}`}
+              style={{ backgroundImage: `url(${slide.image})` }}
             />
           ))}
 
-          <div className="hero-caption">{slides[active].caption}</div>
+          {slides[activeIndex]?.caption ? (
+            <div className="hero-caption">{slides[activeIndex].caption}</div>
+          ) : null}
 
-          <div className="hero-dots">
-            {slides.map((_, i) => (
-              <span
-                key={i}
-                className={`hero-dot${i === active ? " is-active" : ""}`}
-              />
-            ))}
-          </div>
+          {slides.length > 1 ? (
+            <div className="hero-dots">
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className={`hero-dot ${index === activeIndex ? "is-active" : ""}`}
+                  onClick={() => setActiveIndex(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="hero-copy-col">
@@ -91,30 +94,40 @@ export default function Hero({ settings }: { settings: Settings | null }) {
           </div>
 
           <h1 className="hero-title">
-            <span className="hero-title-main">{first}</span>{" "}
-            <span className="hero-accent">{rest}</span>
+            <span className="hero-title-main">
+              {settings?.hero_title_main || "Surface"}
+            </span>{" "}
+            <span className="hero-accent">
+              {settings?.hero_title_accent || "Interval"}
+            </span>
           </h1>
 
-          <div className="hero-byline">
-            {settings?.hero_subtitle || "By Irene W"}
-          </div>
+          <div className="hero-byline">{settings?.hero_byline || "By Irene W"}</div>
 
           <div className="hero-copy">
             <div className="hero-copy-strong">
-              A journal from the deep end of the world.
+              {settings?.hero_copy_strong || "A journal from the deep end of the world."}
             </div>
+
             <div className="hero-copy-soft">
-              {settings?.hero_description ||
+              {settings?.hero_copy_soft ||
                 "Dive logs, travel, gear, and the quieter moments in between."}
             </div>
           </div>
 
           <div className="hero-tags">
-            {tags.map((tag) => (
-              <Link key={tag} href={tagHref(tag)} className="hero-tag">
-                {tag}
-              </Link>
-            ))}
+            <Link href="/category/diving" className="hero-tag">
+              Diving
+            </Link>
+            <Link href="/category/travel" className="hero-tag">
+              Travel
+            </Link>
+            <Link href="/category/gear" className="hero-tag">
+              Gear
+            </Link>
+            <Link href="/category/personal" className="hero-tag">
+              Personal
+            </Link>
           </div>
         </div>
       </div>

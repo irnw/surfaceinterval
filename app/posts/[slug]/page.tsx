@@ -30,9 +30,7 @@ export async function generateMetadata({
     .single();
 
   if (!post) {
-    return {
-      title: "Post not found",
-    };
+    return { title: "Post not found" };
   }
 
   const galleryImages: string[] = Array.isArray(post.gallery_images)
@@ -44,21 +42,19 @@ export async function generateMetadata({
     galleryImages[0] ||
     "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1800&q=80";
 
-  const description = post.excerpt || "A dispatch from Surface Interval.";
-
   return {
     title: post.title,
-    description,
+    description: post.excerpt || "A dispatch from Surface Interval.",
     openGraph: {
       title: post.title,
-      description,
+      description: post.excerpt || "A dispatch from Surface Interval.",
       type: "article",
       images: [{ url: image, alt: post.title }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description,
+      description: post.excerpt || "A dispatch from Surface Interval.",
       images: [image],
     },
   };
@@ -99,31 +95,11 @@ export default async function PostPage({
     ? post.gallery_images.filter(Boolean)
     : [];
 
+  const galleryCaptions: string[] = Array.isArray(post.gallery_captions)
+    ? post.gallery_captions
+    : [];
+
   const isGallery = post.post_type === "gallery";
-
-  let relatedQuery = supabase
-    .from("posts")
-    .select("*")
-    .eq("status", "published")
-    .neq("slug", post.slug)
-    .order("published_at", { ascending: false })
-    .limit(3);
-
-  if (post.series) {
-    relatedQuery = relatedQuery.eq("series", post.series);
-  } else {
-    relatedQuery = relatedQuery.eq("category", post.category);
-  }
-
-  const { data: relatedRaw } = await relatedQuery;
-  const relatedPosts = relatedRaw ?? [];
-
-  const metadataItems = [
-    { label: "Series", value: post.series },
-    { label: "Location", value: post.location },
-    { label: "Gear", value: post.gear },
-    { label: "Camera", value: post.camera },
-  ].filter((item) => item.value);
 
   return (
     <>
@@ -136,9 +112,14 @@ export default async function PostPage({
         ) : null}
 
         {post.hero_image ? (
-          <div className="post-hero">
-            <img src={post.hero_image} alt={post.title} />
-          </div>
+          <>
+            <div className="post-hero">
+              <img src={post.hero_image} alt={post.title} />
+            </div>
+            {post.hero_image_caption ? (
+              <div className="caption post-hero-caption">{post.hero_image_caption}</div>
+            ) : null}
+          </>
         ) : null}
 
         <div className="post-head">
@@ -147,21 +128,21 @@ export default async function PostPage({
           </div>
           <h1 className="post-title">{post.title}</h1>
           <div className="post-standfirst">{post.excerpt}</div>
-
-          {metadataItems.length > 0 ? (
-            <div className="post-data-grid">
-              {metadataItems.map((item) => (
-                <div key={item.label} className="post-data-item">
-                  <div className="post-data-label">{item.label}</div>
-                  <div className="post-data-value">{item.value}</div>
-                </div>
-              ))}
-            </div>
-          ) : null}
         </div>
 
         {isGallery && galleryImages.length > 0 ? (
-          <GalleryLightbox images={galleryImages} title={post.title} />
+          <>
+            <GalleryLightbox images={galleryImages} title={post.title} />
+            {galleryCaptions.length > 0 ? (
+              <div className="gallery-caption-list">
+                {galleryCaptions.map((caption, index) => (
+                  <div key={`${caption}-${index}`} className="caption">
+                    {caption}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </>
         ) : null}
 
         <article className="prose prose-editorial">
@@ -180,6 +161,9 @@ export default async function PostPage({
           {!isGallery && post.inline_image ? (
             <div className="inline-media inline-media-wide">
               <img src={post.inline_image} alt={post.title} />
+              {post.inline_image_caption ? (
+                <div className="caption">{post.inline_image_caption}</div>
+              ) : null}
             </div>
           ) : null}
 
@@ -197,38 +181,6 @@ export default async function PostPage({
             </div>
           ) : null}
         </article>
-
-        {relatedPosts.length > 0 ? (
-          <section className="related-posts">
-            <div className="section-head">
-              <div className="section-title">
-                {post.series ? `More from ${post.series}` : "Related Dispatches"}
-              </div>
-            </div>
-
-            <div className="posts related-posts-grid">
-              {relatedPosts.map((item) => (
-                <article key={item.id} className="post-card">
-                  {item.hero_image ? (
-                    <img src={item.hero_image} alt={item.title} />
-                  ) : (
-                    <div className="post-card-placeholder" />
-                  )}
-
-                  <div className="post-meta">
-                    <div className="post-category">{item.category}</div>
-
-                    <h2 className="post-title">
-                      <Link href={`/posts/${item.slug}`}>{item.title}</Link>
-                    </h2>
-
-                    <div className="post-desc">{item.excerpt}</div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        ) : null}
       </main>
 
       <Footer settings={settings} />

@@ -2475,3 +2475,136 @@ html[data-theme="dark"] .login-error-box {
   gap: 12px;
   max-width: 520px;
 }
+
+/* =========================
+   HERO SLIDE MANAGER
+========================= */
+
+.hero-dot {
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hero-slide-manager {
+  display: grid;
+  gap: 16px;
+}
+
+.hero-slide-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+  background: var(--surface);
+}
+
+.hero-slide-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.hero-slide-card-actions {
+  margin-top: 12px;
+}
+
+.hero-slide-thumb {
+  margin-top: 14px;
+  max-width: 220px;
+}
+
+.hero-slide-thumb img {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+
+.media-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.media-modal-card {
+  width: min(980px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.media-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* =========================
+   POST IMAGE CAPTIONS
+========================= */
+
+.post-hero-caption {
+  max-width: var(--read);
+  margin: 12px auto 0;
+}
+
+.gallery-caption-list {
+  max-width: 820px;
+  margin: 20px auto 36px;
+  display: grid;
+  gap: 8px;
+}
+
+/* =========================
+   ADMIN USERS
+========================= */
+
+.admin-user-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-user-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.login-form-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  max-width: 520px;
+}
+
+.login-error-box {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff1f1;
+  border: 1px solid #f2c6c6;
+  color: #a33;
+  max-width: 560px;
+}
+
+html[data-theme="dark"] .login-error-box {
+  background: rgba(163, 51, 51, 0.12);
+  border-color: rgba(242, 198, 198, 0.2);
+  color: #ffb4b4;
+}
