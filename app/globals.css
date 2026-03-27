@@ -2615,3 +2615,51 @@ html[data-theme="dark"] .login-error-box {
   border-radius: 28px;
   background: #ececf0;
 }
+
+/* =========================
+   POST PAGE ALIGNMENT FIX
+========================= */
+
+.post-shell {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.post-hero {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 28px;
+  border-radius: 0;
+}
+
+.post-hero img {
+  border-radius: var(--radius-xl);
+}
+
+.post-head {
+  max-width: var(--read);
+  margin: 44px auto 24px;
+  padding: 0 28px;
+}
+
+.prose {
+  max-width: var(--read);
+  margin: 0 auto;
+  padding: 0 28px 72px;
+}
+
+.prose-editorial {
+  max-width: var(--read);
+  margin: 0 auto;
+  padding: 0 28px 72px;
+}
+
+@media (max-width: 700px) {
+  .post-hero,
+  .post-head,
+  .prose,
+  .prose-editorial {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
