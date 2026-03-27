@@ -46,14 +46,18 @@ function textOrNull(value: FormDataEntryValue | null) {
   return text || null;
 }
 
-function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: boolean }) {
+function buildPostPayload(
+  formData: FormData,
+  options?: { keepPublishedDate?: boolean }
+) {
   const status = String(formData.get("status") || "draft");
   const keepPublishedDate = options?.keepPublishedDate ?? false;
 
   const publishedAt =
     status === "published"
       ? keepPublishedDate
-        ? textOrNull(formData.get("existingPublishedAt")) || new Date().toISOString()
+        ? textOrNull(formData.get("existingPublishedAt")) ||
+          new Date().toISOString()
         : new Date().toISOString()
       : null;
 
@@ -68,7 +72,9 @@ function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: bo
     inline_image: textOrNull(formData.get("inline")),
     inline_image_caption: textOrNull(formData.get("inlineCaption")),
     gallery_images: toImageArray(String(formData.get("galleryImages") || "")),
-    gallery_captions: toCaptionArray(String(formData.get("galleryCaptions") || "")),
+    gallery_captions: toCaptionArray(
+      String(formData.get("galleryCaptions") || "")
+    ),
     post_type: String(formData.get("postType") || "standard").trim(),
     read_time: textOrNull(formData.get("readTime")),
     status,
@@ -88,14 +94,19 @@ function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: bo
   };
 }
 
-async function normalizeHomepageFlags(idToKeepFeatured?: number, shouldBeFeatured?: boolean) {
+async function normalizeHomepageFlags(
+  idToKeepFeatured?: number,
+  shouldBeFeatured?: boolean
+) {
   if (shouldBeFeatured) {
     let query = supabaseAdmin.from("posts").update({ is_featured: false });
+
     if (typeof idToKeepFeatured === "number") {
       query = query.neq("id", idToKeepFeatured);
     } else {
       query = query.neq("id", 0);
     }
+
     await query;
   }
 }
@@ -162,7 +173,10 @@ export async function quickUpdatePost(id: number, formData: FormData) {
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await supabaseAdmin.from("posts").update(updatePayload).eq("id", id);
+  const { error } = await supabaseAdmin
+    .from("posts")
+    .update(updatePayload)
+    .eq("id", id);
 
   if (error) {
     throw new Error(error.message);
@@ -270,6 +284,7 @@ export async function saveSiteSettings(formData: FormData) {
 
   try {
     const parsed = JSON.parse(heroSlidesRaw);
+
     if (Array.isArray(parsed)) {
       heroSlides = parsed
         .filter(
