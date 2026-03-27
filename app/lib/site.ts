@@ -1,6 +1,6 @@
 export function getSiteUrl() {
   return (
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "http://localhost:3000"
+    "https://surfaceinterval.vercel.app"
   ).replace(/\/$/, "");
 }
