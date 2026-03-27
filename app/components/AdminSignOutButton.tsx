@@ -1,10 +1,8 @@
 "use client";
 
-import { supabase } from "../lib/supabase";
-
 export default function AdminSignOutButton() {
   async function signOut() {
-    await supabase.auth.signOut();
+    await fetch("/api/signout", { method: "POST" });
     window.location.href = "/";
   }
 
