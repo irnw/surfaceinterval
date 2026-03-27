@@ -22,6 +22,7 @@ type Props = {
     featured?: boolean;
     editorsPick?: boolean;
     editorsPickOrder?: number | null;
+    existingPublishedAt?: string;
     tags?: string[];
     series?: string;
     location?: string;
@@ -176,6 +177,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     formData.set("featured", featured ? "true" : "false");
     formData.set("editorsPick", editorsPick ? "true" : "false");
     formData.set("editorsPickOrder", editorsPickOrder);
+    formData.set("existingPublishedAt", initial?.existingPublishedAt || "");
     formData.set("tags", tags);
     formData.set("series", series);
     formData.set("location", location);

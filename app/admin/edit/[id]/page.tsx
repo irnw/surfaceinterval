@@ -76,6 +76,7 @@ export default async function EditPostPage({
           featured: post.is_featured ?? false,
           editorsPick: post.is_editors_pick ?? false,
           editorsPickOrder: post.editors_pick_order ?? null,
+          existingPublishedAt: post.published_at ?? "",
           tags: post.tags ?? [],
           series: post.series ?? "",
           location: post.location ?? "",
