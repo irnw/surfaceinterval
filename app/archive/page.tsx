@@ -56,20 +56,9 @@ function sortYearsDesc(yearA: string, yearB: string) {
 
 function monthOrder(month: string) {
   const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
   ];
-
   const index = months.indexOf(month);
   return index === -1 ? 999 : index;
 }
@@ -86,8 +75,9 @@ export default async function ArchivePage() {
   const { data: settings } = await supabase
     .from("settings")
     .select("*")
-    .eq("id", 1)
-    .single();
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   const { data: rawPosts } = await supabase
     .from("posts")
@@ -100,10 +90,8 @@ export default async function ArchivePage() {
   const grouped: GroupedArchive = allPosts.reduce((acc, post) => {
     const year = getYear(post);
     const month = getMonth(post);
-
     if (!acc[year]) acc[year] = {};
     if (!acc[year][month]) acc[year][month] = [];
-
     acc[year][month].push(post);
     return acc;
   }, {} as GroupedArchive);
@@ -178,14 +166,11 @@ export default async function ArchivePage() {
                             <div className="archive-row-meta">
                               <div>
                                 {post.published_at
-                                  ? new Date(post.published_at).toLocaleDateString(
-                                      "en-GB",
-                                      {
-                                        day: "2-digit",
-                                        month: "short",
-                                        year: "numeric",
-                                      }
-                                    )
+                                  ? new Date(post.published_at).toLocaleDateString("en-GB", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    })
                                   : "Undated"}
                               </div>
                               <div>{post.read_time ?? "8 min read"}</div>

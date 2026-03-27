@@ -26,8 +26,9 @@ export default async function ContactPage() {
   const { data: settings } = await supabase
     .from("settings")
     .select("*")
-    .eq("id", 1)
-    .single();
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   const paragraphs = String(settings?.contact_body || "")
     .split("\n")

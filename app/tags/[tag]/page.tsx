@@ -41,8 +41,9 @@ export default async function TagPage({ params }: TagPageProps) {
   const { data: settings } = await supabase
     .from("settings")
     .select("*")
-    .eq("id", 1)
-    .single();
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   const { data: posts } = await supabase
     .from("posts")

@@ -26,9 +26,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function SearchPage({
-  searchParams,
-}: SearchPageProps) {
+export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q } = await searchParams;
   const query = (q || "").trim();
 
@@ -37,8 +35,9 @@ export default async function SearchPage({
   const { data: settings } = await supabase
     .from("settings")
     .select("*")
-    .eq("id", 1)
-    .single();
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   let posts:
     | Array<{
@@ -117,8 +116,8 @@ export default async function SearchPage({
         {query ? (
           <div className="search-meta">
             {posts && posts.length > 0
-              ? `${posts.length} result${posts.length > 1 ? "s" : ""} for “${query}”`
-              : `No results for “${query}”`}
+              ? `${posts.length} result${posts.length > 1 ? "s" : ""} for "${query}"`
+              : `No results for "${query}"`}
           </div>
         ) : (
           <div className="search-meta">

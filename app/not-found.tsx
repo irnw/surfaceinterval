@@ -9,8 +9,9 @@ export default async function NotFoundPage() {
   const { data: settings } = await supabase
     .from("settings")
     .select("*")
-    .eq("id", 1)
-    .single();
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   return (
     <>

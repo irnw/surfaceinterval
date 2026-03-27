@@ -86,8 +86,9 @@ export default async function PostPage({
   const { data: settings } = await supabase
     .from("settings")
     .select("*")
-    .eq("id", 1)
-    .single();
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   if (!post) return notFound();
 

@@ -41,9 +41,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function CategoryPage({
-  params,
-}: CategoryPageProps) {
+export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
   const categoryLabel = formatCategoryLabel(slug);
 
@@ -52,8 +50,9 @@ export default async function CategoryPage({
   const { data: settings } = await supabase
     .from("settings")
     .select("*")
-    .eq("id", 1)
-    .single();
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   const { data: rawPosts } = await supabase
     .from("posts")
