@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
 import MediaLibrary from "../../components/MediaLibrary";
+import { saveSiteSettings } from "../actions";
 
 type HeroSlide = {
   image: string;
@@ -11,49 +11,25 @@ type HeroSlide = {
 
 type SettingsRecord = Record<string, any>;
 
-export default function SettingsPage() {
-  const [settings, setSettings] = useState<SettingsRecord>({});
-  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState("");
+export default function SettingsPage({
+  initialSettings,
+}: {
+  initialSettings?: SettingsRecord;
+}) {
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(
+    Array.isArray(initialSettings?.hero_slides)
+      ? initialSettings.hero_slides.slice(0, 5)
+      : []
+  );
   const [heroPickerOpen, setHeroPickerOpen] = useState<number | null>(null);
 
-  useEffect(() => {
-    async function loadSettings() {
-      const { data } = await supabase
-        .from("settings")
-        .select("*")
-        .eq("id", 1)
-        .single();
-
-      if (data) {
-        setSettings(data);
-        setHeroSlides(Array.isArray(data.hero_slides) ? data.hero_slides.slice(0, 5) : []);
-      }
-    }
-
-    loadSettings();
-  }, []);
-
-  async function saveSettings() {
-    setSaving(true);
-    setSaved("");
-
-    const payload = {
-      ...settings,
-      hero_slides: heroSlides.slice(0, 5),
-      id: 1,
-      updated_at: new Date().toISOString(),
-    };
-
-    const { error } = await supabase.from("settings").upsert(payload);
-
-    if (!error) {
-      setSaved("Saved.");
-    }
-
-    setSaving(false);
-  }
+  const [aboutTitle, setAboutTitle] = useState(initialSettings?.about_title || "");
+  const [aboutIntro, setAboutIntro] = useState(initialSettings?.about_intro || "");
+  const [aboutBody, setAboutBody] = useState(initialSettings?.about_body || "");
+  const [contactTitle, setContactTitle] = useState(initialSettings?.contact_title || "");
+  const [contactIntro, setContactIntro] = useState(initialSettings?.contact_intro || "");
+  const [contactEmail, setContactEmail] = useState(initialSettings?.contact_email || "");
+  const [contactBody, setContactBody] = useState(initialSettings?.contact_body || "");
 
   function updateSlide(index: number, next: HeroSlide) {
     const copy = [...heroSlides];
@@ -72,36 +48,6 @@ export default function SettingsPage() {
     setHeroSlides(copy);
   }
 
-  function field(
-    key: string,
-    label: string,
-    multiline = false,
-    full = false
-  ) {
-    return (
-      <div className={`admin-setting ${full ? "is-full" : ""}`} key={key}>
-        <label>{label}</label>
-
-        {multiline ? (
-          <textarea
-            rows={5}
-            value={String(settings[key] || "")}
-            onChange={(e) =>
-              setSettings({ ...settings, [key]: e.target.value })
-            }
-          />
-        ) : (
-          <input
-            value={String(settings[key] || "")}
-            onChange={(e) =>
-              setSettings({ ...settings, [key]: e.target.value })
-            }
-          />
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="admin-panel">
       <div className="admin-panel-head">
@@ -111,83 +57,147 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="admin-settings-section">
-        <h3 className="admin-settings-title">Homepage Hero Slides</h3>
+      <form action={saveSiteSettings}>
+        <input
+          type="hidden"
+          name="heroSlidesPayload"
+          value={JSON.stringify(heroSlides)}
+        />
 
-        <div className="hero-slide-manager">
-          {heroSlides.map((slide, index) => (
-            <div key={index} className="hero-slide-card">
-              <div className="hero-slide-card-head">
-                <strong>Slide {index + 1}</strong>
-                <button type="button" onClick={() => removeSlide(index)}>
-                  Remove
-                </button>
-              </div>
+        <div className="admin-settings-section">
+          <h3 className="admin-settings-title">Homepage Hero Slides</h3>
 
-              <input
-                placeholder="Image URL"
-                value={slide.image}
-                onChange={(e) =>
-                  updateSlide(index, { ...slide, image: e.target.value })
-                }
-              />
-
-              <input
-                placeholder="Caption"
-                value={slide.caption}
-                onChange={(e) =>
-                  updateSlide(index, { ...slide, caption: e.target.value })
-                }
-              />
-
-              <div className="hero-slide-card-actions">
-                <button type="button" onClick={() => setHeroPickerOpen(index)}>
-                  Select from Media Library
-                </button>
-              </div>
-
-              {slide.image ? (
-                <div className="hero-slide-thumb">
-                  <img src={slide.image} alt={`Hero slide ${index + 1}`} />
+          <div className="hero-slide-manager">
+            {heroSlides.map((slide, index) => (
+              <div key={index} className="hero-slide-card">
+                <div className="hero-slide-card-head">
+                  <strong>Slide {index + 1}</strong>
+                  <button type="button" onClick={() => removeSlide(index)}>
+                    Remove
+                  </button>
                 </div>
-              ) : null}
+
+                <input
+                  placeholder="Image URL"
+                  value={slide.image}
+                  onChange={(e) =>
+                    updateSlide(index, { ...slide, image: e.target.value })
+                  }
+                />
+
+                <input
+                  placeholder="Caption"
+                  value={slide.caption}
+                  onChange={(e) =>
+                    updateSlide(index, { ...slide, caption: e.target.value })
+                  }
+                />
+
+                <div className="hero-slide-card-actions">
+                  <button type="button" onClick={() => setHeroPickerOpen(index)}>
+                    Select from Media Library
+                  </button>
+                </div>
+
+                {slide.image ? (
+                  <div className="hero-slide-thumb">
+                    <img src={slide.image} alt={`Hero slide ${index + 1}`} />
+                  </div>
+                ) : null}
+              </div>
+            ))}
+
+            {heroSlides.length < 5 ? (
+              <button type="button" onClick={addSlide}>
+                + Add Hero Slide
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="admin-settings-section">
+          <h3 className="admin-settings-title">About Page</h3>
+
+          <div className="admin-settings-grid">
+            <div className="admin-setting">
+              <label>About Title</label>
+              <input
+                name="about_title"
+                value={aboutTitle}
+                onChange={(e) => setAboutTitle(e.target.value)}
+              />
             </div>
-          ))}
 
-          {heroSlides.length < 5 ? (
-            <button type="button" onClick={addSlide}>
-              + Add Hero Slide
-            </button>
-          ) : null}
+            <div className="admin-setting is-full">
+              <label>About Intro</label>
+              <textarea
+                name="about_intro"
+                rows={4}
+                value={aboutIntro}
+                onChange={(e) => setAboutIntro(e.target.value)}
+              />
+            </div>
+
+            <div className="admin-setting is-full">
+              <label>About Body</label>
+              <textarea
+                name="about_body"
+                rows={8}
+                value={aboutBody}
+                onChange={(e) => setAboutBody(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="admin-settings-section">
-        <h3 className="admin-settings-title">About Page</h3>
-        <div className="admin-settings-grid">
-          {field("about_title", "About Title")}
-          {field("about_intro", "About Intro", true, true)}
-          {field("about_body", "About Body", true, true)}
+        <div className="admin-settings-section">
+          <h3 className="admin-settings-title">Contact Page</h3>
+
+          <div className="admin-settings-grid">
+            <div className="admin-setting">
+              <label>Contact Title</label>
+              <input
+                name="contact_title"
+                value={contactTitle}
+                onChange={(e) => setContactTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="admin-setting">
+              <label>Contact Email</label>
+              <input
+                name="contact_email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="admin-setting is-full">
+              <label>Contact Intro</label>
+              <textarea
+                name="contact_intro"
+                rows={4}
+                value={contactIntro}
+                onChange={(e) => setContactIntro(e.target.value)}
+              />
+            </div>
+
+            <div className="admin-setting is-full">
+              <label>Contact Body</label>
+              <textarea
+                name="contact_body"
+                rows={8}
+                value={contactBody}
+                onChange={(e) => setContactBody(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="admin-settings-section">
-        <h3 className="admin-settings-title">Contact Page</h3>
-        <div className="admin-settings-grid">
-          {field("contact_title", "Contact Title")}
-          {field("contact_intro", "Contact Intro", true, true)}
-          {field("contact_email", "Contact Email")}
-          {field("contact_body", "Contact Body", true, true)}
+        <div className="admin-settings-actions">
+          <button type="submit">Save Settings</button>
         </div>
-      </div>
-
-      <div className="admin-settings-actions">
-        <button type="button" onClick={saveSettings} disabled={saving}>
-          {saving ? "Saving..." : "Save Settings"}
-        </button>
-
-        {saved ? <div className="admin-save-message">{saved}</div> : null}
-      </div>
+      </form>
 
       {heroPickerOpen !== null ? (
         <div

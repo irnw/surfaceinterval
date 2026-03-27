@@ -99,12 +99,12 @@ export default async function AdminPostsPage({
         <div className="table-wrap">
           <table className="admin-table">
             <colgroup>
-              <col style={{ width: "40%" }} />
+              <col style={{ width: "31%" }} />
               <col style={{ width: "12%" }} />
-              <col style={{ width: "11%" }} />
-              <col style={{ width: "19%" }} />
+              <col style={{ width: "12%" }} />
+              <col style={{ width: "18%" }} />
               <col style={{ width: "10%" }} />
-              <col style={{ width: "8%" }} />
+              <col style={{ width: "17%" }} />
             </colgroup>
 
             <thead>
@@ -114,7 +114,7 @@ export default async function AdminPostsPage({
                 <th>Status</th>
                 <th>Homepage</th>
                 <th>Published</th>
-                <th>Edit</th>
+                <th>Quick Edit</th>
               </tr>
             </thead>
 
@@ -176,12 +176,59 @@ export default async function AdminPostsPage({
                     </td>
 
                     <td>
-                      <Link
-                        href={`/admin/edit/${post.id}`}
-                        className="admin-edit-link"
-                      >
-                        Edit
-                      </Link>
+                      <form action={action} className="admin-quick-form">
+                        <div className="admin-quick-grid">
+                          <div className="admin-quick-field">
+                            <span>Status</span>
+                            <select name="status" defaultValue={post.status}>
+                              <option value="draft">Draft</option>
+                              <option value="published">Published</option>
+                            </select>
+                          </div>
+
+                          <div className="admin-quick-field">
+                            <span>Editor&apos;s Pick Order</span>
+                            <input
+                              type="number"
+                              min="1"
+                              name="editorsPickOrder"
+                              defaultValue={post.editors_pick_order ?? ""}
+                              placeholder="Optional"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="admin-check-row">
+                          <label className="admin-checkline">
+                            <input
+                              type="checkbox"
+                              name="featured"
+                              defaultChecked={!!post.is_featured}
+                            />
+                            Featured
+                          </label>
+
+                          <label className="admin-checkline">
+                            <input
+                              type="checkbox"
+                              name="editorsPick"
+                              defaultChecked={!!post.is_editors_pick}
+                            />
+                            Editor&apos;s Pick
+                          </label>
+                        </div>
+
+                        <div className="admin-post-actions">
+                          <button type="submit">Apply</button>
+
+                          <Link
+                            href={`/admin/edit/${post.id}`}
+                            className="admin-edit-link"
+                          >
+                            Edit
+                          </Link>
+                        </div>
+                      </form>
                     </td>
                   </tr>
                 );

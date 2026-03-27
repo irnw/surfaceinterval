@@ -262,3 +262,56 @@ export async function createDashboardUser(formData: FormData) {
   revalidatePath("/admin/users");
   redirect("/admin/users?created=1");
 }
+
+export async function saveSiteSettings(formData: FormData) {
+  const heroSlidesRaw = String(formData.get("heroSlidesPayload") || "[]");
+
+  let heroSlides: Array<{ image: string; caption: string }> = [];
+
+  try {
+    const parsed = JSON.parse(heroSlidesRaw);
+    if (Array.isArray(parsed)) {
+      heroSlides = parsed
+        .filter(
+          (item) =>
+            item &&
+            typeof item.image === "string" &&
+            item.image.trim().length > 0
+        )
+        .slice(0, 5)
+        .map((item) => ({
+          image: String(item.image || "").trim(),
+          caption: String(item.caption || "").trim(),
+        }));
+    }
+  } catch {
+    heroSlides = [];
+  }
+
+  const payload = {
+    hero_slides: heroSlides,
+    about_title: String(formData.get("about_title") || ""),
+    about_intro: String(formData.get("about_intro") || ""),
+    about_body: String(formData.get("about_body") || ""),
+    contact_title: String(formData.get("contact_title") || ""),
+    contact_intro: String(formData.get("contact_intro") || ""),
+    contact_email: String(formData.get("contact_email") || ""),
+    contact_body: String(formData.get("contact_body") || ""),
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await supabaseAdmin
+    .from("settings")
+    .update(payload)
+    .eq("id", 1);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/about");
+  revalidatePath("/contact");
+  revalidatePath("/admin/settings");
+  redirect("/admin/settings?saved=1");
+}
