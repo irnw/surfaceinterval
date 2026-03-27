@@ -1,12 +1,31 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import Header from "../components/Header";
+import AdminSignOutButton from "../components/AdminSignOutButton";
+import { createSupabaseServerClient } from "../lib/supabase-server";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: ReactNode;
 }) {
+  const supabase = await createSupabaseServerClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const allowedEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  if (allowedEmail && user.email?.toLowerCase() !== allowedEmail) {
+    redirect("/login?error=unauthorized");
+  }
+
   return (
     <>
       <Header />
@@ -27,13 +46,20 @@ export default function AdminLayout({
 
         <section className="admin-content">
           <div className="admin-topbar">
-            <Link href="/" className="nav-pill">
-              ← Homepage
-            </Link>
+            <div className="admin-topbar-left">
+              <Link href="/" className="nav-pill">
+                ← Homepage
+              </Link>
 
-            <Link href="/admin/new" className="nav-pill">
-              + New Post
-            </Link>
+              <Link href="/admin/new" className="nav-pill">
+                + New Post
+              </Link>
+            </div>
+
+            <div className="admin-topbar-right">
+              <div className="admin-user-chip">{user.email}</div>
+              <AdminSignOutButton />
+            </div>
           </div>
 
           {children}

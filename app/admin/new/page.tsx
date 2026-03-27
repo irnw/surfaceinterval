@@ -8,7 +8,7 @@ export default function NewPostPage() {
   }
 
   return (
-    <>
+    <div className="admin-panel">
       <div className="panel-head">
         <h2>New Post</h2>
       </div>
@@ -28,6 +28,6 @@ export default function NewPostPage() {
       </div>
 
       <PostEditorForm onSubmit={action} />
-    </>
+    </div>
   );
 }

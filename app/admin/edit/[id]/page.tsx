@@ -39,7 +39,7 @@ export default async function EditPostPage({
   }
 
   return (
-    <>
+    <div className="admin-panel">
       <div
         className="panel-head"
         style={{
@@ -53,14 +53,6 @@ export default async function EditPostPage({
         <h2>Edit Post</h2>
 
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link href="/admin" className="nav-pill">
-            ← Dashboard
-          </Link>
-
-          <Link href="/" className="nav-pill">
-            Homepage
-          </Link>
-
           <Link href={`/posts/${post.slug}?preview=1`} className="nav-pill">
             Preview Draft
           </Link>
@@ -85,6 +77,11 @@ export default async function EditPostPage({
           editorsPick: post.is_editors_pick ?? false,
           editorsPickOrder: post.editors_pick_order ?? null,
           tags: post.tags ?? [],
+          series: post.series ?? "",
+          location: post.location ?? "",
+          gear: post.gear ?? "",
+          camera: post.camera ?? "",
+          diveLog: post.dive_log ?? "",
         }}
       />
 
@@ -100,6 +97,6 @@ export default async function EditPostPage({
           className="danger-button"
         />
       </div>
-    </>
+    </div>
   );
 }

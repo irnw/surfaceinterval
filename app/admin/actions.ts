@@ -35,6 +35,11 @@ function parseEditorsPickOrder(value: FormDataEntryValue | null) {
   return parsed;
 }
 
+function textOrNull(value: FormDataEntryValue | null) {
+  const text = String(value || "").trim();
+  return text || null;
+}
+
 export async function createPost(formData: FormData) {
   const slug = String(formData.get("slug") || "");
   const status = String(formData.get("status") || "draft");
@@ -45,10 +50,7 @@ export async function createPost(formData: FormData) {
     : null;
 
   if (isFeatured) {
-    await supabaseAdmin
-      .from("posts")
-      .update({ is_featured: false })
-      .neq("id", 0);
+    await supabaseAdmin.from("posts").update({ is_featured: false }).neq("id", 0);
   }
 
   const payload = {
@@ -57,8 +59,8 @@ export async function createPost(formData: FormData) {
     category: String(formData.get("category") || ""),
     excerpt: String(formData.get("excerpt") || ""),
     body: toArray(String(formData.get("body") || "")),
-    hero_image: String(formData.get("hero") || "").trim() || null,
-    inline_image: String(formData.get("inline") || "").trim() || null,
+    hero_image: textOrNull(formData.get("hero")),
+    inline_image: textOrNull(formData.get("inline")),
     gallery_images: toImageArray(String(formData.get("galleryImages") || "")),
     post_type: String(formData.get("postType") || "standard"),
     read_time: String(formData.get("readTime") || ""),
@@ -67,6 +69,11 @@ export async function createPost(formData: FormData) {
     is_featured: isFeatured,
     is_editors_pick: isEditorsPick,
     editors_pick_order: editorsPickOrder,
+    series: textOrNull(formData.get("series")),
+    location: textOrNull(formData.get("location")),
+    gear: textOrNull(formData.get("gear")),
+    camera: textOrNull(formData.get("camera")),
+    dive_log: textOrNull(formData.get("diveLog")),
     published_at: status === "published" ? new Date().toISOString() : null,
   };
 
@@ -77,6 +84,7 @@ export async function createPost(formData: FormData) {
   }
 
   revalidatePath("/");
+  revalidatePath("/archive");
   revalidatePath("/admin");
   redirect("/admin?created=1");
 }
@@ -91,10 +99,7 @@ export async function updatePost(id: number, formData: FormData) {
     : null;
 
   if (isFeatured) {
-    await supabaseAdmin
-      .from("posts")
-      .update({ is_featured: false })
-      .neq("id", id);
+    await supabaseAdmin.from("posts").update({ is_featured: false }).neq("id", id);
   }
 
   const payload = {
@@ -103,8 +108,8 @@ export async function updatePost(id: number, formData: FormData) {
     category: String(formData.get("category") || ""),
     excerpt: String(formData.get("excerpt") || ""),
     body: toArray(String(formData.get("body") || "")),
-    hero_image: String(formData.get("hero") || "").trim() || null,
-    inline_image: String(formData.get("inline") || "").trim() || null,
+    hero_image: textOrNull(formData.get("hero")),
+    inline_image: textOrNull(formData.get("inline")),
     gallery_images: toImageArray(String(formData.get("galleryImages") || "")),
     post_type: String(formData.get("postType") || "standard"),
     read_time: String(formData.get("readTime") || ""),
@@ -113,6 +118,11 @@ export async function updatePost(id: number, formData: FormData) {
     is_featured: isFeatured,
     is_editors_pick: isEditorsPick,
     editors_pick_order: editorsPickOrder,
+    series: textOrNull(formData.get("series")),
+    location: textOrNull(formData.get("location")),
+    gear: textOrNull(formData.get("gear")),
+    camera: textOrNull(formData.get("camera")),
+    dive_log: textOrNull(formData.get("diveLog")),
     published_at: status === "published" ? new Date().toISOString() : null,
     updated_at: new Date().toISOString(),
   };
@@ -127,6 +137,7 @@ export async function updatePost(id: number, formData: FormData) {
   }
 
   revalidatePath("/");
+  revalidatePath("/archive");
   revalidatePath("/admin");
   revalidatePath(`/posts/${slug}`);
   redirect("/admin?saved=1");
@@ -141,10 +152,7 @@ export async function quickUpdatePost(id: number, formData: FormData) {
     : null;
 
   if (isFeatured) {
-    await supabaseAdmin
-      .from("posts")
-      .update({ is_featured: false })
-      .neq("id", id);
+    await supabaseAdmin.from("posts").update({ is_featured: false }).neq("id", id);
   }
 
   const payload = {
@@ -156,10 +164,7 @@ export async function quickUpdatePost(id: number, formData: FormData) {
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await supabaseAdmin
-    .from("posts")
-    .update(payload)
-    .eq("id", id);
+  const { error } = await supabaseAdmin.from("posts").update(payload).eq("id", id);
 
   if (error) {
     throw new Error(error.message);
@@ -170,16 +175,14 @@ export async function quickUpdatePost(id: number, formData: FormData) {
 }
 
 export async function deletePost(id: number) {
-  const { error } = await supabaseAdmin
-    .from("posts")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabaseAdmin.from("posts").delete().eq("id", id);
 
   if (error) {
     throw new Error(error.message);
   }
 
   revalidatePath("/");
+  revalidatePath("/archive");
   revalidatePath("/admin");
   redirect("/admin?deleted=1");
 }

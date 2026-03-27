@@ -15,6 +15,8 @@ type ArchivePost = {
   read_time?: string | null;
   published_at?: string | null;
   tags?: string[] | null;
+  series?: string | null;
+  location?: string | null;
 };
 
 type GroupedArchive = Record<string, Record<string, ArchivePost[]>>;
@@ -87,13 +89,13 @@ export default async function ArchivePage() {
     .eq("id", 1)
     .single();
 
-  const { data: posts } = await supabase
+  const { data: rawPosts } = await supabase
     .from("posts")
     .select("*")
     .eq("status", "published")
     .order("published_at", { ascending: false });
 
-  const allPosts = (posts ?? []) as ArchivePost[];
+  const allPosts = (rawPosts ?? []) as ArchivePost[];
 
   const grouped: GroupedArchive = allPosts.reduce((acc, post) => {
     const year = getYear(post);
@@ -112,13 +114,13 @@ export default async function ArchivePage() {
     <>
       <Header />
 
-      <section className="archive-shell">
+      <section className="archive-shell archive-shell-editorial">
         <div className="archive-head">
           <div className="archive-label">Archive</div>
           <h1 className="archive-title">All Dispatches</h1>
           <div className="archive-intro">
-            A chronological index of field notes, essays, travel pieces, gear
-            reflections, and the quieter pages in between.
+            A running index of essays, travel notes, gear reflections, field observations,
+            and underwater returns gathered over time.
           </div>
         </div>
 
@@ -152,6 +154,11 @@ export default async function ArchivePage() {
                               </h4>
 
                               <div className="archive-row-desc">{post.excerpt}</div>
+
+                              <div className="archive-row-extra">
+                                {post.series ? <span>{post.series}</span> : null}
+                                {post.location ? <span>{post.location}</span> : null}
+                              </div>
 
                               {post.tags?.length ? (
                                 <div className="post-tags" style={{ marginTop: 14 }}>

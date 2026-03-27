@@ -20,6 +20,11 @@ type Props = {
     editorsPick?: boolean;
     editorsPickOrder?: number | null;
     tags?: string[];
+    series?: string;
+    location?: string;
+    gear?: string;
+    camera?: string;
+    diveLog?: string;
   };
   onSubmit: (formData: FormData) => void | Promise<void>;
 };
@@ -46,6 +51,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [tags, setTags] = useState(initial?.tags?.join(", ") || "");
   const [excerpt, setExcerpt] = useState(initial?.excerpt || "");
   const [body, setBody] = useState(initial?.body || "");
+  const [series, setSeries] = useState(initial?.series || "");
+  const [location, setLocation] = useState(initial?.location || "");
+  const [gear, setGear] = useState(initial?.gear || "");
+  const [camera, setCamera] = useState(initial?.camera || "");
+  const [diveLog, setDiveLog] = useState(initial?.diveLog || "");
   const [mediaTarget, setMediaTarget] = useState<"hero" | "inline" | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -68,6 +78,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
         tags: initial?.tags?.join(", ") || "",
         excerpt: initial?.excerpt || "",
         body: initial?.body || "",
+        series: initial?.series || "",
+        location: initial?.location || "",
+        gear: initial?.gear || "",
+        camera: initial?.camera || "",
+        diveLog: initial?.diveLog || "",
       }),
     [initial]
   );
@@ -88,6 +103,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     tags,
     excerpt,
     body,
+    series,
+    location,
+    gear,
+    camera,
+    diveLog,
   });
 
   const isDirty = initialSnapshot !== currentSnapshot;
@@ -140,6 +160,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     formData.set("editorsPick", editorsPick ? "true" : "false");
     formData.set("editorsPickOrder", editorsPickOrder);
     formData.set("tags", tags);
+    formData.set("series", series);
+    formData.set("location", location);
+    formData.set("gear", gear);
+    formData.set("camera", camera);
+    formData.set("diveLog", diveLog);
 
     await onSubmit(formData);
   }
@@ -156,9 +181,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
   return (
     <>
-      {isDirty ? (
-        <div className="editor-warning">You have unsaved changes.</div>
-      ) : null}
+      {isDirty ? <div className="editor-warning">You have unsaved changes.</div> : null}
 
       <form onSubmit={handleSubmit} className="settings-grid">
         <div className="setting-item">
@@ -208,6 +231,52 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
         </div>
 
         <div className="setting-item">
+          <label>Series / Collection</label>
+          <input
+            value={series}
+            onChange={(e) => setSeries(e.target.value)}
+            placeholder="e.g. Maldives 2026"
+          />
+        </div>
+
+        <div className="setting-item">
+          <label>Location</label>
+          <input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="e.g. Addu Atoll, Maldives"
+          />
+        </div>
+
+        <div className="setting-item">
+          <label>Gear</label>
+          <input
+            value={gear}
+            onChange={(e) => setGear(e.target.value)}
+            placeholder="e.g. Halcyon, wet notes, reef hook"
+          />
+        </div>
+
+        <div className="setting-item">
+          <label>Camera</label>
+          <input
+            value={camera}
+            onChange={(e) => setCamera(e.target.value)}
+            placeholder="e.g. OM-1 + fisheye"
+          />
+        </div>
+
+        <div className="setting-item is-full">
+          <label>Dive Log / Field Note</label>
+          <textarea
+            rows={3}
+            value={diveLog}
+            onChange={(e) => setDiveLog(e.target.value)}
+            placeholder="Optional short field note block"
+          />
+        </div>
+
+        <div className="setting-item">
           <label>Featured</label>
           <input
             type="checkbox"
@@ -241,7 +310,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
           <input value={tags} onChange={(e) => setTags(e.target.value)} />
         </div>
 
-        <div className="setting-item" style={{ gridColumn: "1 / -1" }}>
+        <div className="setting-item is-full">
           <label>Excerpt</label>
           <textarea
             value={excerpt}
@@ -250,7 +319,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
           />
         </div>
 
-        <div className="setting-item" style={{ gridColumn: "1 / -1" }}>
+        <div className="setting-item is-full">
           <label>Body (one paragraph per line)</label>
           <textarea
             value={body}
@@ -259,7 +328,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
           />
         </div>
 
-        <div className="setting-item" style={{ gridColumn: "1 / -1" }}>
+        <div className="setting-item is-full">
           <label>Hero Image URL</label>
           <input value={hero} onChange={(e) => setHero(e.target.value)} />
 
@@ -267,7 +336,6 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             <button type="button" onClick={() => openMediaPicker("hero")}>
               Select Hero Image
             </button>
-
             {hero ? (
               <button type="button" onClick={() => setHero("")}>
                 Clear
@@ -276,7 +344,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
           </div>
 
           {hero ? (
-            <div style={{ marginTop: 14, maxWidth: 220 }}>
+            <div style={{ marginTop: 14, maxWidth: 240 }}>
               <img
                 src={hero}
                 alt="Hero preview"
@@ -286,7 +354,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
           ) : null}
         </div>
 
-        <div className="setting-item" style={{ gridColumn: "1 / -1" }}>
+        <div className="setting-item is-full">
           <label>Inline Image URL</label>
           <input value={inline} onChange={(e) => setInline(e.target.value)} />
 
@@ -294,7 +362,6 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             <button type="button" onClick={() => openMediaPicker("inline")}>
               Select Inline Image
             </button>
-
             {inline ? (
               <button type="button" onClick={() => setInline("")}>
                 Clear
@@ -303,7 +370,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
           </div>
 
           {inline ? (
-            <div style={{ marginTop: 14, maxWidth: 220 }}>
+            <div style={{ marginTop: 14, maxWidth: 240 }}>
               <img
                 src={inline}
                 alt="Inline preview"
@@ -313,7 +380,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
           ) : null}
         </div>
 
-        <div className="setting-item" style={{ gridColumn: "1 / -1" }}>
+        <div className="setting-item is-full">
           <label>Gallery Images (comma separated URLs)</label>
           <textarea
             value={galleryImages}

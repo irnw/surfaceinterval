@@ -101,16 +101,29 @@ export default async function PostPage({
 
   const isGallery = post.post_type === "gallery";
 
-  const { data: relatedRaw } = await supabase
+  let relatedQuery = supabase
     .from("posts")
     .select("*")
     .eq("status", "published")
-    .eq("category", post.category)
     .neq("slug", post.slug)
     .order("published_at", { ascending: false })
     .limit(3);
 
+  if (post.series) {
+    relatedQuery = relatedQuery.eq("series", post.series);
+  } else {
+    relatedQuery = relatedQuery.eq("category", post.category);
+  }
+
+  const { data: relatedRaw } = await relatedQuery;
   const relatedPosts = relatedRaw ?? [];
+
+  const metadataItems = [
+    { label: "Series", value: post.series },
+    { label: "Location", value: post.location },
+    { label: "Gear", value: post.gear },
+    { label: "Camera", value: post.camera },
+  ].filter((item) => item.value);
 
   return (
     <>
@@ -119,22 +132,7 @@ export default async function PostPage({
 
       <main className="post-shell">
         {isPreview && post.status !== "published" ? (
-          <div
-            style={{
-              marginBottom: 20,
-              padding: "10px 14px",
-              borderRadius: 12,
-              background: "#fff7e8",
-              border: "1px solid #f0d9a7",
-              color: "#8a6a1f",
-              fontSize: 13,
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              fontWeight: 600,
-            }}
-          >
-            Preview Mode · Draft Post
-          </div>
+          <div className="preview-banner">Preview Mode · Draft Post</div>
         ) : null}
 
         {post.hero_image ? (
@@ -149,20 +147,38 @@ export default async function PostPage({
           </div>
           <h1 className="post-title">{post.title}</h1>
           <div className="post-standfirst">{post.excerpt}</div>
+
+          {metadataItems.length > 0 ? (
+            <div className="post-data-grid">
+              {metadataItems.map((item) => (
+                <div key={item.label} className="post-data-item">
+                  <div className="post-data-label">{item.label}</div>
+                  <div className="post-data-value">{item.value}</div>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         {isGallery && galleryImages.length > 0 ? (
           <GalleryLightbox images={galleryImages} title={post.title} />
         ) : null}
 
-        <article className="prose">
+        <article className="prose prose-editorial">
+          {post.dive_log ? (
+            <div className="field-note">
+              <div className="field-note-label">Field Note</div>
+              <div className="field-note-body">{post.dive_log}</div>
+            </div>
+          ) : null}
+
           {Array.isArray(post.body) &&
             post.body.map((paragraph: string, index: number) => (
               <p key={index}>{paragraph}</p>
             ))}
 
           {!isGallery && post.inline_image ? (
-            <div className="inline-media">
+            <div className="inline-media inline-media-wide">
               <img src={post.inline_image} alt={post.title} />
             </div>
           ) : null}
@@ -185,10 +201,12 @@ export default async function PostPage({
         {relatedPosts.length > 0 ? (
           <section className="related-posts">
             <div className="section-head">
-              <div className="section-title">Related Dispatches</div>
+              <div className="section-title">
+                {post.series ? `More from ${post.series}` : "Related Dispatches"}
+              </div>
             </div>
 
-            <div className="posts" style={{ paddingLeft: 0, paddingRight: 0, paddingBottom: 0 }}>
+            <div className="posts related-posts-grid">
               {relatedPosts.map((item) => (
                 <article key={item.id} className="post-card">
                   {item.hero_image ? (
