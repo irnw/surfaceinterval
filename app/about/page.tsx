@@ -29,6 +29,11 @@ export default async function AboutPage() {
     .eq("id", 1)
     .single();
 
+  const paragraphs = String(settings?.about_body || "")
+    .split("\n")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
   return (
     <>
       <Header />
@@ -36,37 +41,19 @@ export default async function AboutPage() {
       <main className="post-shell">
         <div className="post-head">
           <div className="post-meta">About</div>
-          <h1 className="post-title">Editorial · Brand · Creative</h1>
+          <h1 className="post-title">
+            {settings?.about_title || "Editorial · Brand · Creative"}
+          </h1>
           <div className="post-standfirst">
-            Surface Interval is a writing and image-led journal about diving,
-            travel, gear, and the quieter observations that stay with you after
-            the trip is over.
+            {settings?.about_intro ||
+              "Surface Interval is a writing and image-led journal about diving, travel, gear, and the quieter observations that stay with you after the trip is over."}
           </div>
         </div>
 
         <article className="prose">
-          <p>
-            It began as a way to return to writing with more patience: not to
-            post faster, but to notice more carefully. Some stories come from
-            the water, some from the road, and some from the pause in between.
-          </p>
-
-          <p>
-            The journal is shaped by a simple editorial instinct — clarity over
-            noise, mood over volume, and detail over performance. It is meant to
-            feel calm before it feels clever.
-          </p>
-
-          <p>
-            I am open to selected collaborations across editorial work, travel
-            and diving features, gear storytelling, and brand or creative
-            partnerships that fit the tone of the site.
-          </p>
-
-          <p>
-            For collaborations or editorial conversations, you can adapt this
-            page later with your preferred contact details or social links.
-          </p>
+          {paragraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
         </article>
       </main>
 

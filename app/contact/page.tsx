@@ -1,6 +1,24 @@
+export const revalidate = 0;
+
+import type { Metadata } from "next";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { createSupabaseServerClient } from "../lib/supabase-server";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "Editorial, brand, and creative contact details for Surface Interval.",
+  openGraph: {
+    title: "Contact · Surface Interval",
+    description: "Editorial, brand, and creative contact details for Surface Interval.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact · Surface Interval",
+    description: "Editorial, brand, and creative contact details for Surface Interval.",
+  },
+};
 
 export default async function ContactPage() {
   const supabase = await createSupabaseServerClient();
@@ -11,49 +29,40 @@ export default async function ContactPage() {
     .eq("id", 1)
     .single();
 
+  const paragraphs = String(settings?.contact_body || "")
+    .split("\n")
+    .map((p) => p.trim())
+    .filter(Boolean);
+
   return (
     <>
       <Header />
 
       <main className="post-shell">
         <div className="post-head">
-          <div className="post-meta">Surface Interval</div>
-
-          <h1 className="post-title">Editorial · Brand · Creative</h1>
-
+          <div className="post-meta">Contact</div>
+          <h1 className="post-title">
+            {settings?.contact_title || "Contact"}
+          </h1>
           <div className="post-standfirst">
-            For collaborations, editorial features, or creative work, feel free
-            to reach out.
+            {settings?.contact_intro ||
+              "For editorial, brand, and creative enquiries, get in touch."}
           </div>
         </div>
 
         <article className="prose">
-          <p>
-            Surface Interval is an independent journal focused on diving,
-            travel, photography, and the quieter moments in between.
-          </p>
+          {settings?.contact_email ? (
+            <p>
+              <strong>Email:</strong>{" "}
+              <a href={`mailto:${settings.contact_email}`}>
+                {settings.contact_email}
+              </a>
+            </p>
+          ) : null}
 
-          <p>I am open to selected collaborations related to:</p>
-
-          <ul>
-            <li>Editorial features</li>
-            <li>Brand partnerships</li>
-            <li>Diving and travel projects</li>
-            <li>Photography commissions</li>
-            <li>Creative collaborations</li>
-          </ul>
-
-          <p>
-            Email:
-            <br />
-            <strong>your@email.com</strong>
-          </p>
-
-          <p>
-            Instagram:
-            <br />
-            <strong>@irn.w</strong>
-          </p>
+          {paragraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
         </article>
       </main>
 

@@ -91,15 +91,6 @@ export default async function AdminPostsPage({
           <h2>Posts</h2>
           <p>Manage publishing status and homepage placement from one view.</p>
         </div>
-
-        <div className="admin-panel-actions">
-          <Link href="/" className="nav-pill">
-            ← Homepage
-          </Link>
-          <Link href="/admin/new" className="nav-pill">
-            + New Post
-          </Link>
-        </div>
       </div>
 
       <AdminBanner {...params} />
@@ -108,13 +99,12 @@ export default async function AdminPostsPage({
         <div className="table-wrap">
           <table className="admin-table">
             <colgroup>
-              <col style={{ width: "34%" }} />
+              <col style={{ width: "40%" }} />
               <col style={{ width: "12%" }} />
               <col style={{ width: "11%" }} />
               <col style={{ width: "19%" }} />
               <col style={{ width: "10%" }} />
               <col style={{ width: "8%" }} />
-              <col style={{ width: "6%" }} />
             </colgroup>
 
             <thead>
@@ -124,7 +114,6 @@ export default async function AdminPostsPage({
                 <th>Status</th>
                 <th>Homepage</th>
                 <th>Published</th>
-                <th>Manage</th>
                 <th>Edit</th>
               </tr>
             </thead>
@@ -184,61 +173,6 @@ export default async function AdminPostsPage({
                       {post.published_at
                         ? new Date(post.published_at).toLocaleDateString("en-GB")
                         : "—"}
-                    </td>
-
-                    <td>
-                      <form action={action}>
-                        <details className="admin-manage">
-                          <summary>Manage</summary>
-
-                          <div className="admin-manage-popover">
-                            <label>
-                              <span>Status</span>
-                              <select
-                                name="status"
-                                defaultValue={post.status || "draft"}
-                              >
-                                <option value="draft">Draft</option>
-                                <option value="published">Published</option>
-                              </select>
-                            </label>
-
-                            <label className="admin-checkline">
-                              <input
-                                type="checkbox"
-                                name="featured"
-                                defaultChecked={post.is_featured ?? false}
-                              />
-                              Featured
-                            </label>
-
-                            <label className="admin-checkline">
-                              <input
-                                type="checkbox"
-                                name="editorsPick"
-                                defaultChecked={post.is_editors_pick ?? false}
-                              />
-                              Editor&apos;s Pick
-                            </label>
-
-                            <label>
-                              <span>Pick Order</span>
-                              <input
-                                type="number"
-                                min="1"
-                                name="editorsPickOrder"
-                                defaultValue={
-                                  post.editors_pick_order != null
-                                    ? post.editors_pick_order
-                                    : ""
-                                }
-                              />
-                            </label>
-
-                            <button type="submit">Apply</button>
-                          </div>
-                        </details>
-                      </form>
                     </td>
 
                     <td>

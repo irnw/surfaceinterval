@@ -5,7 +5,6 @@ import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { createSupabaseServerClient } from "../lib/supabase-server";
-import { getDisplayReadTime } from "../lib/read-time";
 
 type ArchivePost = {
   id: number;
@@ -15,7 +14,6 @@ type ArchivePost = {
   excerpt: string;
   read_time?: string | null;
   published_at?: string | null;
-  body?: unknown;
   tags?: string[] | null;
 };
 
@@ -89,16 +87,13 @@ export default async function ArchivePage() {
     .eq("id", 1)
     .single();
 
-  const { data: rawPosts } = await supabase
+  const { data: posts } = await supabase
     .from("posts")
     .select("*")
     .eq("status", "published")
     .order("published_at", { ascending: false });
 
-  const allPosts = (rawPosts ?? []).map((post) => ({
-    ...post,
-    read_time: getDisplayReadTime(post.read_time, post.body),
-  })) as ArchivePost[];
+  const allPosts = (posts ?? []) as ArchivePost[];
 
   const grouped: GroupedArchive = allPosts.reduce((acc, post) => {
     const year = getYear(post);
@@ -121,6 +116,10 @@ export default async function ArchivePage() {
         <div className="archive-head">
           <div className="archive-label">Archive</div>
           <h1 className="archive-title">All Dispatches</h1>
+          <div className="archive-intro">
+            A chronological index of field notes, essays, travel pieces, gear
+            reflections, and the quieter pages in between.
+          </div>
         </div>
 
         <div className="archive-index">
@@ -129,7 +128,13 @@ export default async function ArchivePage() {
 
             return (
               <section key={year} className="archive-year-block">
-                <h2 className="archive-year">{year}</h2>
+                <div className="archive-year-rail">
+                  <h2 className="archive-year">{year}</h2>
+                  <div className="archive-year-count">
+                    {Object.values(grouped[year]).flat().length} post
+                    {Object.values(grouped[year]).flat().length > 1 ? "s" : ""}
+                  </div>
+                </div>
 
                 <div className="archive-months">
                   {months.map((month) => (
@@ -140,19 +145,13 @@ export default async function ArchivePage() {
                         {grouped[year][month].map((post) => (
                           <article key={post.id} className="archive-row">
                             <div className="archive-row-main">
-                              <div className="archive-row-kicker">
-                                {post.category}
-                              </div>
+                              <div className="archive-row-kicker">{post.category}</div>
 
                               <h4 className="archive-row-title">
-                                <Link href={`/posts/${post.slug}`}>
-                                  {post.title}
-                                </Link>
+                                <Link href={`/posts/${post.slug}`}>{post.title}</Link>
                               </h4>
 
-                              <div className="archive-row-desc">
-                                {post.excerpt}
-                              </div>
+                              <div className="archive-row-desc">{post.excerpt}</div>
 
                               {post.tags?.length ? (
                                 <div className="post-tags" style={{ marginTop: 14 }}>
@@ -182,7 +181,7 @@ export default async function ArchivePage() {
                                     )
                                   : "Undated"}
                               </div>
-                              <div>{post.read_time}</div>
+                              <div>{post.read_time ?? "8 min read"}</div>
                             </div>
                           </article>
                         ))}

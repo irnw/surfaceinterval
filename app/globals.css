@@ -1912,3 +1912,195 @@ html[data-theme="dark"] .danger-button {
   border-color: rgba(242, 198, 198, 0.22) !important;
   color: #ffb4b4 !important;
 }
+
+/* =========================
+   ARCHIVE POLISH
+========================= */
+
+.archive-intro {
+  margin-top: 14px;
+  max-width: 56ch;
+  color: var(--muted);
+  font-size: 0.98rem;
+  line-height: 1.8;
+}
+
+.archive-year-block {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 30px;
+  padding: 34px 0;
+  border-top: 1px solid var(--line);
+}
+
+.archive-year-rail {
+  position: sticky;
+  top: 120px;
+  align-self: start;
+}
+
+.archive-year {
+  margin: 0;
+  font-family: var(--font-serif), serif;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.archive-year-count {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.archive-month-block + .archive-month-block {
+  margin-top: 28px;
+}
+
+.archive-month {
+  margin: 0 0 18px;
+  font-family: var(--font-serif), serif;
+  font-size: 1.25rem;
+  line-height: 1.1;
+}
+
+.archive-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 140px;
+  gap: 24px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+
+.archive-row:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.archive-row-title {
+  margin: 6px 0 10px;
+  font-family: var(--font-serif), serif;
+  font-size: 1.42rem;
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+}
+
+.archive-row-desc {
+  color: var(--muted);
+  line-height: 1.82;
+  font-size: 0.94rem;
+}
+
+.archive-row-meta {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.8;
+  text-align: right;
+}
+
+/* =========================
+   EMPTY STATE ALIGNMENT
+========================= */
+
+.empty-state-copy {
+  max-width: 760px;
+}
+
+.empty-state-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+  justify-content: flex-start;
+}
+
+/* =========================
+   POST STANDFIRST WIDTH
+========================= */
+
+.post-standfirst {
+  margin-top: 18px;
+  max-width: 100%;
+  width: min(100%, 1040px);
+  color: var(--muted);
+  line-height: 1.76;
+  font-size: 0.95rem;
+}
+
+/* =========================
+   ADMIN TOPBAR SHARED
+========================= */
+
+.admin-topbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.admin-content {
+  min-width: 0;
+}
+
+.admin-panel {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  padding: 34px;
+}
+
+.admin-table-shell {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.admin-title-cell {
+  min-width: 0;
+}
+
+.admin-post-title {
+  font-size: 1rem;
+  line-height: 1.45;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.admin-post-slug {
+  color: var(--muted-2);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.admin-edit-link {
+  color: var(--purple-deep);
+  font-size: 0.92rem;
+}
+
+.admin-edit-link:hover {
+  color: var(--text);
+}
+
+@media (max-width: 980px) {
+  .archive-year-block {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .archive-year-rail {
+    position: static;
+  }
+
+  .archive-row {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .archive-row-meta {
+    text-align: left;
+  }
+}
