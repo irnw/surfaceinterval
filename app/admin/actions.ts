@@ -98,17 +98,46 @@ async function normalizeHomepageFlags(
   idToKeepFeatured?: number,
   shouldBeFeatured?: boolean
 ) {
-  if (shouldBeFeatured) {
-    let query = supabaseAdmin.from("posts").update({ is_featured: false });
+  if (!shouldBeFeatured) return;
 
-    if (typeof idToKeepFeatured === "number") {
-      query = query.neq("id", idToKeepFeatured);
-    } else {
-      query = query.neq("id", 0);
-    }
+  let query = supabaseAdmin.from("posts").update({ is_featured: false });
 
-    await query;
+  if (typeof idToKeepFeatured === "number") {
+    query = query.neq("id", idToKeepFeatured);
+  } else {
+    query = query.neq("id", 0);
   }
+
+  await query;
+}
+
+async function getPrimarySettingsRow() {
+  const { data, error } = await supabaseAdmin
+    .from("settings")
+    .select("id")
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (data?.id) {
+    return data.id as number;
+  }
+
+  const { data: inserted, error: insertError } = await supabaseAdmin
+    .from("settings")
+    .insert({})
+    .select("id")
+    .single();
+
+  if (insertError || !inserted?.id) {
+    throw new Error(insertError?.message || "Unable to create settings row.");
+  }
+
+  return inserted.id as number;
 }
 
 export async function createPost(formData: FormData) {
@@ -118,9 +147,7 @@ export async function createPost(formData: FormData) {
 
   const { error } = await supabaseAdmin.from("posts").insert(payload);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/archive");
@@ -142,9 +169,7 @@ export async function updatePost(id: number, formData: FormData) {
     })
     .eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/archive");
@@ -178,9 +203,7 @@ export async function quickUpdatePost(id: number, formData: FormData) {
     .update(updatePayload)
     .eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/archive");
@@ -197,9 +220,7 @@ export async function deletePost(id: number) {
 
   const { error } = await supabaseAdmin.from("posts").delete().eq("id", id);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/archive");
@@ -242,9 +263,7 @@ export async function duplicatePost(id: number) {
 
   const { error } = await supabaseAdmin.from("posts").insert(payload);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/archive");
@@ -269,9 +288,7 @@ export async function createDashboardUser(formData: FormData) {
     email_confirm: true,
   });
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/admin/users");
   redirect("/admin/users?created=1");
@@ -303,26 +320,26 @@ export async function saveSiteSettings(formData: FormData) {
     heroSlides = [];
   }
 
+  const settingsId = await getPrimarySettingsRow();
+
   const payload = {
     hero_slides: heroSlides,
-    about_title: String(formData.get("about_title") || ""),
-    about_intro: String(formData.get("about_intro") || ""),
-    about_body: String(formData.get("about_body") || ""),
-    contact_title: String(formData.get("contact_title") || ""),
-    contact_intro: String(formData.get("contact_intro") || ""),
-    contact_email: String(formData.get("contact_email") || ""),
-    contact_body: String(formData.get("contact_body") || ""),
+    about_title: String(formData.get("about_title") || "").trim(),
+    about_intro: String(formData.get("about_intro") || "").trim(),
+    about_body: String(formData.get("about_body") || "").trim(),
+    contact_title: String(formData.get("contact_title") || "").trim(),
+    contact_intro: String(formData.get("contact_intro") || "").trim(),
+    contact_email: String(formData.get("contact_email") || "").trim(),
+    contact_body: String(formData.get("contact_body") || "").trim(),
     updated_at: new Date().toISOString(),
   };
 
   const { error } = await supabaseAdmin
     .from("settings")
     .update(payload)
-    .eq("id", 1);
+    .eq("id", settingsId);
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   revalidatePath("/");
   revalidatePath("/about");

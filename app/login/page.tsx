@@ -13,7 +13,8 @@ export default function LoginPage() {
   const error = searchParams.get("error");
   const mode = searchParams.get("mode");
 
-  const [email, setEmail] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [resetEmail, setResetEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,7 +32,11 @@ export default function LoginPage() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") && session && mode === "recovery") {
+      if (
+        (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") &&
+        session &&
+        mode === "recovery"
+      ) {
         setCanRecover(true);
       }
     });
@@ -46,7 +51,7 @@ export default function LoginPage() {
     setMessage("");
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: loginEmail,
       password,
     });
 
@@ -66,7 +71,7 @@ export default function LoginPage() {
     setLocalError("");
     setMessage("");
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
       redirectTo: `${window.location.origin}/login?mode=recovery`,
     });
 
@@ -119,7 +124,12 @@ export default function LoginPage() {
           ) : null}
 
           {localError ? <div className="login-error-box">{localError}</div> : null}
-          {message ? <div className="editor-warning" style={{ maxWidth: 560, marginTop: 20 }}>{message}</div> : null}
+
+          {message ? (
+            <div className="editor-warning" style={{ maxWidth: 560, marginTop: 20 }}>
+              {message}
+            </div>
+          ) : null}
 
           {mode === "recovery" ? (
             <form onSubmit={updatePassword} className="login-form login-form-stack">
@@ -140,8 +150,8 @@ export default function LoginPage() {
                 <input
                   type="email"
                   placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
                   required
                 />
                 <input
@@ -156,12 +166,16 @@ export default function LoginPage() {
                 </button>
               </form>
 
-              <form onSubmit={sendResetEmail} className="login-form login-form-stack" style={{ marginTop: 18 }}>
+              <form
+                onSubmit={sendResetEmail}
+                className="login-form login-form-stack"
+                style={{ marginTop: 18 }}
+              >
                 <input
                   type="email"
                   placeholder="Reset password for this email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
                   required
                 />
                 <button type="submit" disabled={loading}>

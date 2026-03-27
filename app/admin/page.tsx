@@ -1,27 +1,5 @@
 import Link from "next/link";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-
-export async function createSupabaseServerClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        },
-      },
-    }
-  );
-}
+import { createSupabaseServerClient } from "../lib/supabase-server";
 import { quickUpdatePost } from "./actions";
 
 function StatusBadge({ status }: { status: string }) {
@@ -64,12 +42,10 @@ function AdminBanner({
   deleted?: string;
 }) {
   let text = "";
-
   if (created) text = "Post created.";
   if (saved) text = "Changes saved.";
   if (duplicated) text = "Draft duplicated.";
   if (deleted) text = "Post deleted.";
-
   if (!text) return null;
 
   return <div className="admin-banner">{text}</div>;

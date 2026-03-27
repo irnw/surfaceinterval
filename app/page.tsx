@@ -48,8 +48,9 @@ export default async function HomePage() {
   const { data: settings } = await supabase
     .from("settings")
     .select("*")
-    .eq("id", 1)
-    .single();
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   const allPosts = (posts ?? []).map((post) => ({
     ...post,

@@ -13,12 +13,12 @@ export default function Hero({
 }: {
   settings: Record<string, any> | null;
 }) {
-  const slides = useMemo(() => {
+  const slides = useMemo<HeroSlide[]>(() => {
     const rawSlides = Array.isArray(settings?.hero_slides)
       ? settings.hero_slides
       : [];
 
-    const cleaned = rawSlides
+    return rawSlides
       .filter(
         (item: any) =>
           item &&
@@ -30,22 +30,13 @@ export default function Hero({
         image: item.image,
         caption: item.caption || "",
       }));
-
-    if (cleaned.length > 0) return cleaned;
-
-    if (settings?.hero_image) {
-      return [
-        {
-          image: settings.hero_image,
-          caption: settings.hero_caption || "",
-        },
-      ];
-    }
-
-    return [];
   }, [settings]);
 
   const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [slides.length]);
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -61,31 +52,37 @@ export default function Hero({
     <section className="hero">
       <div className="hero-layout">
         <div className="hero-media">
-          {slides.map((slide, index) => (
-            <div
-              key={`${slide.image}-${index}`}
-              className={`hero-slide ${index === activeIndex ? "is-active" : ""}`}
-              style={{ backgroundImage: `url(${slide.image})` }}
-            />
-          ))}
-
-          {slides[activeIndex]?.caption ? (
-            <div className="hero-caption">{slides[activeIndex].caption}</div>
-          ) : null}
-
-          {slides.length > 1 ? (
-            <div className="hero-dots">
-              {slides.map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className={`hero-dot ${index === activeIndex ? "is-active" : ""}`}
-                  onClick={() => setActiveIndex(index)}
-                  aria-label={`Go to slide ${index + 1}`}
+          {slides.length > 0 ? (
+            <>
+              {slides.map((slide, index) => (
+                <div
+                  key={`${slide.image}-${index}`}
+                  className={`hero-slide ${index === activeIndex ? "is-active" : ""}`}
+                  style={{ backgroundImage: `url(${slide.image})` }}
                 />
               ))}
-            </div>
-          ) : null}
+
+              {slides[activeIndex]?.caption ? (
+                <div className="hero-caption">{slides[activeIndex].caption}</div>
+              ) : null}
+
+              {slides.length > 1 ? (
+                <div className="hero-dots">
+                  {slides.map((_, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className={`hero-dot ${index === activeIndex ? "is-active" : ""}`}
+                      onClick={() => setActiveIndex(index)}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="hero-placeholder" />
+          )}
         </div>
 
         <div className="hero-copy-col">
