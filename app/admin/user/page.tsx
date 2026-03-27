@@ -7,7 +7,11 @@ export default async function AdminUsersPage({
   searchParams: Promise<{ created?: string }>;
 }) {
   const params = await searchParams;
-  const { data } = await supabaseAdmin.auth.admin.listUsers();
+  const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+
+  if (error) {
+    throw new Error(error.message);
+  }
 
   return (
     <div className="admin-panel">
@@ -50,6 +54,7 @@ export default async function AdminUsersPage({
                 <div className="admin-post-title">{user.email || "No email"}</div>
                 <div className="admin-post-slug">{user.id}</div>
               </div>
+
               <div className="admin-muted-cell">
                 {user.email_confirmed_at ? "Confirmed" : "Unconfirmed"}
               </div>

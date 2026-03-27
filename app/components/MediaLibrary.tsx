@@ -63,35 +63,26 @@ export default function MediaLibrary({ onSelect }: MediaLibraryProps) {
     setUrl("");
 
     try {
-      const ext = file.name.split(".").pop() || "jpg";
+      const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+        const filePath = `uploads/${fileName}`;
 
-      const safeName =
-        Date.now() +
-        "-" +
-        Math.random().toString(36).slice(2) +
-        "." +
-        ext;
+        const { error: uploadError } = await supabase.storage
+             .from("media")
+                .upload(filePath, file, {
+                    cacheControl: "3600",
+                upsert: false, 
+            });
 
-      const path = `uploads/${safeName}`;
+        if (uploadError) {
+            throw uploadError;
+        }
 
-      const { data: uploadData, error: uploadError } =
-        await supabase.storage
-          .from("media") // ✅ FIXED
-          .upload(path, file, {
-            cacheControl: "3600",
-            upsert: false,
-          });
+        const { data: publicUrlData } = supabase.storage
+            .from("media")
+          .getPublicUrl(filePath);
 
-      if (uploadError) {
-        setError(uploadError.message);
-        return;
-      }
-
-      const { data: publicData } = supabase.storage
-        .from("media") // ✅ FIXED
-        .getPublicUrl(path);
-
-      setUrl(publicData.publicUrl);
+        const url = publicUrlData.publicUrl;
 
       await loadFiles();
     } catch (err) {

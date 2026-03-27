@@ -111,7 +111,7 @@ async function normalizeHomepageFlags(
   await query;
 }
 
-async function getPrimarySettingsRow() {
+async function getPrimarySettingsRowId() {
   const { data, error } = await supabaseAdmin
     .from("settings")
     .select("id")
@@ -119,25 +119,10 @@ async function getPrimarySettingsRow() {
     .limit(1)
     .maybeSingle();
 
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
+  if (!data?.id) throw new Error("No settings row found. Create one in Supabase first.");
 
-  if (data?.id) {
-    return data.id as number;
-  }
-
-  const { data: inserted, error: insertError } = await supabaseAdmin
-    .from("settings")
-    .insert({})
-    .select("id")
-    .single();
-
-  if (insertError || !inserted?.id) {
-    throw new Error(insertError?.message || "Unable to create settings row.");
-  }
-
-  return inserted.id as number;
+  return data.id as number;
 }
 
 export async function createPost(formData: FormData) {
@@ -320,7 +305,7 @@ export async function saveSiteSettings(formData: FormData) {
     heroSlides = [];
   }
 
-  const settingsId = await getPrimarySettingsRow();
+  const settingsId = await getPrimarySettingsRowId();
 
   const payload = {
     hero_slides: heroSlides,
