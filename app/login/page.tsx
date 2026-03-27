@@ -1,68 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Header from "../components/Header";
 import { supabase } from "../lib/supabase";
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-
   const next = searchParams.get("next") || "/admin";
   const error = searchParams.get("error");
   const mode = searchParams.get("mode");
 
   const [loginEmail, setLoginEmail] = useState("");
-  const [resetEmail, setResetEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [resetEmail, setResetEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState("");
   const [message, setMessage] = useState("");
-  const [canRecover, setCanRecover] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session && mode === "recovery") {
-        setCanRecover(true);
-      }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (
-        (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") &&
-        session &&
-        mode === "recovery"
-      ) {
-        setCanRecover(true);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [mode]);
 
   async function signInWithPassword(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setLocalError("");
-    setMessage("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password,
+    const res = await fetch("/api/signin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: loginEmail, password }),
     });
 
-    if (error) {
-      setLocalError(error.message);
+    if (!res.ok) {
+      const data = await res.json();
+      setLocalError(data.error || "Sign in failed.");
       setLoading(false);
       return;
     }
 
-    router.push(next);
-    router.refresh();
+    window.location.href = next;
   }
 
   async function sendResetEmail(e: React.FormEvent) {
@@ -101,7 +76,7 @@ export default function LoginPage() {
       return;
     }
 
-    setMessage("Password updated. You can now use your new password.");
+    setMessage("Password updated. You can now sign in with your new password.");
     setLoading(false);
   }
 
@@ -123,7 +98,9 @@ export default function LoginPage() {
             </div>
           ) : null}
 
-          {localError ? <div className="login-error-box">{localError}</div> : null}
+          {localError ? (
+            <div className="login-error-box">{localError}</div>
+          ) : null}
 
           {message ? (
             <div className="editor-warning" style={{ maxWidth: 560, marginTop: 20 }}>
@@ -140,7 +117,7 @@ export default function LoginPage() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
               />
-              <button type="submit" disabled={loading || !canRecover}>
+              <button type="submit" disabled={loading}>
                 {loading ? "Updating..." : "Update Password"}
               </button>
             </form>
