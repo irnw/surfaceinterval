@@ -2467,3 +2467,11 @@ html[data-theme="dark"] .login-error-box {
   border-color: rgba(242, 198, 198, 0.2);
   color: #ffb4b4;
 }
+
+ .login-form-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  max-width: 520px;
+}
