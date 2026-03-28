@@ -18,7 +18,6 @@ function textOrNull(value: FormDataEntryValue | null) {
   return text || null;
 }
 
-// Parse body — accepts JSON block array string from BlockEditor
 function parseBody(raw: FormDataEntryValue | null): unknown[] {
   const str = String(raw || "").trim();
   if (!str) return [];
@@ -26,17 +25,39 @@ function parseBody(raw: FormDataEntryValue | null): unknown[] {
     const parsed = JSON.parse(str);
     if (Array.isArray(parsed)) return parsed;
   } catch { /* fall through */ }
-  // Fallback: treat as plain text, split into paragraphs
   return str.split("\n").map((p) => p.trim()).filter(Boolean)
     .map((content) => ({ id: Math.random().toString(36).slice(2), type: "text", content }));
+}
+
+/**
+ * Convert a datetime-local string (no timezone) to UTC ISO string
+ * using the browser's timezone offset (in minutes, as returned by getTimezoneOffset()).
+ *
+ * getTimezoneOffset() returns minutes BEHIND UTC, so Singapore (UTC+8) returns -480.
+ * We add the offset back to get the correct UTC time.
+ */
+function toUtcIso(localDateTimeStr: string, tzOffsetMinutes: number): string {
+  if (!localDateTimeStr) return "";
+  // localDateTimeStr is like "2026-03-29T22:00" — no timezone
+  // Treat it as local time and convert to UTC
+  const localMs = new Date(localDateTimeStr).getTime();
+  // tzOffsetMinutes is negative for UTC+ zones (e.g. -480 for UTC+8)
+  // So UTC = local + offset (adding a negative number subtracts)
+  const utcMs = localMs + tzOffsetMinutes * 60 * 1000;
+  return new Date(utcMs).toISOString();
 }
 
 function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: boolean }) {
   const status = String(formData.get("status") || "draft");
   const keepPublishedDate = options?.keepPublishedDate ?? false;
+
   const scheduledAtRaw = String(formData.get("scheduledAt") || "").trim();
+  const tzOffset = Number(formData.get("tzOffset") ?? "0");
+
   const scheduledAt = scheduledAtRaw && status === "scheduled"
-    ? new Date(scheduledAtRaw).toISOString() : null;
+    ? toUtcIso(scheduledAtRaw, tzOffset)
+    : null;
+
   const publishedAt =
     status === "published"
       ? keepPublishedDate
@@ -114,9 +135,12 @@ export async function quickUpdatePost(id: number, formData: FormData) {
   const isFeatured = formData.get("featured") === "on";
   const isEditorsPick = formData.get("editorsPick") === "on";
   const editorsPickOrder = isEditorsPick ? parseEditorsPickOrder(formData.get("editorsPickOrder")) : null;
+
   const scheduledAtRaw = String(formData.get("scheduledAt") || "").trim();
+  const tzOffset = Number(formData.get("tzOffset") ?? "0");
   const scheduledAt = scheduledAtRaw && status === "scheduled"
-    ? new Date(scheduledAtRaw).toISOString() : null;
+    ? toUtcIso(scheduledAtRaw, tzOffset) : null;
+
   await normalizeHomepageFlags(id, isFeatured);
   const { error } = await supabaseAdmin.from("posts").update({
     status, is_featured: isFeatured, is_editors_pick: isEditorsPick,
@@ -202,7 +226,8 @@ export async function publishScheduledPosts() {
   if (!due || due.length === 0) return { published: 0 };
   const ids = due.map((p) => p.id);
   const { error: updateError } = await supabaseAdmin.from("posts")
-    .update({ status: "published", published_at: now, scheduled_at: null, updated_at: now }).in("id", ids);
+    .update({ status: "published", published_at: now, scheduled_at: null, updated_at: now })
+    .in("id", ids);
   if (updateError) throw new Error(updateError.message);
   revalidatePath("/"); revalidatePath("/archive");
   for (const post of due) revalidatePath(`/posts/${post.slug}`);

@@ -23,7 +23,6 @@ export default function QuickEditRow({
 }: QuickEditRowProps) {
   const [status, setStatus] = useState(initialStatus);
   const [scheduledAt, setScheduledAt] = useState(
-    // Convert stored UTC ISO to local datetime-local format
     initialScheduledAt
       ? new Date(initialScheduledAt).toISOString().slice(0, 16)
       : ""
@@ -38,15 +37,15 @@ export default function QuickEditRow({
       return;
     }
     const fd = new FormData(e.currentTarget);
-    // Override with controlled values
     fd.set("status", status);
     fd.set("scheduledAt", scheduledAt);
+    // ✅ Send browser timezone offset in minutes so server can convert correctly
+    fd.set("tzOffset", String(new Date().getTimezoneOffset()));
     await action(fd);
   }
 
   return (
     <form onSubmit={handleSubmit} className="apt-qe" data-quick-edit data-post-id={postId}>
-      {/* Row 1: controls */}
       <div className="apt-qe-controls">
         <select
           name="status"
@@ -60,20 +59,12 @@ export default function QuickEditRow({
         </select>
 
         <label className="apt-qe-check" title="Featured">
-          <input
-            type="checkbox"
-            name="featured"
-            defaultChecked={initialFeatured}
-          />
+          <input type="checkbox" name="featured" defaultChecked={initialFeatured} />
           <span>Feat</span>
         </label>
 
         <label className="apt-qe-check" title="Editor's Pick">
-          <input
-            type="checkbox"
-            name="editorsPick"
-            defaultChecked={initialEditorsPick}
-          />
+          <input type="checkbox" name="editorsPick" defaultChecked={initialEditorsPick} />
           <span>Pick</span>
         </label>
 
@@ -90,7 +81,6 @@ export default function QuickEditRow({
         <button type="submit" className="apt-qe-apply">Apply</button>
       </div>
 
-      {/* Row 2: schedule datetime — expands when Sched is selected */}
       {isScheduled && (
         <div className="apt-qe-schedule-row">
           <label className="apt-qe-schedule-label">Publish at</label>

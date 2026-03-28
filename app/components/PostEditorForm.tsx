@@ -37,6 +37,19 @@ function Section({ label, children, defaultOpen = false }: {
   );
 }
 
+/**
+ * Convert a UTC ISO string to a datetime-local string in the user's local timezone.
+ * Used to pre-fill the schedule input when editing an existing scheduled post.
+ */
+function utcToLocalDatetimeLocal(utcIso: string): string {
+  if (!utcIso) return "";
+  const d = new Date(utcIso);
+  // Offset the date by timezone difference to get local time
+  const offset = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - offset * 60 * 1000);
+  return local.toISOString().slice(0, 16);
+}
+
 export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [title, setTitle] = useState(initial?.title || "");
   const [slug, setSlug] = useState(initial?.slug || "");
@@ -50,7 +63,10 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [category, setCategory] = useState(initial?.category || "Diving");
   const [readTime, setReadTime] = useState(initial?.readTime || "");
   const [status, setStatus] = useState(initial?.status || "draft");
-  const [scheduledAt, setScheduledAt] = useState(initial?.scheduledAt || "");
+  // ✅ Convert stored UTC back to local time for display
+  const [scheduledAt, setScheduledAt] = useState(
+    initial?.scheduledAt ? utcToLocalDatetimeLocal(initial.scheduledAt) : ""
+  );
   const [featured, setFeatured] = useState(initial?.featured || false);
   const [editorsPick, setEditorsPick] = useState(initial?.editorsPick || false);
   const [editorsPickOrder, setEditorsPickOrder] = useState(
@@ -69,11 +85,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
   const slugManuallyEdited = useRef(!!initial?.slug);
 
-  // Dirty check — simplified, blocks compared by JSON
-  const initialBlocksJson = useMemo(
-    () => JSON.stringify(parseBody(initial?.body)),
-    [initial?.body]
-  );
+  const initialBlocksJson = useMemo(() => JSON.stringify(parseBody(initial?.body)), [initial?.body]);
   const isDirty =
     title !== (initial?.title || "") ||
     slug !== (initial?.slug || "") ||
@@ -84,12 +96,8 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
   useEffect(() => {
     if (slugManuallyEdited.current) return;
-    setSlug(
-      title.toLowerCase().trim()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-    );
+    setSlug(title.toLowerCase().trim()
+      .replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-"));
   }, [title]);
 
   useEffect(() => { if (!editorsPick) setEditorsPickOrder(""); }, [editorsPick]);
@@ -111,39 +119,26 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     }
     setSubmitting(true);
     const fd = new FormData();
-    fd.set("title", title);
-    fd.set("slug", slug);
-    fd.set("category", category);
-    fd.set("excerpt", excerpt);
-    // Serialize blocks as JSON string — actions.ts will parse it
-    fd.set("body", JSON.stringify(blocks));
-    fd.set("hero", hero);
-    fd.set("heroCaption", heroCaption);
-    fd.set("inline", inline);
-    fd.set("inlineCaption", inlineCaption);
-    fd.set("galleryImages", galleryImages);
-    fd.set("galleryCaptions", galleryCaptions);
-    fd.set("postType", postType);
-    fd.set("readTime", readTime);
-    fd.set("status", status);
-    fd.set("scheduledAt", scheduledAt);
+    fd.set("title", title); fd.set("slug", slug); fd.set("category", category);
+    fd.set("excerpt", excerpt); fd.set("body", JSON.stringify(blocks));
+    fd.set("hero", hero); fd.set("heroCaption", heroCaption);
+    fd.set("inline", inline); fd.set("inlineCaption", inlineCaption);
+    fd.set("galleryImages", galleryImages); fd.set("galleryCaptions", galleryCaptions);
+    fd.set("postType", postType); fd.set("readTime", readTime);
+    fd.set("status", status); fd.set("scheduledAt", scheduledAt);
+    // ✅ Send browser timezone offset so server converts to correct UTC
+    fd.set("tzOffset", String(new Date().getTimezoneOffset()));
     fd.set("featured", featured ? "true" : "false");
     fd.set("editorsPick", editorsPick ? "true" : "false");
     fd.set("editorsPickOrder", editorsPickOrder);
     fd.set("existingPublishedAt", initial?.existingPublishedAt || "");
-    fd.set("tags", tags);
-    fd.set("series", series);
-    fd.set("location", location);
-    fd.set("gear", gear);
-    fd.set("camera", camera);
-    fd.set("diveLog", diveLog);
+    fd.set("tags", tags); fd.set("series", series); fd.set("location", location);
+    fd.set("gear", gear); fd.set("camera", camera); fd.set("diveLog", diveLog);
     await onSubmit(fd);
   }
 
-  const saveLabel = submitting
-    ? "Saving…"
-    : status === "scheduled" && scheduledAt
-    ? "Schedule Post"
+  const saveLabel = submitting ? "Saving…"
+    : status === "scheduled" && scheduledAt ? "Schedule Post"
     : "Save Post";
 
   return (
@@ -151,7 +146,6 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
       {isDirty && <div className="pef-dirty-bar">Unsaved changes</div>}
 
       <form onSubmit={handleSubmit} className="pef-form">
-
         <div className="pef-topbar">
           <div className="pef-field pef-field--title">
             <label className="pef-label">Title</label>
@@ -187,14 +181,17 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             <div className="pef-field pef-schedule-field">
               <label className="pef-label">
                 Publish at
-                <span className="pef-label-hint">auto-publishes at this exact date &amp; time</span>
+                <span className="pef-label-hint">
+                  your local time ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+                </span>
               </label>
               <input
                 type="datetime-local"
                 className="pef-input"
                 value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
-                min={new Date().toISOString().slice(0, 16)}
+                min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
+                  .toISOString().slice(0, 16)}
               />
             </div>
           )}
@@ -202,12 +199,9 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
         <div className="pef-slug-row">
           <span className="pef-slug-prefix">slug /</span>
-          <input
-            className="pef-slug-input"
-            value={slug}
+          <input className="pef-slug-input" value={slug}
             onChange={(e) => { slugManuallyEdited.current = true; setSlug(e.target.value); }}
-            placeholder="auto-generated"
-          />
+            placeholder="auto-generated" />
         </div>
 
         <div className="pef-field">
@@ -217,11 +211,10 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             placeholder="One or two sentences that describe this post" />
         </div>
 
-        {/* ── Block editor replaces body textarea ── */}
         <div className="pef-field">
           <label className="pef-label">
             Body
-            <span className="pef-label-hint">text and image blocks · drag or use arrows to reorder</span>
+            <span className="pef-label-hint">write long-form above · add images between blocks</span>
           </label>
           <BlockEditor blocks={blocks} onChange={setBlocks} />
         </div>
@@ -247,7 +240,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
               onChange={(e) => setGalleryImages(e.target.value)} rows={3} placeholder="url1, url2, url3" />
           </div>
           <div className="pef-field">
-            <label className="pef-label">Gallery Captions <span className="pef-label-hint">one per line, matching order</span></label>
+            <label className="pef-label">Gallery Captions <span className="pef-label-hint">one per line</span></label>
             <textarea className="pef-textarea" value={galleryCaptions}
               onChange={(e) => setGalleryCaptions(e.target.value)} rows={3}
               placeholder={"Caption 1\nCaption 2\nCaption 3"} />
@@ -261,7 +254,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
               <input className="pef-input" value={tags} onChange={(e) => setTags(e.target.value)} />
             </div>
             <div className="pef-field">
-              <label className="pef-label">Read Time <span className="pef-label-hint">optional override</span></label>
+              <label className="pef-label">Read Time</label>
               <input className="pef-input" value={readTime} onChange={(e) => setReadTime(e.target.value)} placeholder="e.g. 8 min" />
             </div>
             <div className="pef-field">
@@ -308,9 +301,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
         </Section>
 
         <div className="pef-save-bar">
-          <button type="submit" className="pef-btn-save" disabled={submitting}>
-            {saveLabel}
-          </button>
+          <button type="submit" className="pef-btn-save" disabled={submitting}>{saveLabel}</button>
           {isDirty && <span className="pef-save-hint">Unsaved changes</span>}
         </div>
       </form>
