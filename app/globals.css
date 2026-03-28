@@ -2948,3 +2948,359 @@ html[data-theme="dark"] .media-modal-card {
 .apt-qe-apply { font-size: 0.55rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 8px; background: var(--purple-soft); color: var(--purple-deep); border: 1px solid var(--line-strong); border-radius: 5px; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
 .apt-qe-apply:hover { background: var(--purple-deep); color: #fff; }
 .admin-badge.is-scheduled { background: rgba(186,117,23,0.12); color: #854f0b; }
+
+/* ============================================================
+   PASTE AT THE BOTTOM OF globals.css
+   New additions: QuickEdit schedule row, Media bulk select, Insights
+   ============================================================ */
+
+
+/* =========================
+   QUICK EDIT — schedule row
+========================= */
+
+.apt-qe {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.apt-qe-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+}
+
+.apt-qe-schedule-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: var(--purple-soft);
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  margin-top: 2px;
+}
+
+.apt-qe-schedule-label {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--purple-deep);
+  white-space: nowrap;
+}
+
+.apt-qe-schedule-input {
+  font: inherit;
+  font-size: 0.68rem;
+  padding: 3px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+
+.apt-qe-schedule-input:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+
+/* =========================
+   MEDIA LIBRARY — bulk select
+========================= */
+
+.ml-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.ml-select-all {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  cursor: pointer;
+  user-select: none;
+}
+
+.ml-select-all input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--purple);
+  cursor: pointer;
+}
+
+.ml-bulk-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.ml-bulk-btn {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--purple-deep);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.ml-bulk-btn:hover { background: var(--purple-soft); }
+
+.ml-bulk-btn--danger {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.ml-bulk-btn--danger:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+/* Selected card state */
+.ml-card--selected {
+  outline: 2px solid var(--purple);
+  outline-offset: -2px;
+}
+
+.ml-card-check {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  z-index: 2;
+}
+
+.ml-card-check input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--purple);
+  cursor: pointer;
+  background: white;
+  border-radius: 3px;
+}
+
+/* Make card position relative for checkbox overlay */
+.ml-card { position: relative; }
+
+
+/* =========================
+   INSIGHTS — editorial redesign
+========================= */
+
+.ins-period-bar {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.ins-period-btn {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.ins-period-btn:hover {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+.ins-period-btn--active {
+  background: var(--purple-deep);
+  border-color: var(--purple-deep);
+  color: #fff;
+}
+
+/* Summary cards */
+.ins-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 900px) {
+  .ins-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+.ins-card {
+  padding: 20px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-2);
+}
+
+.ins-card-label {
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.ins-card-value {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.ins-card-sub {
+  font-size: 0.68rem;
+  color: var(--light, #a3a3af);
+  line-height: 1.4;
+}
+
+/* Body layout */
+.ins-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 800px) {
+  .ins-body { grid-template-columns: 1fr; }
+}
+
+.ins-section {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.ins-section-head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.ins-section-label {
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+
+.ins-loading,
+.ins-empty {
+  padding: 28px 18px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* Platform bars */
+.ins-platform-list {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ins-platform-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ins-platform-name {
+  font-size: 0.74rem;
+  color: var(--text-soft);
+  min-width: 90px;
+}
+
+.ins-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: var(--purple-soft);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ins-bar {
+  height: 100%;
+  background: var(--purple);
+  border-radius: 999px;
+  min-width: 2px;
+  transition: width 0.4s ease;
+}
+
+.ins-platform-count {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text);
+  min-width: 24px;
+  text-align: right;
+}
+
+/* Top posts */
+.ins-post-list {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ins-post-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.ins-post-row:last-child { border-bottom: none; }
+
+.ins-post-rank {
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--muted-2, #a0a0aa);
+  min-width: 16px;
+  text-align: center;
+}
+
+.ins-post-slug {
+  font-size: 0.74rem;
+  color: var(--purple-deep);
+  text-decoration: none;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ins-post-slug:hover { text-decoration: underline; }
+
+.ins-post-count {
+  font-size: 0.68rem;
+  color: var(--muted);
+  white-space: nowrap;
+}

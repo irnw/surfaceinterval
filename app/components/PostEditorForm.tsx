@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import MediaLibrary from "./MediaLibrary";
 import PostBodyEditor from "./PostBodyEditor";
 
@@ -15,7 +15,6 @@ type Props = {
     tags?: string[]; series?: string; location?: string;
     gear?: string; camera?: string; diveLog?: string;
   };
-  // ✅ `unknown` return type — satisfied by both server actions and regular async functions
   onSubmit: (formData: FormData) => unknown;
 };
 
@@ -50,6 +49,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [category, setCategory] = useState(initial?.category || "Diving");
   const [readTime, setReadTime] = useState(initial?.readTime || "");
   const [status, setStatus] = useState(initial?.status || "draft");
+  // scheduledAt is ALWAYS preserved — never auto-cleared
   const [scheduledAt, setScheduledAt] = useState(initial?.scheduledAt || "");
   const [featured, setFeatured] = useState(initial?.featured || false);
   const [editorsPick, setEditorsPick] = useState(initial?.editorsPick || false);
@@ -66,6 +66,9 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [diveLog, setDiveLog] = useState(initial?.diveLog || "");
   const [mediaTarget, setMediaTarget] = useState<"hero" | "inline" | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Track whether slug was manually edited (don't auto-generate after that)
+  const slugManuallyEdited = useRef(!!initial?.slug);
 
   const snap = (v: object) => JSON.stringify(v);
   const initialSnapshot = useMemo(() => snap({
@@ -94,15 +97,20 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
   const isDirty = initialSnapshot !== currentSnapshot;
 
+  // Auto-generate slug only for NEW posts (no initial slug)
   useEffect(() => {
-    if (!initial?.slug) {
-      setSlug(title.toLowerCase().trim()
-        .replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-"));
-    }
-  }, [title, initial?.slug]);
+    if (slugManuallyEdited.current) return;
+    setSlug(
+      title.toLowerCase().trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+    );
+  }, [title]);
 
   useEffect(() => { if (!editorsPick) setEditorsPickOrder(""); }, [editorsPick]);
-  useEffect(() => { if (status !== "scheduled") setScheduledAt(""); }, [status]);
+
+  // ✅ NO auto-clear of scheduledAt — user controls it explicitly
 
   useEffect(() => {
     function onBeforeUnload(e: BeforeUnloadEvent) {
@@ -115,6 +123,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    // Validate: if status=scheduled, a date must be set
+    if (status === "scheduled" && !scheduledAt) {
+      alert("Please set a publish date and time before scheduling.");
+      return;
+    }
     setSubmitting(true);
     const fd = new FormData();
     fd.set("title", title); fd.set("slug", slug); fd.set("category", category);
@@ -132,6 +145,13 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     fd.set("gear", gear); fd.set("camera", camera); fd.set("diveLog", diveLog);
     await onSubmit(fd);
   }
+
+  // Button label logic — only "Schedule Post" if status=scheduled AND a date is set
+  const saveLabel = submitting
+    ? "Saving…"
+    : status === "scheduled" && scheduledAt
+    ? "Schedule Post"
+    : "Save Post";
 
   return (
     <>
@@ -170,24 +190,35 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             </div>
           </div>
 
+          {/* Schedule field — always shown when status=scheduled, regardless of existing/new post */}
           {status === "scheduled" && (
             <div className="pef-field pef-schedule-field">
               <label className="pef-label">
                 Publish at
-                <span className="pef-label-hint">auto-publishes at this date &amp; time</span>
+                <span className="pef-label-hint">auto-publishes at this exact date &amp; time via cron</span>
               </label>
-              <input type="datetime-local" className="pef-input" value={scheduledAt}
+              <input
+                type="datetime-local"
+                className="pef-input"
+                value={scheduledAt}
                 onChange={(e) => setScheduledAt(e.target.value)}
-                required={status === "scheduled"}
-                min={new Date().toISOString().slice(0, 16)} />
+                min={new Date().toISOString().slice(0, 16)}
+              />
             </div>
           )}
         </div>
 
         <div className="pef-slug-row">
           <span className="pef-slug-prefix">slug /</span>
-          <input className="pef-slug-input" value={slug}
-            onChange={(e) => setSlug(e.target.value)} placeholder="auto-generated" />
+          <input
+            className="pef-slug-input"
+            value={slug}
+            onChange={(e) => {
+              slugManuallyEdited.current = true;
+              setSlug(e.target.value);
+            }}
+            placeholder="auto-generated"
+          />
         </div>
 
         <div className="pef-field">
@@ -300,7 +331,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
         <div className="pef-save-bar">
           <button type="submit" className="pef-btn-save" disabled={submitting}>
-            {submitting ? "Saving…" : status === "scheduled" ? "Schedule Post" : "Save Post"}
+            {saveLabel}
           </button>
           {isDirty && <span className="pef-save-hint">Unsaved changes</span>}
         </div>

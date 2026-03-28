@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createSupabaseServerClient } from "../lib/supabase-server";
 import { quickUpdatePost } from "./actions";
 import ApplyAllButton from "../components/ApplyAllButton";
+import QuickEditRow from "../components/QuickEditRow";
 
 function StatusBadge({ status }: { status: string }) {
   const cls =
@@ -10,8 +11,7 @@ function StatusBadge({ status }: { status: string }) {
     "is-draft";
   const label =
     status === "published" ? "Published" :
-    status === "scheduled" ? "Scheduled" :
-    "Draft";
+    status === "scheduled" ? "Scheduled" : "Draft";
   return <span className={`admin-badge ${cls}`}>{label}</span>;
 }
 
@@ -20,9 +20,9 @@ function FlagBadge({ children, tone = "default" }: {
   tone?: "default" | "featured" | "pick";
 }) {
   return (
-    <span className={`admin-badge ${tone === "featured" ? "is-featured" : tone === "pick" ? "is-pick" : ""}`}>
-      {children}
-    </span>
+    <span className={`admin-badge ${
+      tone === "featured" ? "is-featured" : tone === "pick" ? "is-pick" : ""
+    }`}>{children}</span>
   );
 }
 
@@ -70,21 +70,20 @@ export default async function AdminPostsPage({
           <h2>Posts</h2>
           <p>Manage publishing status and homepage placement from one view.</p>
         </div>
-        {/* Apply All button — client component, submits all quick-edit forms */}
         <ApplyAllButton />
       </div>
 
       <AdminBanner {...params} />
 
       <div className="apt-wrap">
-        <table className="apt-table" id="posts-table">
+        <table className="apt-table">
           <colgroup>
-            <col style={{ width: "34%" }} />
+            <col style={{ width: "32%" }} />
             <col style={{ width: "11%" }} />
             <col style={{ width: "11%" }} />
             <col style={{ width: "14%" }} />
             <col style={{ width: "11%" }} />
-            <col style={{ width: "19%" }} />
+            <col style={{ width: "21%" }} />
           </colgroup>
           <thead>
             <tr>
@@ -120,60 +119,33 @@ export default async function AdminPostsPage({
                       <div className="apt-schedule-row">⏰ {formatScheduled(post.scheduled_at)}</div>
                     )}
                   </td>
-
                   <td className="apt-cat">{post.category}</td>
                   <td><StatusBadge status={post.status} /></td>
-
                   <td>
                     <div className="apt-flags">
                       {badges.length > 0 ? badges : <span className="apt-none">—</span>}
                     </div>
                   </td>
-
                   <td className="apt-date">
                     {post.status === "published" && post.published_at
                       ? new Date(post.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" })
-                      : post.status === "scheduled" && post.scheduled_at
-                      ? `⏰ ${formatScheduled(post.scheduled_at)}`
                       : "—"}
                   </td>
-
                   <td>
                     <div className="apt-actions">
                       <Link href={`/admin/edit/${post.id}`} className="apt-btn">Edit</Link>
                       <Link href={`/posts/${post.slug}`} target="_blank" className="apt-btn">View</Link>
                     </div>
-
-                    {/* data-post-id lets ApplyAllButton find all forms */}
-                    <form action={action} className="apt-qe" data-quick-edit data-post-id={post.id}>
-                      <select name="status" defaultValue={post.status} className="apt-qe-select">
-                        <option value="draft">Draft</option>
-                        <option value="published">Pub</option>
-                        <option value="scheduled">Sched</option>
-                      </select>
-
-                      <label className="apt-qe-check" title="Featured">
-                        <input type="checkbox" name="featured" defaultChecked={!!post.is_featured} />
-                        <span>Feat</span>
-                      </label>
-
-                      <label className="apt-qe-check" title="Editor's Pick">
-                        <input type="checkbox" name="editorsPick" defaultChecked={!!post.is_editors_pick} />
-                        <span>Pick</span>
-                      </label>
-
-                      <input
-                        type="number"
-                        name="editorsPickOrder"
-                        defaultValue={post.editors_pick_order ?? ""}
-                        placeholder="#"
-                        min="1"
-                        className="apt-qe-num"
-                        title="Pick order"
-                      />
-
-                      <button type="submit" className="apt-qe-apply">Apply</button>
-                    </form>
+                    {/* QuickEditRow is a client component so it can manage the schedule datetime expansion */}
+                    <QuickEditRow
+                      postId={post.id}
+                      initialStatus={post.status}
+                      initialFeatured={!!post.is_featured}
+                      initialEditorsPick={!!post.is_editors_pick}
+                      initialEditorsPickOrder={post.editors_pick_order ?? null}
+                      initialScheduledAt={post.scheduled_at ?? ""}
+                      action={action}
+                    />
                   </td>
                 </tr>
               );
