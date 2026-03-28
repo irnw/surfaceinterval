@@ -43,9 +43,7 @@ function getYear(post: ArchivePost) {
 
 function getMonth(post: ArchivePost) {
   if (!post.published_at) return "Undated";
-  return new Date(post.published_at).toLocaleDateString("en-GB", {
-    month: "long",
-  });
+  return new Date(post.published_at).toLocaleDateString("en-GB", { month: "long" });
 }
 
 function sortYearsDesc(yearA: string, yearB: string) {
@@ -56,8 +54,8 @@ function sortYearsDesc(yearA: string, yearB: string) {
 
 function monthOrder(month: string) {
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December",
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December",
   ];
   const index = months.indexOf(month);
   return index === -1 ? 999 : index;
@@ -73,15 +71,11 @@ export default async function ArchivePage() {
   const supabase = await createSupabaseServerClient();
 
   const { data: settings } = await supabase
-    .from("settings")
-    .select("*")
-    .order("id", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .from("settings").select("*")
+    .order("id", { ascending: true }).limit(1).maybeSingle();
 
   const { data: rawPosts } = await supabase
-    .from("posts")
-    .select("*")
+    .from("posts").select("*")
     .eq("status", "published")
     .order("published_at", { ascending: false });
 
@@ -115,7 +109,6 @@ export default async function ArchivePage() {
         <div className="archive-index">
           {years.map((year) => {
             const months = Object.keys(grouped[year]).sort(sortMonthsDesc);
-
             return (
               <section key={year} className="archive-year-block">
                 <div className="archive-year-rail">
@@ -135,7 +128,17 @@ export default async function ArchivePage() {
                         {grouped[year][month].map((post) => (
                           <article key={post.id} className="archive-row">
                             <div className="archive-row-main">
-                              <div className="archive-row-kicker">{post.category}</div>
+
+                              {/* Kicker row — category + series */}
+                              <div className="archive-row-kicker-row">
+                                <span className="archive-row-kicker">{post.category}</span>
+                                {post.series && (
+                                  <>
+                                    <span className="archive-row-kicker-sep">·</span>
+                                    <span className="archive-row-series">{post.series}</span>
+                                  </>
+                                )}
+                              </div>
 
                               <h4 className="archive-row-title">
                                 <Link href={`/posts/${post.slug}`}>{post.title}</Link>
@@ -143,13 +146,15 @@ export default async function ArchivePage() {
 
                               <div className="archive-row-desc">{post.excerpt}</div>
 
-                              <div className="archive-row-extra">
-                                {post.series ? <span>{post.series}</span> : null}
-                                {post.location ? <span>{post.location}</span> : null}
-                              </div>
+                              {/* Location */}
+                              {post.location && (
+                                <div className="archive-row-location">
+                                  {post.location}
+                                </div>
+                              )}
 
                               {post.tags?.length ? (
-                                <div className="post-tags" style={{ marginTop: 14 }}>
+                                <div className="post-tags" style={{ marginTop: 12 }}>
                                   {post.tags.map((tag) => (
                                     <Link
                                       key={tag}
@@ -167,9 +172,7 @@ export default async function ArchivePage() {
                               <div>
                                 {post.published_at
                                   ? new Date(post.published_at).toLocaleDateString("en-GB", {
-                                      day: "2-digit",
-                                      month: "short",
-                                      year: "numeric",
+                                      day: "2-digit", month: "short", year: "numeric",
                                     })
                                   : "Undated"}
                               </div>

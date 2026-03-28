@@ -5,20 +5,25 @@ import MediaLibrary from "../../components/MediaLibrary";
 import { saveSiteSettings } from "../actions";
 
 type HeroSlide = { image: string; caption: string };
+type ShelfBook = { title: string; author: string; note: string };
 type SettingsRecord = Record<string, any>;
 
 export default function SettingsClientPage({
-  initialSettings, saved,
+  initialSettings,
+  saved,
 }: {
-  initialSettings: SettingsRecord; saved?: boolean;
+  initialSettings: SettingsRecord;
+  saved?: boolean;
 }) {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(
-    Array.isArray(initialSettings?.hero_slides) ? initialSettings.hero_slides.slice(0, 5) : []
+    Array.isArray(initialSettings?.hero_slides)
+      ? initialSettings.hero_slides.slice(0, 5) : []
   );
   const [heroPickerOpen, setHeroPickerOpen] = useState<number | null>(null);
   const [aboutTitle, setAboutTitle] = useState(initialSettings?.about_title || "");
   const [aboutIntro, setAboutIntro] = useState(initialSettings?.about_intro || "");
   const [aboutBody, setAboutBody] = useState(initialSettings?.about_body || "");
+  const [collaborationNote, setCollaborationNote] = useState(initialSettings?.collaboration_note || "");
   const [contactTitle, setContactTitle] = useState(initialSettings?.contact_title || "");
   const [contactIntro, setContactIntro] = useState(initialSettings?.contact_intro || "");
   const [contactEmail, setContactEmail] = useState(initialSettings?.contact_email || "");
@@ -26,13 +31,39 @@ export default function SettingsClientPage({
   const [divesLogged, setDivesLogged] = useState(initialSettings?.dives_logged || "");
   const [countriesReached, setCountriesReached] = useState(initialSettings?.countries_reached || "");
 
+  // Reading shelf — max 6 books
+  const [shelf, setShelf] = useState<ShelfBook[]>(
+    Array.isArray(initialSettings?.reading_shelf)
+      ? initialSettings.reading_shelf.slice(0, 6)
+      : []
+  );
+
+  function updateBook(index: number, field: keyof ShelfBook, value: string) {
+    const copy = [...shelf];
+    copy[index] = { ...copy[index], [field]: value };
+    setShelf(copy);
+  }
+
+  function addBook() {
+    if (shelf.length >= 6) return;
+    setShelf([...shelf, { title: "", author: "", note: "" }]);
+  }
+
+  function removeBook(index: number) {
+    const copy = [...shelf];
+    copy.splice(index, 1);
+    setShelf(copy);
+  }
+
   function updateSlide(index: number, next: HeroSlide) {
     const copy = [...heroSlides]; copy[index] = next; setHeroSlides(copy);
   }
+
   function addSlide() {
     if (heroSlides.length >= 5) return;
     setHeroSlides([...heroSlides, { image: "", caption: "" }]);
   }
+
   function removeSlide(index: number) {
     const copy = [...heroSlides]; copy.splice(index, 1); setHeroSlides(copy);
   }
@@ -42,7 +73,7 @@ export default function SettingsClientPage({
       <div className="admin-panel-head">
         <div>
           <h2>Settings</h2>
-          <p>Edit homepage hero slides, about page, and contact page from one place.</p>
+          <p>Edit homepage, about page, reading shelf, and contact details from one place.</p>
         </div>
       </div>
 
@@ -50,11 +81,14 @@ export default function SettingsClientPage({
 
       <form action={saveSiteSettings}>
         <input type="hidden" name="heroSlidesPayload" value={JSON.stringify(heroSlides)} />
+        <input type="hidden" name="readingShelfPayload" value={JSON.stringify(shelf)} />
 
-        {/* Homepage Stats */}
+        {/* ── HOMEPAGE STATS ── */}
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">Homepage Stats</h3>
-          <p className="admin-settings-note">Update after each trip or milestone. Appears on the homepage stats strip.</p>
+          <p className="admin-settings-note">
+            Update after each trip or milestone. Appears on the homepage stats strip.
+          </p>
           <div className="admin-settings-grid">
             <div className="admin-setting">
               <label>Dives Logged</label>
@@ -69,7 +103,7 @@ export default function SettingsClientPage({
           </div>
         </div>
 
-        {/* Hero Slides */}
+        {/* ── HERO SLIDES ── */}
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">Homepage Hero Slides</h3>
           <div className="hero-slide-manager">
@@ -84,53 +118,116 @@ export default function SettingsClientPage({
                 <input placeholder="Caption" value={slide.caption}
                   onChange={(e) => updateSlide(index, { ...slide, caption: e.target.value })} />
                 <div className="hero-slide-card-actions">
-                  <button type="button" onClick={() => setHeroPickerOpen(index)}>Select from Media Library</button>
+                  <button type="button" onClick={() => setHeroPickerOpen(index)}>
+                    Select from Media Library
+                  </button>
                 </div>
-                {slide.image ? <div className="hero-slide-thumb"><img src={slide.image} alt={`Hero slide ${index + 1}`} /></div> : null}
+                {slide.image ? (
+                  <div className="hero-slide-thumb">
+                    <img src={slide.image} alt={`Hero slide ${index + 1}`} />
+                  </div>
+                ) : null}
               </div>
             ))}
-            {heroSlides.length < 5 ? <button type="button" onClick={addSlide}>+ Add Hero Slide</button> : null}
+            {heroSlides.length < 5 ? (
+              <button type="button" onClick={addSlide}>+ Add Hero Slide</button>
+            ) : null}
           </div>
         </div>
 
-        {/* About Page */}
+        {/* ── ABOUT PAGE ── */}
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">About Page</h3>
           <div className="admin-settings-grid">
             <div className="admin-setting">
               <label>About Title</label>
-              <input name="about_title" value={aboutTitle} onChange={(e) => setAboutTitle(e.target.value)} />
+              <input name="about_title" value={aboutTitle}
+                onChange={(e) => setAboutTitle(e.target.value)} />
             </div>
             <div className="admin-setting is-full">
               <label>About Intro</label>
-              <textarea name="about_intro" rows={4} value={aboutIntro} onChange={(e) => setAboutIntro(e.target.value)} />
+              <textarea name="about_intro" rows={3} value={aboutIntro}
+                onChange={(e) => setAboutIntro(e.target.value)} />
             </div>
             <div className="admin-setting is-full">
               <label>About Body</label>
-              <textarea name="about_body" rows={8} value={aboutBody} onChange={(e) => setAboutBody(e.target.value)} />
+              <textarea name="about_body" rows={8} value={aboutBody}
+                onChange={(e) => setAboutBody(e.target.value)} />
+            </div>
+            <div className="admin-setting is-full">
+              <label>Collaboration Note</label>
+              <textarea name="collaboration_note" rows={3} value={collaborationNote}
+                onChange={(e) => setCollaborationNote(e.target.value)}
+                placeholder="Describe what kinds of work you're open to..." />
             </div>
           </div>
         </div>
 
-        {/* Contact Page */}
+        {/* ── ON THE SHELF ── */}
+        <div className="admin-settings-section">
+          <h3 className="admin-settings-title">On the Shelf</h3>
+          <p className="admin-settings-note">
+            A curated list of books currently on your shelf — shown on the About page. Maximum 6.
+          </p>
+          <div className="shelf-manager">
+            {shelf.map((book, index) => (
+              <div key={index} className="shelf-book-card">
+                <div className="shelf-book-card-head">
+                  <strong>Book {index + 1}</strong>
+                  <button type="button" onClick={() => removeBook(index)}>Remove</button>
+                </div>
+                <div className="admin-settings-grid">
+                  <div className="admin-setting">
+                    <label>Title</label>
+                    <input value={book.title} placeholder="Book title"
+                      onChange={(e) => updateBook(index, "title", e.target.value)} />
+                  </div>
+                  <div className="admin-setting">
+                    <label>Author</label>
+                    <input value={book.author} placeholder="Author name"
+                      onChange={(e) => updateBook(index, "author", e.target.value)} />
+                  </div>
+                  <div className="admin-setting is-full">
+                    <label>Note <span style={{ fontWeight: 400, color: "var(--muted)" }}>(optional — one line)</span></label>
+                    <input value={book.note} placeholder="Why it's there, what it made you think about..."
+                      onChange={(e) => updateBook(index, "note", e.target.value)} />
+                  </div>
+                </div>
+              </div>
+            ))}
+            {shelf.length < 6 ? (
+              <button type="button" className="shelf-add-btn" onClick={addBook}>
+                + Add book
+              </button>
+            ) : (
+              <p className="admin-settings-note">Maximum of 6 books reached.</p>
+            )}
+          </div>
+        </div>
+
+        {/* ── CONTACT PAGE ── */}
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">Contact Page</h3>
           <div className="admin-settings-grid">
             <div className="admin-setting">
               <label>Contact Title</label>
-              <input name="contact_title" value={contactTitle} onChange={(e) => setContactTitle(e.target.value)} />
+              <input name="contact_title" value={contactTitle}
+                onChange={(e) => setContactTitle(e.target.value)} />
             </div>
             <div className="admin-setting">
               <label>Contact Email</label>
-              <input name="contact_email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+              <input name="contact_email" value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)} />
             </div>
             <div className="admin-setting is-full">
               <label>Contact Intro</label>
-              <textarea name="contact_intro" rows={4} value={contactIntro} onChange={(e) => setContactIntro(e.target.value)} />
+              <textarea name="contact_intro" rows={3} value={contactIntro}
+                onChange={(e) => setContactIntro(e.target.value)} />
             </div>
             <div className="admin-setting is-full">
               <label>Contact Body</label>
-              <textarea name="contact_body" rows={8} value={contactBody} onChange={(e) => setContactBody(e.target.value)} />
+              <textarea name="contact_body" rows={6} value={contactBody}
+                onChange={(e) => setContactBody(e.target.value)} />
             </div>
           </div>
         </div>

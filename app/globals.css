@@ -3967,3 +3967,345 @@ html[data-theme="dark"] .media-modal-card {
   border-color: var(--purple-deep);
   color: #fff;
 }
+
+/* ============================================================
+   PASTE AT BOTTOM OF globals.css
+   About page · On the Shelf · Archive series · Footer RSS
+   ============================================================ */
+
+
+/* =========================
+   ABOUT PAGE
+========================= */
+
+.about-shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+/* Hero section */
+.about-hero {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 48px;
+  align-items: start;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 680px) {
+  .about-hero { grid-template-columns: 1fr; }
+}
+
+.about-kicker {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 14px;
+}
+
+.about-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin: 0 0 20px;
+}
+
+.about-intro {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text-soft);
+  margin: 0;
+  max-width: 52ch;
+}
+
+/* Portrait */
+.about-portrait {
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 3 / 4;
+  background: var(--purple-soft);
+}
+
+.about-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.about-portrait--placeholder {
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.about-portrait-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+
+/* Rule */
+.about-rule {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 40px 0;
+}
+
+/* Credentials strip */
+.about-credentials {
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.about-credential {
+  flex: 1;
+  min-width: 140px;
+  padding: 0 24px 0 0;
+  border-right: 1px solid var(--line);
+  margin-right: 24px;
+  margin-bottom: 20px;
+}
+
+.about-credential:last-child {
+  border-right: none;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+.about-credential-label {
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.about-credential-value {
+  font-size: 0.84rem;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+/* Body text */
+.about-body {
+  font-size: 0.96rem;
+  line-height: 1.85;
+  color: var(--text-soft);
+}
+
+.about-body p { margin: 0 0 1.4em; }
+.about-body p:last-child { margin-bottom: 0; }
+
+/* On the Shelf */
+.about-shelf-section { }
+
+.about-shelf-head {
+  margin-bottom: 28px;
+}
+
+.about-shelf-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 8px;
+}
+
+.about-shelf-intro {
+  font-size: 0.84rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.about-shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 680px) {
+  .about-shelf-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.about-shelf-book {
+  display: flex;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.about-shelf-spine {
+  width: 3px;
+  min-height: 60px;
+  background: var(--purple);
+  border-radius: 2px;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.about-shelf-book-body {
+  flex: 1;
+}
+
+.about-shelf-book-title {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.about-shelf-book-author {
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.about-shelf-book-note {
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Collaboration */
+.about-collab { }
+
+.about-collab-label {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 12px;
+}
+
+.about-collab-text {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: var(--text-soft);
+  max-width: 56ch;
+  margin: 0 0 16px;
+}
+
+.about-collab-link {
+  font-size: 0.82rem;
+  color: var(--purple-deep);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 2px;
+  transition: border-color 0.15s;
+}
+
+.about-collab-link:hover { border-color: var(--purple); }
+
+
+/* =========================
+   ARCHIVE — series label
+========================= */
+
+.archive-row-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.archive-row-kicker-sep {
+  font-size: 0.6rem;
+  color: var(--muted-2, #a0a0aa);
+}
+
+.archive-row-series {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+
+.archive-row-location {
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+}
+
+
+/* =========================
+   SETTINGS — shelf manager
+========================= */
+
+.shelf-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.shelf-book-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.shelf-book-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.shelf-book-card .admin-settings-grid {
+  padding: 14px;
+}
+
+.shelf-add-btn {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--purple-deep);
+  cursor: pointer;
+  transition: background 0.15s;
+  align-self: flex-start;
+}
+
+.shelf-add-btn:hover { background: var(--purple-soft); }
+
+
+/* =========================
+   FOOTER — RSS link
+========================= */
+
+.footer-rss {
+  font-size: inherit;
+  color: inherit;
+  text-decoration: none;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.footer-rss:hover { opacity: 1; color: var(--purple); }

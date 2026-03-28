@@ -5,17 +5,13 @@ type FooterSettings = {
   footer_right?: string | null;
 };
 
-export default function Footer({
-  settings,
-}: {
-  settings: FooterSettings | null;
-}) {
+export default function Footer({ settings }: { settings: FooterSettings | null }) {
   return (
     <footer className="footer">
       <div className="footer-left">
         <div className="footer-brand">Surface Interval</div>
         <div className="footer-copy">
-          {settings?.footer_left || "Editorial · Brand · Creative"}
+          {settings?.footer_left || "Surface Interval – Irene W"}
         </div>
       </div>
 
@@ -23,10 +19,19 @@ export default function Footer({
         <Link href="/about">About</Link>
         <Link href="/archive">Archive</Link>
         <Link href="/search">Search</Link>
+        <a
+          href="/rss.xml"
+          className="footer-rss"
+          title="Subscribe via RSS"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          RSS
+        </a>
       </div>
 
       <div className="footer-right">
-        {settings?.footer_right || "© 2026 Surface Interval"}
+        {settings?.footer_right || "Modern editorial journal · photography-led long-form writing"}
       </div>
     </footer>
   );

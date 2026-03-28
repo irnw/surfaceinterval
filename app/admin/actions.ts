@@ -32,11 +32,8 @@ function parseBody(raw: FormDataEntryValue | null): unknown[] {
 function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: boolean }) {
   const status = String(formData.get("status") || "draft");
   const keepPublishedDate = options?.keepPublishedDate ?? false;
-
-  // scheduledAt arrives as a clean UTC ISO string — no conversion needed
   const scheduledAtRaw = String(formData.get("scheduledAt") || "").trim();
   const scheduledAt = scheduledAtRaw && status === "scheduled" ? scheduledAtRaw : null;
-
   const publishedAt =
     status === "published"
       ? keepPublishedDate
@@ -116,7 +113,6 @@ export async function quickUpdatePost(id: number, formData: FormData) {
   const editorsPickOrder = isEditorsPick ? parseEditorsPickOrder(formData.get("editorsPickOrder")) : null;
   const scheduledAtRaw = String(formData.get("scheduledAt") || "").trim();
   const scheduledAt = scheduledAtRaw && status === "scheduled" ? scheduledAtRaw : null;
-
   await normalizeHomepageFlags(id, isFeatured);
   const { error } = await supabaseAdmin.from("posts").update({
     status, is_featured: isFeatured, is_editors_pick: isEditorsPick,
@@ -175,18 +171,38 @@ export async function saveSiteSettings(formData: FormData) {
         .map((item) => ({ image: String(item.image || "").trim(), caption: String(item.caption || "").trim() }));
     }
   } catch { heroSlides = []; }
+
+  // Parse reading shelf
+  let readingShelf: Array<{ title: string; author: string; note: string }> = [];
+  try {
+    const raw = String(formData.get("readingShelfPayload") || "[]");
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      readingShelf = parsed
+        .filter((b) => b?.title?.trim())
+        .slice(0, 6)
+        .map((b) => ({
+          title: String(b.title || "").trim(),
+          author: String(b.author || "").trim(),
+          note: String(b.note || "").trim(),
+        }));
+    }
+  } catch { readingShelf = []; }
+
   const settingsId = await getPrimarySettingsRowId();
   const { error } = await supabaseAdmin.from("settings").update({
     hero_slides: heroSlides,
     about_title: String(formData.get("about_title") || "").trim(),
     about_intro: String(formData.get("about_intro") || "").trim(),
     about_body: String(formData.get("about_body") || "").trim(),
+    collaboration_note: String(formData.get("collaboration_note") || "").trim(),
     contact_title: String(formData.get("contact_title") || "").trim(),
     contact_intro: String(formData.get("contact_intro") || "").trim(),
     contact_email: String(formData.get("contact_email") || "").trim(),
     contact_body: String(formData.get("contact_body") || "").trim(),
     dives_logged: String(formData.get("dives_logged") || "").trim(),
     countries_reached: String(formData.get("countries_reached") || "").trim(),
+    reading_shelf: readingShelf,
     updated_at: new Date().toISOString(),
   }).eq("id", settingsId);
   if (error) throw new Error(error.message);

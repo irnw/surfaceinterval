@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   },
 };
 
+type ShelfBook = {
+  title: string;
+  author: string;
+  note?: string;
+};
+
 export default async function AboutPage() {
   const supabase = await createSupabaseServerClient();
 
@@ -32,30 +38,128 @@ export default async function AboutPage() {
 
   const paragraphs = String(settings?.about_body || "")
     .split("\n")
-    .map((p) => p.trim())
+    .map((p: string) => p.trim())
     .filter(Boolean);
+
+  const shelf: ShelfBook[] = Array.isArray(settings?.reading_shelf)
+    ? (settings.reading_shelf as ShelfBook[]).slice(0, 6)
+    : [];
 
   return (
     <>
       <Header />
 
-      <main className="post-shell">
-        <div className="post-head">
-          <div className="post-meta">About</div>
-          <h1 className="post-title">
-            {settings?.about_title || "Editorial · Brand · Creative"}
-          </h1>
-          <div className="post-standfirst">
-            {settings?.about_intro ||
-              "Surface Interval is a writing and image-led journal about diving, travel, gear, and the quieter observations that stay with you after the trip is over."}
+      <main className="about-shell">
+
+        {/* ── HERO ── */}
+        <div className="about-hero">
+          <div className="about-hero-text">
+            <div className="about-kicker">About</div>
+            <h1 className="about-title">
+              {settings?.about_title || "A journal from the deep end of the world."}
+            </h1>
+            <p className="about-intro">
+              {settings?.about_intro ||
+                "Surface Interval is a writing and image-led journal about diving, travel, gear, and the quieter observations that stay with you after the trip is over."}
+            </p>
+          </div>
+
+          {/* Portrait — upload your photo via Media and update hero_image in settings */}
+          {settings?.hero_image ? (
+            <div className="about-portrait">
+              <img src={settings.hero_image} alt="Irene W" />
+            </div>
+          ) : (
+            <div className="about-portrait about-portrait--placeholder">
+              <div className="about-portrait-label">Irene W</div>
+            </div>
+          )}
+        </div>
+
+        {/* ── DIVIDER ── */}
+        <div className="about-rule" />
+
+        {/* ── CREDENTIALS STRIP ── */}
+        <div className="about-credentials">
+          <div className="about-credential">
+            <div className="about-credential-label">Certification</div>
+            <div className="about-credential-value">PADI Rescue Diver · EFR</div>
+          </div>
+          <div className="about-credential">
+            <div className="about-credential-label">Diving since</div>
+            <div className="about-credential-value">2015</div>
+          </div>
+          <div className="about-credential">
+            <div className="about-credential-label">Oceans dived</div>
+            <div className="about-credential-value">Indian · Red Sea · Pacific</div>
+          </div>
+          <div className="about-credential">
+            <div className="about-credential-label">Camera</div>
+            <div className="about-credential-value">OM System OM-1 · GoPro Hero 13</div>
+          </div>
+          <div className="about-credential">
+            <div className="about-credential-label">Based in</div>
+            <div className="about-credential-value">Singapore</div>
           </div>
         </div>
 
-        <article className="prose">
-          {paragraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
-          ))}
-        </article>
+        <div className="about-rule" />
+
+        {/* ── BODY TEXT ── */}
+        {paragraphs.length > 0 && (
+          <article className="about-body prose">
+            {paragraphs.map((paragraph: string, index: number) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </article>
+        )}
+
+        {/* ── ON THE SHELF ── */}
+        {shelf.length > 0 && (
+          <div className="about-shelf-section">
+            <div className="about-rule" />
+            <div className="about-shelf-head">
+              <div className="about-shelf-label">On the Shelf</div>
+              <p className="about-shelf-intro">
+                A few books currently within reach.
+              </p>
+            </div>
+            <div className="about-shelf-grid">
+              {shelf.map((book, i) => (
+                <div key={i} className="about-shelf-book">
+                  <div className="about-shelf-spine" />
+                  <div className="about-shelf-book-body">
+                    <div className="about-shelf-book-title">{book.title}</div>
+                    <div className="about-shelf-book-author">{book.author}</div>
+                    {book.note && (
+                      <div className="about-shelf-book-note">{book.note}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="about-rule" />
+
+        {/* ── COLLABORATION ── */}
+        <div className="about-collab">
+          <div className="about-collab-label">Work together</div>
+          <p className="about-collab-text">
+            {settings?.collaboration_note ||
+              "Open to selected collaborations across editorial work, travel and diving features, gear storytelling, and brand partnerships that fit the tone of this journal."}
+          </p>
+          {settings?.contact_email && (
+            <a
+              href={`mailto:${settings.contact_email}`}
+              className="about-collab-link"
+            >
+              {settings.contact_email}
+            </a>
+          )}
+        </div>
+
       </main>
 
       <Footer settings={settings} />
