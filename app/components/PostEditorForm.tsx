@@ -101,7 +101,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
   // Track the last auto-generated slug so we know if the user has customised it
   // Initialise to the auto-slug of the initial title so edits to title keep updating
-  const prevAutoSlug = useRef(autoSlugify(initial?.title || ""));
+  const prevAutoSlug = useRef(initial?.slug || "");
 
   const initialBlocksJson = useMemo(() => JSON.stringify(parseBody(initial?.body)), [initial?.body]);
   const isDirty =
