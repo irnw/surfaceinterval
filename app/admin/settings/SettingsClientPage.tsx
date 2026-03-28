@@ -33,6 +33,10 @@ export default function SettingsClientPage({
   const [contactEmail, setContactEmail] = useState(initialSettings?.contact_email || "");
   const [contactBody, setContactBody] = useState(initialSettings?.contact_body || "");
 
+  // ── NEW: manually editable homepage stats ──
+  const [divesLogged, setDivesLogged] = useState(initialSettings?.dives_logged || "");
+  const [countriesReached, setCountriesReached] = useState(initialSettings?.countries_reached || "");
+
   function updateSlide(index: number, next: HeroSlide) {
     const copy = [...heroSlides];
     copy[index] = next;
@@ -68,6 +72,35 @@ export default function SettingsClientPage({
           value={JSON.stringify(heroSlides)}
         />
 
+        {/* ── HOMEPAGE STATS ── */}
+        <div className="admin-settings-section">
+          <h3 className="admin-settings-title">Homepage Stats</h3>
+          <p className="admin-settings-note">
+            Update these after each trip or milestone. They appear on the homepage stats strip.
+          </p>
+          <div className="admin-settings-grid">
+            <div className="admin-setting">
+              <label>Dives Logged</label>
+              <input
+                name="dives_logged"
+                value={divesLogged}
+                placeholder="e.g. 500+"
+                onChange={(e) => setDivesLogged(e.target.value)}
+              />
+            </div>
+            <div className="admin-setting">
+              <label>Countries Reached</label>
+              <input
+                name="countries_reached"
+                value={countriesReached}
+                placeholder="e.g. 40+"
+                onChange={(e) => setCountriesReached(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ── HERO SLIDES ── */}
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">Homepage Hero Slides</h3>
 
@@ -119,6 +152,7 @@ export default function SettingsClientPage({
           </div>
         </div>
 
+        {/* ── ABOUT PAGE ── */}
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">About Page</h3>
 
@@ -154,6 +188,7 @@ export default function SettingsClientPage({
           </div>
         </div>
 
+        {/* ── CONTACT PAGE ── */}
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">Contact Page</h3>
 

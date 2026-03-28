@@ -2108,3 +2108,155 @@ html[data-theme="dark"] .media-modal-card {
   .admin-topbar-left,
   .admin-topbar-right { width: 100%; }
 }
+
+/* ============================================================
+   PASTE THIS AT THE BOTTOM OF YOUR globals.css
+   ============================================================ */
+
+
+/* =========================
+   SETTINGS — note style
+========================= */
+
+.admin-settings-note {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 14px;
+  max-width: 52ch;
+}
+
+
+/* =========================
+   POSTS TABLE — compact, no horizontal scroll
+========================= */
+
+.posts-table-wrap {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+.posts-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.posts-table .col-title   { width: 38%; }
+.posts-table .col-cat     { width: 12%; }
+.posts-table .col-status  { width: 11%; }
+.posts-table .col-date    { width: 13%; }
+.posts-table .col-actions { width: 26%; }
+
+.posts-table th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 2px solid var(--line);
+  white-space: nowrap;
+}
+
+.posts-table td {
+  padding: 11px 12px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.posts-table tr:last-child td { border-bottom: none; }
+
+.posts-table tr:hover td { background: var(--purple-soft); }
+
+/* Truncate long titles */
+.posts-table .cell-title {
+  font-family: var(--font-serif);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 0; /* required for ellipsis in table cells */
+}
+
+.posts-table .cell-cat {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+
+/* Status pills */
+.status-pill {
+  display: inline-block;
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.status-pill.published {
+  background: rgba(99, 153, 34, 0.12);
+  color: #3b6d11;
+}
+
+.status-pill.draft {
+  background: var(--purple-soft);
+  color: var(--purple-deep);
+}
+
+.status-pill.scheduled {
+  background: rgba(186, 117, 23, 0.12);
+  color: #854f0b;
+}
+
+.cell-date {
+  font-size: 0.7rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Row action buttons */
+.cell-actions {
+  display: flex;
+  gap: 5px;
+  flex-wrap: nowrap;
+}
+
+.table-action-btn {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.table-action-btn:hover {
+  background: var(--purple-soft);
+  color: var(--purple-deep);
+  border-color: var(--line-strong);
+}
+
+.table-action-btn.danger:hover {
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+}

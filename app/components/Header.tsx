@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
+import { createBrowserClient } from "@supabase/ssr";
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -17,8 +18,28 @@ function navLinkClass(pathname: string, href: string) {
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const isHome = pathname === "/";
+
+  useEffect(() => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsSignedIn(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsSignedIn(!!session);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <header className={`masthead ${isHome ? "masthead-home" : "masthead-inner-page"}`}>
@@ -106,12 +127,18 @@ export default function Header() {
 
             <ThemeToggle />
 
-            <Link
-              href="/admin"
-              className={`nav-pill ${pathname.startsWith("/admin") ? "is-active" : ""}`}
-            >
-              Dashboard
-            </Link>
+            {isSignedIn ? (
+              <Link
+                href="/admin"
+                className={`nav-pill ${pathname.startsWith("/admin") ? "is-active" : ""}`}
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <Link href="/admin/login" className="nav-pill">
+                Admin
+              </Link>
+            )}
           </nav>
 
           {open ? (

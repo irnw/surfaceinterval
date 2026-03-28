@@ -34,10 +34,8 @@ function toCaptionArray(text: string) {
 function parseEditorsPickOrder(value: FormDataEntryValue | null) {
   const raw = String(value || "").trim();
   if (!raw) return null;
-
   const parsed = Number(raw);
   if (Number.isNaN(parsed)) return null;
-
   return parsed;
 }
 
@@ -127,13 +125,9 @@ async function getPrimarySettingsRowId() {
 
 export async function createPost(formData: FormData) {
   const payload = buildPostPayload(formData);
-
   await normalizeHomepageFlags(undefined, payload.is_featured);
-
   const { error } = await supabaseAdmin.from("posts").insert(payload);
-
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/archive");
   revalidatePath("/search");
@@ -143,19 +137,12 @@ export async function createPost(formData: FormData) {
 
 export async function updatePost(id: number, formData: FormData) {
   const payload = buildPostPayload(formData, { keepPublishedDate: true });
-
   await normalizeHomepageFlags(id, payload.is_featured);
-
   const { error } = await supabaseAdmin
     .from("posts")
-    .update({
-      ...payload,
-      updated_at: new Date().toISOString(),
-    })
+    .update({ ...payload, updated_at: new Date().toISOString() })
     .eq("id", id);
-
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/archive");
   revalidatePath("/search");
@@ -174,18 +161,16 @@ export async function quickUpdatePost(id: number, formData: FormData) {
 
   await normalizeHomepageFlags(id, isFeatured);
 
-  const updatePayload = {
-    status,
-    is_featured: isFeatured,
-    is_editors_pick: isEditorsPick,
-    editors_pick_order: editorsPickOrder,
-    published_at: status === "published" ? new Date().toISOString() : null,
-    updated_at: new Date().toISOString(),
-  };
-
   const { error } = await supabaseAdmin
     .from("posts")
-    .update(updatePayload)
+    .update({
+      status,
+      is_featured: isFeatured,
+      is_editors_pick: isEditorsPick,
+      editors_pick_order: editorsPickOrder,
+      published_at: status === "published" ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id);
 
   if (error) throw new Error(error.message);
@@ -204,7 +189,6 @@ export async function deletePost(id: number) {
     .single();
 
   const { error } = await supabaseAdmin.from("posts").delete().eq("id", id);
-
   if (error) throw new Error(error.message);
 
   revalidatePath("/");
@@ -247,7 +231,6 @@ export async function duplicatePost(id: number) {
   };
 
   const { error } = await supabaseAdmin.from("posts").insert(payload);
-
   if (error) throw new Error(error.message);
 
   revalidatePath("/");
@@ -258,9 +241,7 @@ export async function duplicatePost(id: number) {
 }
 
 export async function createDashboardUser(formData: FormData) {
-  const email = String(formData.get("email") || "")
-    .trim()
-    .toLowerCase();
+  const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "").trim();
 
   if (!email || !password) {
@@ -286,7 +267,6 @@ export async function saveSiteSettings(formData: FormData) {
 
   try {
     const parsed = JSON.parse(heroSlidesRaw);
-
     if (Array.isArray(parsed)) {
       heroSlides = parsed
         .filter(
@@ -316,6 +296,9 @@ export async function saveSiteSettings(formData: FormData) {
     contact_intro: String(formData.get("contact_intro") || "").trim(),
     contact_email: String(formData.get("contact_email") || "").trim(),
     contact_body: String(formData.get("contact_body") || "").trim(),
+    // ── NEW: manually editable homepage stats ──
+    dives_logged: String(formData.get("dives_logged") || "").trim(),
+    countries_reached: String(formData.get("countries_reached") || "").trim(),
     updated_at: new Date().toISOString(),
   };
 
