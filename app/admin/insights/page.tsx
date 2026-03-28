@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
+import { createSupabaseBrowserClient } from "../../lib/supabase-browser";
 
 type Period = "day" | "week" | "month" | "3months" | "6months" | "9months" | "year";
 
@@ -44,6 +44,7 @@ export default function InsightsPage() {
   useEffect(() => {
     async function load() {
       setLoading(true);
+      const supabase = createSupabaseBrowserClient();
       const { data } = await supabase
         .from("share_events")
         .select("slug, platform, shared_at")
@@ -82,7 +83,6 @@ export default function InsightsPage() {
         </div>
       </div>
 
-      {/* Period toggle */}
       <div className="ins-period-bar">
         {PERIODS.map((p) => (
           <button
@@ -96,14 +96,12 @@ export default function InsightsPage() {
         ))}
       </div>
 
-      {/* Summary cards */}
       <div className="ins-cards">
         <div className="ins-card">
           <div className="ins-card-label">Total Shares</div>
           <div className="ins-card-value">{loading ? "—" : totalShares > 0 ? totalShares : "0"}</div>
           <div className="ins-card-sub">across all platforms</div>
         </div>
-
         <div className="ins-card">
           <div className="ins-card-label">Top Platform</div>
           <div className="ins-card-value">
@@ -113,13 +111,11 @@ export default function InsightsPage() {
             {totalShares > 0 ? `${platformCounts[topPlatform] ?? 0} shares` : "no data yet"}
           </div>
         </div>
-
         <div className="ins-card">
           <div className="ins-card-label">Unique Visitors</div>
           <div className="ins-card-value">—</div>
           <div className="ins-card-sub">connect Google Analytics</div>
         </div>
-
         <div className="ins-card">
           <div className="ins-card-label">Avg. Time on Page</div>
           <div className="ins-card-value">—</div>
@@ -128,7 +124,6 @@ export default function InsightsPage() {
       </div>
 
       <div className="ins-body">
-        {/* Shares by platform */}
         <div className="ins-section">
           <div className="ins-section-head">
             <div className="ins-section-label">Shares by platform</div>
@@ -156,7 +151,6 @@ export default function InsightsPage() {
           )}
         </div>
 
-        {/* Top shared posts */}
         <div className="ins-section">
           <div className="ins-section-head">
             <div className="ins-section-label">Most shared posts</div>
@@ -170,12 +164,7 @@ export default function InsightsPage() {
               {topPosts.map(([slug, count], i) => (
                 <div key={slug} className="ins-post-row">
                   <span className="ins-post-rank">{i + 1}</span>
-                  <a
-                    href={`/posts/${slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ins-post-slug"
-                  >
+                  <a href={`/posts/${slug}`} target="_blank" rel="noopener noreferrer" className="ins-post-slug">
                     /posts/{slug}
                   </a>
                   <span className="ins-post-count">{count} {count === 1 ? "share" : "shares"}</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { createSupabaseBrowserClient } from "../lib/supabase-browser";
 
 interface ShareButtonsProps {
   title: string;
@@ -27,14 +27,8 @@ function buildShareUrl(platform: Platform, url: string, title: string): string {
     case "whatsapp":  return `https://wa.me/?text=${encTitle}%20${enc}`;
     case "linkedin":  return `https://www.linkedin.com/sharing/share-offsite/?url=${enc}`;
     case "email":     return `mailto:?subject=${encTitle}&body=I thought you might enjoy this: ${enc}`;
-    case "instagram": return ""; // no web share URL — copy to clipboard instead
+    case "instagram": return "";
   }
-}
-
-async function trackShare(slug: string, platform: string) {
-  try {
-    await supabase.from("share_events").insert({ slug, platform, shared_at: new Date().toISOString() });
-  } catch { /* non-critical */ }
 }
 
 export default function ShareButtons({ title, slug, position }: ShareButtonsProps) {
@@ -43,8 +37,19 @@ export default function ShareButtons({ title, slug, position }: ShareButtonsProp
 
   useEffect(() => { setPageUrl(window.location.href); }, []);
 
+  async function trackShare(platform: string) {
+    try {
+      const supabase = createSupabaseBrowserClient();
+      await supabase.from("share_events").insert({
+        slug,
+        platform,
+        shared_at: new Date().toISOString(),
+      });
+    } catch { /* non-critical */ }
+  }
+
   async function handleShare(platform: Platform) {
-    await trackShare(slug, platform);
+    await trackShare(platform);
 
     if (platform === "instagram") {
       await navigator.clipboard.writeText(pageUrl).catch(() => {});

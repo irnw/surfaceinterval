@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { createSupabaseBrowserClient } from "../lib/supabase-browser";
 
 type MediaLibraryProps = {
   onSelect?: (url: string) => void;
@@ -33,6 +33,9 @@ export default function MediaLibrary({ onSelect, selectable = true }: MediaLibra
   const [bulkDeleting, setBulkDeleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Create client once — createBrowserClient reads cookies so session is attached
+  const supabase = createSupabaseBrowserClient();
+
   useEffect(() => { loadFiles(); }, []);
 
   async function loadFiles() {
@@ -55,7 +58,6 @@ export default function MediaLibrary({ onSelect, selectable = true }: MediaLibra
     setUploading(true);
     setError("");
     try {
-      const ext = file.name.split(".").pop();
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-").toLowerCase();
       const filePath = `uploads/${Date.now()}-${safeName}`;
 
@@ -175,12 +177,7 @@ export default function MediaLibrary({ onSelect, selectable = true }: MediaLibra
 
           {selected.size > 0 && (
             <div className="ml-bulk-actions">
-              <button
-                type="button"
-                className="ml-bulk-btn"
-                onClick={handleBulkDownload}
-                title="Download selected"
-              >
+              <button type="button" className="ml-bulk-btn" onClick={handleBulkDownload}>
                 Download ({selected.size})
               </button>
               <button
@@ -188,7 +185,6 @@ export default function MediaLibrary({ onSelect, selectable = true }: MediaLibra
                 className="ml-bulk-btn ml-bulk-btn--danger"
                 onClick={handleBulkDelete}
                 disabled={bulkDeleting}
-                title="Delete selected"
               >
                 {bulkDeleting ? "Deleting…" : `Delete (${selected.size})`}
               </button>
@@ -206,7 +202,6 @@ export default function MediaLibrary({ onSelect, selectable = true }: MediaLibra
               key={item.path}
               className={`ml-card ${selected.has(item.path) ? "ml-card--selected" : ""}`}
             >
-              {/* Checkbox */}
               <div className="ml-card-check">
                 <input
                   type="checkbox"
@@ -216,7 +211,6 @@ export default function MediaLibrary({ onSelect, selectable = true }: MediaLibra
                 />
               </div>
 
-              {/* Thumbnail */}
               <div
                 className="ml-thumb"
                 onClick={() => {
@@ -234,7 +228,6 @@ export default function MediaLibrary({ onSelect, selectable = true }: MediaLibra
                 {copied === item.publicUrl && <div className="ml-copied-toast">Copied!</div>}
               </div>
 
-              {/* Footer */}
               <div className="ml-card-footer">
                 <span className="ml-filename" title={item.name}>{item.name.slice(0, 18)}</span>
                 <div className="ml-card-actions">
