@@ -2260,3 +2260,535 @@ html[data-theme="dark"] .media-modal-card {
   color: #dc2626;
   border-color: rgba(220, 38, 38, 0.3);
 }
+
+/* ============================================================
+   PASTE AT THE BOTTOM OF globals.css
+   PostEditorForm (pef-) + Admin Posts Table (apt-)
+   ============================================================ */
+
+
+/* =========================
+   POST EDITOR FORM
+========================= */
+
+.pef-dirty-bar {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--purple-deep);
+  background: var(--purple-soft);
+  border: 1px solid var(--line-strong);
+  padding: 7px 14px;
+  border-radius: 6px;
+  margin-bottom: 18px;
+}
+
+.pef-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Top bar */
+.pef-topbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+
+.pef-inline-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Field */
+.pef-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+}
+
+.pef-field:last-child { margin-bottom: 0; }
+
+.pef-field--slim { flex: 1; min-width: 100px; }
+
+.pef-field--title { flex: 1; }
+
+/* Labels */
+.pef-label {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pef-label-hint {
+  font-size: 0.56rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--light, #a3a3af);
+  font-weight: 400;
+}
+
+/* Inputs */
+.pef-input {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: var(--surface-2);
+  width: 100%;
+  transition: border-color 0.15s;
+}
+
+.pef-input:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+.pef-input--title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.pef-input--caption {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.pef-select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--text);
+  background: var(--surface-2);
+  width: 100%;
+  cursor: pointer;
+}
+
+.pef-textarea {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: var(--text);
+  background: var(--surface-2);
+  width: 100%;
+  resize: vertical;
+  transition: border-color 0.15s;
+}
+
+.pef-textarea:focus {
+  outline: none;
+  border-color: var(--purple);
+}
+
+/* Slug row */
+.pef-slug-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.pef-slug-prefix {
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.pef-slug-input {
+  border: none;
+  border-bottom: 1px dashed var(--line);
+  border-radius: 0;
+  padding: 3px 0;
+  font: inherit;
+  font-size: 0.78rem;
+  color: var(--muted);
+  background: transparent;
+  width: 100%;
+}
+
+.pef-slug-input:focus {
+  outline: none;
+  border-bottom-color: var(--purple);
+}
+
+/* Collapsible sections */
+.pef-section {
+  border-top: 1px solid var(--line);
+  margin-bottom: 0;
+}
+
+.pef-section-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  appearance: none;
+}
+
+.pef-section-label {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.pef-section-arrow {
+  font-size: 0.5rem;
+  color: var(--light, #a3a3af);
+}
+
+.pef-section-body {
+  padding-bottom: 20px;
+}
+
+/* Image row */
+.pef-image-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pef-image-row .pef-input { flex: 1; }
+
+.pef-image-preview {
+  margin-top: 8px;
+  max-height: 140px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  object-fit: cover;
+}
+
+/* Ghost buttons */
+.pef-btn-ghost {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--purple-deep);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.pef-btn-ghost:hover { background: var(--purple-soft); }
+
+.pef-btn-ghost--muted { color: var(--muted); }
+.pef-btn-ghost--muted:hover { background: var(--warm, #f5f2ee); color: var(--text); }
+
+/* Metadata grid */
+.pef-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+/* Homepage flags */
+.pef-flags-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pef-check-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.pef-check-label input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--purple);
+}
+
+/* Save bar */
+.pef-save-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 20px;
+  margin-top: 4px;
+  border-top: 1px solid var(--line);
+}
+
+.pef-btn-save {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 11px 24px;
+  background: var(--purple-deep);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pef-btn-save:hover { background: var(--purple); }
+.pef-btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.pef-save-hint {
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* Modal */
+.pef-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.pef-modal-card {
+  width: min(980px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  background: var(--surface-2);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.pef-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.pef-modal-head h3 { margin: 0; font-size: 1rem; }
+
+
+/* =========================
+   ADMIN POSTS TABLE (apt-)
+========================= */
+
+.apt-wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.apt-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.apt-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 2px solid var(--line);
+  white-space: nowrap;
+}
+
+.apt-table td {
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.apt-table tr:last-child td { border-bottom: none; }
+.apt-table tr:hover td { background: var(--purple-soft); }
+
+.apt-title {
+  font-family: var(--font-serif);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.apt-slug {
+  font-size: 0.62rem;
+  color: var(--light, #a3a3af);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.apt-cat {
+  font-size: 0.68rem;
+  color: var(--muted);
+  vertical-align: middle;
+  padding-top: 14px !important;
+}
+
+.apt-date {
+  font-size: 0.68rem;
+  color: var(--muted);
+  white-space: nowrap;
+  vertical-align: middle;
+  padding-top: 14px !important;
+}
+
+.apt-flags {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 4px;
+}
+
+.apt-none {
+  color: var(--light, #a3a3af);
+  font-size: 0.7rem;
+}
+
+/* Action links row */
+.apt-actions {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 7px;
+}
+
+.apt-btn {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.apt-btn:hover {
+  background: var(--purple-soft);
+  color: var(--purple-deep);
+  border-color: var(--line-strong);
+}
+
+/* Quick edit form — single compact row */
+.apt-qe {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+}
+
+.apt-qe-select {
+  font: inherit;
+  font-size: 0.62rem;
+  padding: 3px 5px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  max-width: 56px;
+}
+
+.apt-qe-check {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.apt-qe-check span {
+  font-size: 0.5rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.apt-qe-check input[type="checkbox"] {
+  accent-color: var(--purple);
+  width: 13px;
+  height: 13px;
+}
+
+.apt-qe-num {
+  font: inherit;
+  font-size: 0.68rem;
+  width: 34px;
+  padding: 3px 4px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface-2);
+  text-align: center;
+  color: var(--text);
+}
+
+.apt-qe-num::-webkit-inner-spin-button,
+.apt-qe-num::-webkit-outer-spin-button { opacity: 0; }
+
+.apt-qe-apply {
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  background: var(--purple-soft);
+  color: var(--purple-deep);
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.apt-qe-apply:hover { background: var(--purple-deep); color: #fff; }

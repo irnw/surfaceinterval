@@ -3,11 +3,9 @@ import { createSupabaseServerClient } from "../lib/supabase-server";
 import { quickUpdatePost } from "./actions";
 
 function StatusBadge({ status }: { status: string }) {
-  const isPublished = status === "published";
-
   return (
-    <span className={`admin-badge ${isPublished ? "is-published" : "is-draft"}`}>
-      {isPublished ? "Published" : "Draft"}
+    <span className={`admin-badge ${status === "published" ? "is-published" : "is-draft"}`}>
+      {status === "published" ? "Published" : "Draft"}
     </span>
   );
 }
@@ -20,46 +18,26 @@ function FlagBadge({
   tone?: "default" | "featured" | "pick";
 }) {
   return (
-    <span
-      className={`admin-badge ${
-        tone === "featured" ? "is-featured" : tone === "pick" ? "is-pick" : ""
-      }`}
-    >
+    <span className={`admin-badge ${tone === "featured" ? "is-featured" : tone === "pick" ? "is-pick" : ""}`}>
       {children}
     </span>
   );
 }
 
 function AdminBanner({
-  created,
-  saved,
-  duplicated,
-  deleted,
+  created, saved, duplicated, deleted,
 }: {
-  created?: string;
-  saved?: string;
-  duplicated?: string;
-  deleted?: string;
+  created?: string; saved?: string; duplicated?: string; deleted?: string;
 }) {
-  let text = "";
-  if (created) text = "Post created.";
-  if (saved) text = "Changes saved.";
-  if (duplicated) text = "Draft duplicated.";
-  if (deleted) text = "Post deleted.";
+  const text = created ? "Post created." : saved ? "Changes saved." : duplicated ? "Draft duplicated." : deleted ? "Post deleted." : "";
   if (!text) return null;
-
   return <div className="admin-banner">{text}</div>;
 }
 
 export default async function AdminPostsPage({
   searchParams,
 }: {
-  searchParams: Promise<{
-    created?: string;
-    saved?: string;
-    duplicated?: string;
-    deleted?: string;
-  }>;
+  searchParams: Promise<{ created?: string; saved?: string; duplicated?: string; deleted?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
@@ -72,12 +50,7 @@ export default async function AdminPostsPage({
   if (error) {
     return (
       <div className="admin-panel">
-        <div className="admin-panel-head">
-          <div>
-            <h2>Posts</h2>
-            <p>Error loading posts.</p>
-          </div>
-        </div>
+        <p style={{ color: "var(--muted)", padding: "24px 0" }}>Error loading posts.</p>
       </div>
     );
   }
@@ -93,147 +66,111 @@ export default async function AdminPostsPage({
 
       <AdminBanner {...params} />
 
-      <div className="admin-table-shell">
-        <div className="table-wrap">
-          <table className="admin-table">
-            <colgroup>
-              <col style={{ width: "31%" }} />
-              <col style={{ width: "12%" }} />
-              <col style={{ width: "12%" }} />
-              <col style={{ width: "18%" }} />
-              <col style={{ width: "10%" }} />
-              <col style={{ width: "17%" }} />
-            </colgroup>
+      <div className="apt-wrap">
+        <table className="apt-table">
+          <colgroup>
+            <col style={{ width: "34%" }} />
+            <col style={{ width: "11%" }} />
+            <col style={{ width: "11%" }} />
+            <col style={{ width: "14%" }} />
+            <col style={{ width: "11%" }} />
+            <col style={{ width: "19%" }} />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Homepage</th>
+              <th>Published</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {posts?.map((post) => {
+              async function action(formData: FormData) {
+                "use server";
+                await quickUpdatePost(post.id, formData);
+              }
 
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Status</th>
-                <th>Homepage</th>
-                <th>Published</th>
-                <th>Quick Edit</th>
-              </tr>
-            </thead>
+              const badges: React.ReactNode[] = [];
+              if (post.is_featured) badges.push(<FlagBadge key="f" tone="featured">Featured</FlagBadge>);
+              if (post.is_editors_pick) badges.push(
+                <FlagBadge key="p" tone="pick">
+                  Pick{post.editors_pick_order != null ? ` #${post.editors_pick_order}` : ""}
+                </FlagBadge>
+              );
 
-            <tbody>
-              {posts?.map((post) => {
-                async function action(formData: FormData) {
-                  "use server";
-                  await quickUpdatePost(post.id, formData);
-                }
+              return (
+                <tr key={post.id}>
+                  {/* Title */}
+                  <td>
+                    <div className="apt-title">{post.title}</div>
+                    <div className="apt-slug">/posts/{post.slug}</div>
+                  </td>
 
-                const homepageBadges: React.ReactNode[] = [];
+                  {/* Category */}
+                  <td className="apt-cat">{post.category}</td>
 
-                if (post.is_featured) {
-                  homepageBadges.push(
-                    <FlagBadge key="featured" tone="featured">
-                      Featured
-                    </FlagBadge>
-                  );
-                }
+                  {/* Status */}
+                  <td><StatusBadge status={post.status} /></td>
 
-                if (post.is_editors_pick) {
-                  homepageBadges.push(
-                    <FlagBadge key="pick" tone="pick">
-                      Editor&apos;s Pick
-                      {post.editors_pick_order != null
-                        ? ` #${post.editors_pick_order}`
-                        : ""}
-                    </FlagBadge>
-                  );
-                }
+                  {/* Homepage flags */}
+                  <td>
+                    <div className="apt-flags">
+                      {badges.length > 0 ? badges : <span className="apt-none">—</span>}
+                    </div>
+                  </td>
 
-                if (homepageBadges.length === 0) {
-                  homepageBadges.push(<FlagBadge key="none">None</FlagBadge>);
-                }
+                  {/* Date */}
+                  <td className="apt-date">
+                    {post.published_at
+                      ? new Date(post.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" })
+                      : "—"}
+                  </td>
 
-                return (
-                  <tr key={post.id}>
-                    <td>
-                      <div className="admin-title-cell">
-                        <div className="admin-post-title">{post.title}</div>
-                        <div className="admin-post-slug">/posts/{post.slug}</div>
-                      </div>
-                    </td>
+                  {/* Actions + inline quick-edit */}
+                  <td>
+                    <div className="apt-actions">
+                      <Link href={`/admin/edit/${post.id}`} className="apt-btn">Edit</Link>
+                      <Link href={`/posts/${post.slug}`} target="_blank" className="apt-btn">View</Link>
+                    </div>
 
-                    <td className="admin-muted-cell">{post.category}</td>
+                    {/* Compact quick-edit — single row */}
+                    <form action={action} className="apt-qe">
+                      <select name="status" defaultValue={post.status} className="apt-qe-select">
+                        <option value="draft">Draft</option>
+                        <option value="published">Pub</option>
+                      </select>
 
-                    <td>
-                      <StatusBadge status={post.status} />
-                    </td>
+                      <label className="apt-qe-check" title="Featured">
+                        <input type="checkbox" name="featured" defaultChecked={!!post.is_featured} />
+                        <span>Feat</span>
+                      </label>
 
-                    <td>
-                      <div className="admin-badge-stack">{homepageBadges}</div>
-                    </td>
+                      <label className="apt-qe-check" title="Editor's Pick">
+                        <input type="checkbox" name="editorsPick" defaultChecked={!!post.is_editors_pick} />
+                        <span>Pick</span>
+                      </label>
 
-                    <td className="admin-muted-cell">
-                      {post.published_at
-                        ? new Date(post.published_at).toLocaleDateString("en-GB")
-                        : "—"}
-                    </td>
+                      <input
+                        type="number"
+                        name="editorsPickOrder"
+                        defaultValue={post.editors_pick_order ?? ""}
+                        placeholder="#"
+                        min="1"
+                        className="apt-qe-num"
+                        title="Pick order"
+                      />
 
-                    <td>
-                      <form action={action} className="admin-quick-form">
-                        <div className="admin-quick-grid">
-                          <div className="admin-quick-field">
-                            <span>Status</span>
-                            <select name="status" defaultValue={post.status}>
-                              <option value="draft">Draft</option>
-                              <option value="published">Published</option>
-                            </select>
-                          </div>
-
-                          <div className="admin-quick-field">
-                            <span>Editor&apos;s Pick Order</span>
-                            <input
-                              type="number"
-                              min="1"
-                              name="editorsPickOrder"
-                              defaultValue={post.editors_pick_order ?? ""}
-                              placeholder="Optional"
-                            />
-                          </div>
-                        </div>
-
-                        <div className="admin-check-row">
-                          <label className="admin-checkline">
-                            <input
-                              type="checkbox"
-                              name="featured"
-                              defaultChecked={!!post.is_featured}
-                            />
-                            Featured
-                          </label>
-
-                          <label className="admin-checkline">
-                            <input
-                              type="checkbox"
-                              name="editorsPick"
-                              defaultChecked={!!post.is_editors_pick}
-                            />
-                            Editor&apos;s Pick
-                          </label>
-                        </div>
-
-                        <div className="admin-post-actions">
-                          <button type="submit">Apply</button>
-
-                          <Link
-                            href={`/admin/edit/${post.id}`}
-                            className="admin-edit-link"
-                          >
-                            Edit
-                          </Link>
-                        </div>
-                      </form>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                      <button type="submit" className="apt-qe-apply">Apply</button>
+                    </form>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
