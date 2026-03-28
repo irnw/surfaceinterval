@@ -3885,3 +3885,85 @@ html[data-theme="dark"] .media-modal-card {
   padding: 10px 14px;
   background: var(--surface);
 }
+
+/* ============================================================
+   PASTE AT BOTTOM OF globals.css
+   Schedule picker — date + 8am/8pm slot buttons
+   ============================================================ */
+
+/* Post editor schedule picker */
+.pef-schedule-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pef-schedule-date {
+  flex: 1;
+  min-width: 150px;
+}
+
+.pef-schedule-slots {
+  display: flex;
+  gap: 6px;
+}
+
+.pef-slot-btn {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.pef-slot-btn:hover { background: var(--purple-soft); color: var(--purple-deep); }
+
+.pef-slot-btn.is-active {
+  background: var(--purple-deep);
+  border-color: var(--purple-deep);
+  color: #fff;
+}
+
+.pef-schedule-summary {
+  font-size: 0.72rem;
+  color: var(--purple-deep);
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+/* Quick edit schedule row */
+.apt-qe-slots {
+  display: flex;
+  gap: 4px;
+}
+
+.apt-qe-slot-btn {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 5px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.apt-qe-slot-btn:hover { background: var(--purple-soft); color: var(--purple-deep); }
+
+.apt-qe-slot-btn.is-active {
+  background: var(--purple-deep);
+  border-color: var(--purple-deep);
+  color: #fff;
+}

@@ -29,34 +29,13 @@ function parseBody(raw: FormDataEntryValue | null): unknown[] {
     .map((content) => ({ id: Math.random().toString(36).slice(2), type: "text", content }));
 }
 
-/**
- * Convert a datetime-local string (no timezone) to UTC ISO string
- * using the browser's timezone offset (in minutes, as returned by getTimezoneOffset()).
- *
- * getTimezoneOffset() returns minutes BEHIND UTC, so Singapore (UTC+8) returns -480.
- * We add the offset back to get the correct UTC time.
- */
-function toUtcIso(localDateTimeStr: string, tzOffsetMinutes: number): string {
-  if (!localDateTimeStr) return "";
-  // localDateTimeStr is like "2026-03-29T22:00" — no timezone
-  // Treat it as local time and convert to UTC
-  const localMs = new Date(localDateTimeStr).getTime();
-  // tzOffsetMinutes is negative for UTC+ zones (e.g. -480 for UTC+8)
-  // So UTC = local + offset (adding a negative number subtracts)
-  const utcMs = localMs + tzOffsetMinutes * 60 * 1000;
-  return new Date(utcMs).toISOString();
-}
-
 function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: boolean }) {
   const status = String(formData.get("status") || "draft");
   const keepPublishedDate = options?.keepPublishedDate ?? false;
 
+  // scheduledAt arrives as a clean UTC ISO string — no conversion needed
   const scheduledAtRaw = String(formData.get("scheduledAt") || "").trim();
-  const tzOffset = Number(formData.get("tzOffset") ?? "0");
-
-  const scheduledAt = scheduledAtRaw && status === "scheduled"
-    ? toUtcIso(scheduledAtRaw, tzOffset)
-    : null;
+  const scheduledAt = scheduledAtRaw && status === "scheduled" ? scheduledAtRaw : null;
 
   const publishedAt =
     status === "published"
@@ -135,11 +114,8 @@ export async function quickUpdatePost(id: number, formData: FormData) {
   const isFeatured = formData.get("featured") === "on";
   const isEditorsPick = formData.get("editorsPick") === "on";
   const editorsPickOrder = isEditorsPick ? parseEditorsPickOrder(formData.get("editorsPickOrder")) : null;
-
   const scheduledAtRaw = String(formData.get("scheduledAt") || "").trim();
-  const tzOffset = Number(formData.get("tzOffset") ?? "0");
-  const scheduledAt = scheduledAtRaw && status === "scheduled"
-    ? toUtcIso(scheduledAtRaw, tzOffset) : null;
+  const scheduledAt = scheduledAtRaw && status === "scheduled" ? scheduledAtRaw : null;
 
   await normalizeHomepageFlags(id, isFeatured);
   const { error } = await supabaseAdmin.from("posts").update({

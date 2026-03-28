@@ -21,36 +21,32 @@ type Props = {
 
 const categories = ["Diving", "Travel", "Gear", "Personal"];
 
-// SGT = UTC+8, so:
-// 8am SGT  = 00:00 UTC
-// 8pm SGT  = 12:00 UTC
+// Hobby plan: one cron per day at midnight UTC = 8am SGT
 const SGT_SLOTS = [
   { label: "8:00 AM (SGT)", utcHour: 0 },
 ];
 
-/**
- * Given a stored UTC ISO string, extract the date (YYYY-MM-DD in SGT)
- * and which slot (0 = 8am, 1 = 8pm) it corresponds to.
- */
 function parseStoredSchedule(utcIso: string): { date: string; slotIndex: number } {
   if (!utcIso) return { date: "", slotIndex: 0 };
   const d = new Date(utcIso);
-  // Convert to SGT (UTC+8)
   const sgtMs = d.getTime() + 8 * 60 * 60 * 1000;
   const sgt = new Date(sgtMs);
-  const date = sgt.toISOString().slice(0, 10); // YYYY-MM-DD
-  const utcHour = d.getUTCHours();
-  const slotIndex = utcHour >= 12 ? 1 : 0;
-  return { date, slotIndex };
+  const date = sgt.toISOString().slice(0, 10);
+  const slotIndex = d.getUTCHours() >= 12 ? 1 : 0;
+  return { date, slotIndex: Math.min(slotIndex, SGT_SLOTS.length - 1) };
 }
 
-/**
- * Build UTC ISO from a SGT date string + slot index.
- */
 function buildScheduledAt(date: string, slotIndex: number): string {
   if (!date) return "";
   const utcHour = SGT_SLOTS[slotIndex].utcHour;
   return `${date}T${String(utcHour).padStart(2, "0")}:00:00.000Z`;
+}
+
+function autoSlugify(title: string): string {
+  return title.toLowerCase().trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
 }
 
 function Section({ label, children, defaultOpen = false }: {
@@ -83,7 +79,6 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [readTime, setReadTime] = useState(initial?.readTime || "");
   const [status, setStatus] = useState(initial?.status || "draft");
 
-  // Schedule state — date + slot
   const parsedInitial = parseStoredSchedule(initial?.scheduledAt || "");
   const [scheduleDate, setScheduleDate] = useState(parsedInitial.date);
   const [scheduleSlot, setScheduleSlot] = useState(parsedInitial.slotIndex);
@@ -104,7 +99,9 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [mediaTarget, setMediaTarget] = useState<"hero" | "inline" | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const slugManuallyEdited = useRef(!!initial?.slug);
+  // Track the last auto-generated slug so we know if the user has customised it
+  // Initialise to the auto-slug of the initial title so edits to title keep updating
+  const prevAutoSlug = useRef(autoSlugify(initial?.title || ""));
 
   const initialBlocksJson = useMemo(() => JSON.stringify(parseBody(initial?.body)), [initial?.body]);
   const isDirty =
@@ -115,10 +112,14 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     category !== (initial?.category || "Diving") ||
     JSON.stringify(blocks) !== initialBlocksJson;
 
+  // Auto-generate slug from title — updates as long as slug hasn't been manually customised
   useEffect(() => {
-    if (slugManuallyEdited.current) return;
-    setSlug(title.toLowerCase().trim()
-      .replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-"));
+    const auto = autoSlugify(title);
+    // If current slug matches the previously auto-generated value, keep following the title
+    if (slug === prevAutoSlug.current || slug === "") {
+      setSlug(auto);
+      prevAutoSlug.current = auto;
+    }
   }, [title]);
 
   useEffect(() => { if (!editorsPick) setEditorsPickOrder(""); }, [editorsPick]);
@@ -132,7 +133,6 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [isDirty, submitting]);
 
-  // Today's date in SGT for min date validation
   const todaySGT = new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -150,10 +150,8 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     fd.set("inline", inline); fd.set("inlineCaption", inlineCaption);
     fd.set("galleryImages", galleryImages); fd.set("galleryCaptions", galleryCaptions);
     fd.set("postType", postType); fd.set("readTime", readTime);
-    fd.set("status", status);
-    // Send pre-built UTC ISO — no tzOffset needed since we handle conversion here
-    fd.set("scheduledAt", scheduledAt);
-    fd.set("tzOffset", "0"); // already UTC
+    fd.set("status", status); fd.set("scheduledAt", scheduledAt);
+    fd.set("tzOffset", "0");
     fd.set("featured", featured ? "true" : "false");
     fd.set("editorsPick", editorsPick ? "true" : "false");
     fd.set("editorsPickOrder", editorsPickOrder);
@@ -203,12 +201,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             </div>
           </div>
 
-          {/* Schedule picker — date + 8am/8pm SGT slots */}
           {status === "scheduled" && (
             <div className="pef-field pef-schedule-field">
               <label className="pef-label">
                 Publish on
-                <span className="pef-label-hint">posts go live at 8am or 8pm SGT</span>
+                <span className="pef-label-hint">posts go live at 8am SGT</span>
               </label>
               <div className="pef-schedule-row">
                 <input
@@ -218,22 +215,10 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
                   onChange={(e) => setScheduleDate(e.target.value)}
                   min={todaySGT}
                 />
-                <div className="pef-schedule-slots">
-                  {SGT_SLOTS.map((slot, i) => (
-                    <button
-                      key={slot.label}
-                      type="button"
-                      className={`pef-slot-btn ${scheduleSlot === i ? "is-active" : ""}`}
-                      onClick={() => setScheduleSlot(i)}
-                    >
-                      {slot.label}
-                    </button>
-                  ))}
-                </div>
               </div>
               {scheduleDate && (
                 <div className="pef-schedule-summary">
-                  Will publish on {new Date(buildScheduledAt(scheduleDate, scheduleSlot))
+                  Will publish on {new Date(buildScheduledAt(scheduleDate, 0))
                     .toLocaleString("en-SG", {
                       timeZone: "Asia/Singapore",
                       weekday: "short", day: "numeric", month: "short",
@@ -247,9 +232,16 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
         <div className="pef-slug-row">
           <span className="pef-slug-prefix">slug /</span>
-          <input className="pef-slug-input" value={slug}
-            onChange={(e) => { slugManuallyEdited.current = true; setSlug(e.target.value); }}
-            placeholder="auto-generated" />
+          <input
+            className="pef-slug-input"
+            value={slug}
+            onChange={(e) => {
+              // User is manually editing — stop following title
+              prevAutoSlug.current = "";
+              setSlug(e.target.value);
+            }}
+            placeholder="auto-generated from title"
+          />
         </div>
 
         <div className="pef-field">
