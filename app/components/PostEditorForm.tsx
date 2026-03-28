@@ -21,6 +21,38 @@ type Props = {
 
 const categories = ["Diving", "Travel", "Gear", "Personal"];
 
+// SGT = UTC+8, so:
+// 8am SGT  = 00:00 UTC
+// 8pm SGT  = 12:00 UTC
+const SGT_SLOTS = [
+  { label: "8:00 AM (SGT)", utcHour: 0 },
+];
+
+/**
+ * Given a stored UTC ISO string, extract the date (YYYY-MM-DD in SGT)
+ * and which slot (0 = 8am, 1 = 8pm) it corresponds to.
+ */
+function parseStoredSchedule(utcIso: string): { date: string; slotIndex: number } {
+  if (!utcIso) return { date: "", slotIndex: 0 };
+  const d = new Date(utcIso);
+  // Convert to SGT (UTC+8)
+  const sgtMs = d.getTime() + 8 * 60 * 60 * 1000;
+  const sgt = new Date(sgtMs);
+  const date = sgt.toISOString().slice(0, 10); // YYYY-MM-DD
+  const utcHour = d.getUTCHours();
+  const slotIndex = utcHour >= 12 ? 1 : 0;
+  return { date, slotIndex };
+}
+
+/**
+ * Build UTC ISO from a SGT date string + slot index.
+ */
+function buildScheduledAt(date: string, slotIndex: number): string {
+  if (!date) return "";
+  const utcHour = SGT_SLOTS[slotIndex].utcHour;
+  return `${date}T${String(utcHour).padStart(2, "0")}:00:00.000Z`;
+}
+
 function Section({ label, children, defaultOpen = false }: {
   label: string; children: React.ReactNode; defaultOpen?: boolean;
 }) {
@@ -37,19 +69,6 @@ function Section({ label, children, defaultOpen = false }: {
   );
 }
 
-/**
- * Convert a UTC ISO string to a datetime-local string in the user's local timezone.
- * Used to pre-fill the schedule input when editing an existing scheduled post.
- */
-function utcToLocalDatetimeLocal(utcIso: string): string {
-  if (!utcIso) return "";
-  const d = new Date(utcIso);
-  // Offset the date by timezone difference to get local time
-  const offset = d.getTimezoneOffset();
-  const local = new Date(d.getTime() - offset * 60 * 1000);
-  return local.toISOString().slice(0, 16);
-}
-
 export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [title, setTitle] = useState(initial?.title || "");
   const [slug, setSlug] = useState(initial?.slug || "");
@@ -63,10 +82,12 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [category, setCategory] = useState(initial?.category || "Diving");
   const [readTime, setReadTime] = useState(initial?.readTime || "");
   const [status, setStatus] = useState(initial?.status || "draft");
-  // ✅ Convert stored UTC back to local time for display
-  const [scheduledAt, setScheduledAt] = useState(
-    initial?.scheduledAt ? utcToLocalDatetimeLocal(initial.scheduledAt) : ""
-  );
+
+  // Schedule state — date + slot
+  const parsedInitial = parseStoredSchedule(initial?.scheduledAt || "");
+  const [scheduleDate, setScheduleDate] = useState(parsedInitial.date);
+  const [scheduleSlot, setScheduleSlot] = useState(parsedInitial.slotIndex);
+
   const [featured, setFeatured] = useState(initial?.featured || false);
   const [editorsPick, setEditorsPick] = useState(initial?.editorsPick || false);
   const [editorsPickOrder, setEditorsPickOrder] = useState(
@@ -111,13 +132,17 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [isDirty, submitting]);
 
+  // Today's date in SGT for min date validation
+  const todaySGT = new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (status === "scheduled" && !scheduledAt) {
-      alert("Please set a publish date and time before scheduling.");
+    if (status === "scheduled" && !scheduleDate) {
+      alert("Please choose a publish date.");
       return;
     }
     setSubmitting(true);
+    const scheduledAt = status === "scheduled" ? buildScheduledAt(scheduleDate, scheduleSlot) : "";
     const fd = new FormData();
     fd.set("title", title); fd.set("slug", slug); fd.set("category", category);
     fd.set("excerpt", excerpt); fd.set("body", JSON.stringify(blocks));
@@ -125,9 +150,10 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
     fd.set("inline", inline); fd.set("inlineCaption", inlineCaption);
     fd.set("galleryImages", galleryImages); fd.set("galleryCaptions", galleryCaptions);
     fd.set("postType", postType); fd.set("readTime", readTime);
-    fd.set("status", status); fd.set("scheduledAt", scheduledAt);
-    // ✅ Send browser timezone offset so server converts to correct UTC
-    fd.set("tzOffset", String(new Date().getTimezoneOffset()));
+    fd.set("status", status);
+    // Send pre-built UTC ISO — no tzOffset needed since we handle conversion here
+    fd.set("scheduledAt", scheduledAt);
+    fd.set("tzOffset", "0"); // already UTC
     fd.set("featured", featured ? "true" : "false");
     fd.set("editorsPick", editorsPick ? "true" : "false");
     fd.set("editorsPickOrder", editorsPickOrder);
@@ -138,7 +164,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   }
 
   const saveLabel = submitting ? "Saving…"
-    : status === "scheduled" && scheduledAt ? "Schedule Post"
+    : status === "scheduled" && scheduleDate ? "Schedule Post"
     : "Save Post";
 
   return (
@@ -177,22 +203,44 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             </div>
           </div>
 
+          {/* Schedule picker — date + 8am/8pm SGT slots */}
           {status === "scheduled" && (
             <div className="pef-field pef-schedule-field">
               <label className="pef-label">
-                Publish at
-                <span className="pef-label-hint">
-                  your local time ({Intl.DateTimeFormat().resolvedOptions().timeZone})
-                </span>
+                Publish on
+                <span className="pef-label-hint">posts go live at 8am or 8pm SGT</span>
               </label>
-              <input
-                type="datetime-local"
-                className="pef-input"
-                value={scheduledAt}
-                onChange={(e) => setScheduledAt(e.target.value)}
-                min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
-                  .toISOString().slice(0, 16)}
-              />
+              <div className="pef-schedule-row">
+                <input
+                  type="date"
+                  className="pef-input pef-schedule-date"
+                  value={scheduleDate}
+                  onChange={(e) => setScheduleDate(e.target.value)}
+                  min={todaySGT}
+                />
+                <div className="pef-schedule-slots">
+                  {SGT_SLOTS.map((slot, i) => (
+                    <button
+                      key={slot.label}
+                      type="button"
+                      className={`pef-slot-btn ${scheduleSlot === i ? "is-active" : ""}`}
+                      onClick={() => setScheduleSlot(i)}
+                    >
+                      {slot.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {scheduleDate && (
+                <div className="pef-schedule-summary">
+                  Will publish on {new Date(buildScheduledAt(scheduleDate, scheduleSlot))
+                    .toLocaleString("en-SG", {
+                      timeZone: "Asia/Singapore",
+                      weekday: "short", day: "numeric", month: "short",
+                      year: "numeric", hour: "numeric", minute: "2-digit",
+                    })}
+                </div>
+              )}
             </div>
           )}
         </div>
