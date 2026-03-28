@@ -8,11 +8,12 @@ export default function MediaPage() {
       <div className="admin-panel-head">
         <div>
           <h2>Media</h2>
-          <p>Upload images and copy URLs for use in posts and hero slides.</p>
+          <p>Upload images and video clips. Click any file to copy its URL.</p>
         </div>
       </div>
 
       <MediaLibrary
+        selectable={false}
         onSelect={(url) => {
           navigator.clipboard.writeText(url).catch(() => {});
         }}

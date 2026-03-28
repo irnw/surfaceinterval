@@ -51,7 +51,6 @@ export default async function EditPostPage({
         }}
       >
         <h2>Edit Post</h2>
-
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link href={`/posts/${post.slug}?preview=1`} className="nav-pill">
             Preview Draft
@@ -68,8 +67,11 @@ export default async function EditPostPage({
           excerpt: post.excerpt,
           body: bodyText,
           hero: post.hero_image ?? "",
+          heroCaption: post.hero_image_caption ?? "",
           inline: post.inline_image ?? "",
+          inlineCaption: post.inline_image_caption ?? "",
           galleryImages: post.gallery_images ?? [],
+          galleryCaptions: post.gallery_captions ?? [],
           postType: post.post_type ?? "standard",
           readTime: post.read_time ?? "",
           status: post.status,
@@ -77,6 +79,7 @@ export default async function EditPostPage({
           editorsPick: post.is_editors_pick ?? false,
           editorsPickOrder: post.editors_pick_order ?? null,
           existingPublishedAt: post.published_at ?? "",
+          scheduledAt: post.scheduled_at ?? "",
           tags: post.tags ?? [],
           series: post.series ?? "",
           location: post.location ?? "",

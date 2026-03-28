@@ -9,11 +9,6 @@ interface PostBodyEditorProps {
   placeholder?: string;
 }
 
-/**
- * Drop-in replacement for the body <textarea> in the post editor.
- * Paste any image or GIF → it uploads to Supabase Storage and inserts
- * a markdown image tag at the cursor position automatically.
- */
 export default function PostBodyEditor({
   value,
   onChange,
@@ -24,11 +19,9 @@ export default function PostBodyEditor({
 
   async function handlePaste(e: React.ClipboardEvent<HTMLTextAreaElement>) {
     const files = getFilesFromClipboard(e.nativeEvent);
-    if (files.length === 0) return; // plain text — fall through normally
-
+    if (files.length === 0) return;
     e.preventDefault();
     setUploading(true);
-
     try {
       for (const file of files) {
         const url = await uploadMediaFile(file);
@@ -47,8 +40,7 @@ export default function PostBodyEditor({
     if (!el) return;
     const start = el.selectionStart;
     const end = el.selectionEnd;
-    const next = value.slice(0, start) + text + value.slice(end);
-    onChange(next);
+    onChange(value.slice(0, start) + text + value.slice(end));
     requestAnimationFrame(() => {
       el.selectionStart = el.selectionEnd = start + text.length;
       el.focus();
@@ -64,21 +56,15 @@ export default function PostBodyEditor({
         onChange={(e) => onChange(e.target.value)}
         onPaste={handlePaste}
         placeholder={placeholder}
-        style={{ width: "100%", minHeight: "320px", resize: "vertical" }}
+        className="pef-textarea"
+        style={{ minHeight: "320px" }}
       />
       {uploading && (
         <div style={{
-          position: "absolute",
-          bottom: "12px",
-          right: "14px",
-          fontSize: "0.68rem",
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          color: "var(--purple)",
-          background: "var(--surface-2)",
-          padding: "4px 10px",
-          borderRadius: "6px",
-          border: "1px solid var(--line)",
+          position: "absolute", bottom: "12px", right: "14px",
+          fontSize: "0.68rem", letterSpacing: "0.1em", textTransform: "uppercase",
+          color: "var(--purple)", background: "var(--surface-2)",
+          padding: "4px 10px", borderRadius: "6px", border: "1px solid var(--line)",
         }}>
           Uploading…
         </div>

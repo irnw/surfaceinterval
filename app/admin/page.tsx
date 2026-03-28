@@ -1,19 +1,21 @@
 import Link from "next/link";
 import { createSupabaseServerClient } from "../lib/supabase-server";
 import { quickUpdatePost } from "./actions";
+import ApplyAllButton from "../components/ApplyAllButton";
 
 function StatusBadge({ status }: { status: string }) {
-  return (
-    <span className={`admin-badge ${status === "published" ? "is-published" : "is-draft"}`}>
-      {status === "published" ? "Published" : "Draft"}
-    </span>
-  );
+  const cls =
+    status === "published" ? "is-published" :
+    status === "scheduled" ? "is-scheduled" :
+    "is-draft";
+  const label =
+    status === "published" ? "Published" :
+    status === "scheduled" ? "Scheduled" :
+    "Draft";
+  return <span className={`admin-badge ${cls}`}>{label}</span>;
 }
 
-function FlagBadge({
-  children,
-  tone = "default",
-}: {
+function FlagBadge({ children, tone = "default" }: {
   children: React.ReactNode;
   tone?: "default" | "featured" | "pick";
 }) {
@@ -24,14 +26,20 @@ function FlagBadge({
   );
 }
 
-function AdminBanner({
-  created, saved, duplicated, deleted,
-}: {
+function AdminBanner({ created, saved, duplicated, deleted }: {
   created?: string; saved?: string; duplicated?: string; deleted?: string;
 }) {
-  const text = created ? "Post created." : saved ? "Changes saved." : duplicated ? "Draft duplicated." : deleted ? "Post deleted." : "";
+  const text = created ? "Post created." : saved ? "Changes saved."
+    : duplicated ? "Draft duplicated." : deleted ? "Post deleted." : "";
   if (!text) return null;
   return <div className="admin-banner">{text}</div>;
+}
+
+function formatScheduled(iso?: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" })
+    + " " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
 }
 
 export default async function AdminPostsPage({
@@ -62,12 +70,14 @@ export default async function AdminPostsPage({
           <h2>Posts</h2>
           <p>Manage publishing status and homepage placement from one view.</p>
         </div>
+        {/* Apply All button — client component, submits all quick-edit forms */}
+        <ApplyAllButton />
       </div>
 
       <AdminBanner {...params} />
 
       <div className="apt-wrap">
-        <table className="apt-table">
+        <table className="apt-table" id="posts-table">
           <colgroup>
             <col style={{ width: "34%" }} />
             <col style={{ width: "11%" }} />
@@ -82,7 +92,7 @@ export default async function AdminPostsPage({
               <th>Category</th>
               <th>Status</th>
               <th>Homepage</th>
-              <th>Published</th>
+              <th>Date</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -103,44 +113,43 @@ export default async function AdminPostsPage({
 
               return (
                 <tr key={post.id}>
-                  {/* Title */}
                   <td>
                     <div className="apt-title">{post.title}</div>
                     <div className="apt-slug">/posts/{post.slug}</div>
+                    {post.status === "scheduled" && post.scheduled_at && (
+                      <div className="apt-schedule-row">⏰ {formatScheduled(post.scheduled_at)}</div>
+                    )}
                   </td>
 
-                  {/* Category */}
                   <td className="apt-cat">{post.category}</td>
-
-                  {/* Status */}
                   <td><StatusBadge status={post.status} /></td>
 
-                  {/* Homepage flags */}
                   <td>
                     <div className="apt-flags">
                       {badges.length > 0 ? badges : <span className="apt-none">—</span>}
                     </div>
                   </td>
 
-                  {/* Date */}
                   <td className="apt-date">
-                    {post.published_at
+                    {post.status === "published" && post.published_at
                       ? new Date(post.published_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" })
+                      : post.status === "scheduled" && post.scheduled_at
+                      ? `⏰ ${formatScheduled(post.scheduled_at)}`
                       : "—"}
                   </td>
 
-                  {/* Actions + inline quick-edit */}
                   <td>
                     <div className="apt-actions">
                       <Link href={`/admin/edit/${post.id}`} className="apt-btn">Edit</Link>
                       <Link href={`/posts/${post.slug}`} target="_blank" className="apt-btn">View</Link>
                     </div>
 
-                    {/* Compact quick-edit — single row */}
-                    <form action={action} className="apt-qe">
+                    {/* data-post-id lets ApplyAllButton find all forms */}
+                    <form action={action} className="apt-qe" data-quick-edit data-post-id={post.id}>
                       <select name="status" defaultValue={post.status} className="apt-qe-select">
                         <option value="draft">Draft</option>
                         <option value="published">Pub</option>
+                        <option value="scheduled">Sched</option>
                       </select>
 
                       <label className="apt-qe-check" title="Featured">

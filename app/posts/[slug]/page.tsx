@@ -7,6 +7,7 @@ import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ReadingProgress from "../../components/ReadingProgress";
 import GalleryLightbox from "../../components/GalleryLightbox";
+import ShareButtons from "../../components/ShareButtons";
 import { createSupabaseServerClient } from "../../lib/supabase-server";
 
 type PostPageProps = {
@@ -29,9 +30,7 @@ export async function generateMetadata({
     .eq("status", "published")
     .single();
 
-  if (!post) {
-    return { title: "Post not found" };
-  }
+  if (!post) return { title: "Post not found" };
 
   const galleryImages: string[] = Array.isArray(post.gallery_images)
     ? post.gallery_images.filter(Boolean)
@@ -60,26 +59,17 @@ export async function generateMetadata({
   };
 }
 
-export default async function PostPage({
-  params,
-  searchParams,
-}: PostPageProps) {
+export default async function PostPage({ params, searchParams }: PostPageProps) {
   const { slug } = await params;
   const { preview } = await searchParams;
 
   const supabase = await createSupabaseServerClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   const isPreview = preview === "1" && !!user;
 
   let query = supabase.from("posts").select("*").eq("slug", slug);
-
-  if (!isPreview) {
-    query = query.eq("status", "published");
-  }
+  if (!isPreview) query = query.eq("status", "published");
 
   const { data: post } = await query.single();
 
@@ -131,15 +121,16 @@ export default async function PostPage({
           <div className="post-standfirst">{post.excerpt}</div>
         </div>
 
+        {/* ── Share buttons — top ── */}
+        <ShareButtons title={post.title} slug={post.slug} position="top" />
+
         {isGallery && galleryImages.length > 0 ? (
           <>
             <GalleryLightbox images={galleryImages} title={post.title} />
             {galleryCaptions.length > 0 ? (
               <div className="gallery-caption-list">
                 {galleryCaptions.map((caption, index) => (
-                  <div key={`${caption}-${index}`} className="caption">
-                    {caption}
-                  </div>
+                  <div key={`${caption}-${index}`} className="caption">{caption}</div>
                 ))}
               </div>
             ) : null}
@@ -171,17 +162,16 @@ export default async function PostPage({
           {post.tags && post.tags.length > 0 ? (
             <div className="post-tags">
               {post.tags.map((tag: string) => (
-                <Link
-                  key={tag}
-                  href={`/tags/${encodeURIComponent(tag)}`}
-                  className="tag"
-                >
+                <Link key={tag} href={`/tags/${encodeURIComponent(tag)}`} className="tag">
                   #{tag}
                 </Link>
               ))}
             </div>
           ) : null}
         </article>
+
+        {/* ── Share buttons — bottom ── */}
+        <ShareButtons title={post.title} slug={post.slug} position="bottom" />
       </main>
 
       <Footer settings={settings} />
