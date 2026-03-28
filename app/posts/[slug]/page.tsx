@@ -44,23 +44,18 @@ export async function generateMetadata({
   };
 }
 
-// Render a single image block with layout
 function RenderImageBlock({ block }: { block: ImageBlock }) {
   if (!block.url) return null;
-
   return (
     <div className={`post-block-image post-block-image--${block.layout}`}>
       <div className="post-block-image-inner">
         <img src={block.url} alt={block.alt || block.caption || ""} />
-        {block.caption && (
-          <div className="post-block-caption">{block.caption}</div>
-        )}
+        {block.caption && <div className="post-block-caption">{block.caption}</div>}
       </div>
     </div>
   );
 }
 
-// Render all blocks, grouping consecutive "pair" images into a side-by-side row
 function RenderBlocks({ blocks }: { blocks: Block[] }) {
   const elements: React.ReactNode[] = [];
   let i = 0;
@@ -70,7 +65,6 @@ function RenderBlocks({ blocks }: { blocks: Block[] }) {
 
     if (block.type === "text") {
       const textBlock = block as TextBlock;
-      // Split content by newlines into paragraphs
       const paragraphs = textBlock.content.split("\n").filter((p) => p.trim());
       elements.push(
         <div key={block.id} className="post-block-text">
@@ -80,8 +74,6 @@ function RenderBlocks({ blocks }: { blocks: Block[] }) {
       i++;
     } else if (block.type === "image") {
       const imgBlock = block as ImageBlock;
-
-      // Group consecutive pair blocks together
       if (imgBlock.layout === "pair") {
         const pairBlocks: ImageBlock[] = [imgBlock];
         while (
@@ -91,7 +83,6 @@ function RenderBlocks({ blocks }: { blocks: Block[] }) {
         ) {
           pairBlocks.push(blocks[i + pairBlocks.length] as ImageBlock);
         }
-
         elements.push(
           <div key={block.id} className="post-block-pair">
             {pairBlocks.map((pb) => (
@@ -136,8 +127,6 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
   const galleryCaptions: string[] = Array.isArray(post.gallery_captions)
     ? post.gallery_captions : [];
   const isGallery = post.post_type === "gallery";
-
-  // Parse body — handles both old string[] and new block[] formats
   const blocks = parseBody(post.body);
 
   return (
@@ -150,7 +139,7 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
           <div className="preview-banner">Preview Mode · Draft Post</div>
         ) : null}
 
-        {/* Hero image — caption overlays inside */}
+        {/* Hero — caption overlays inside */}
         {post.hero_image ? (
           <div className="post-hero">
             <img src={post.hero_image} alt={post.title} />
@@ -160,6 +149,7 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
           </div>
         ) : null}
 
+        {/* Post header */}
         <div className="post-head">
           <div className="post-meta">
             {post.category} · {post.read_time || "8 min read"}
@@ -168,8 +158,10 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
           <div className="post-standfirst">{post.excerpt}</div>
         </div>
 
+        {/* Share — top */}
         <ShareButtons title={post.title} slug={post.slug} position="top" />
 
+        {/* Gallery post type */}
         {isGallery && galleryImages.length > 0 ? (
           <>
             <GalleryLightbox images={galleryImages} title={post.title} />
@@ -183,6 +175,7 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
           </>
         ) : null}
 
+        {/* Article body */}
         <article className="prose prose-editorial">
           {post.dive_log ? (
             <div className="field-note">
@@ -191,20 +184,24 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
             </div>
           ) : null}
 
-          {/* Block renderer */}
           <RenderBlocks blocks={blocks} />
 
-          {post.tags && post.tags.length > 0 ? (
-            <div className="post-tags">
-              {post.tags.map((tag: string) => (
-                <Link key={tag} href={`/tags/${encodeURIComponent(tag)}`} className="tag">
-                  #{tag}
-                </Link>
-              ))}
-            </div>
-          ) : null}
+          {/* Clear floats after last block before tags */}
+          <div style={{ clear: "both" }} />
         </article>
 
+        {/* Tags — outside article, after all content */}
+        {post.tags && post.tags.length > 0 ? (
+          <div className="post-tags">
+            {post.tags.map((tag: string) => (
+              <Link key={tag} href={`/tags/${encodeURIComponent(tag)}`} className="tag">
+                #{tag}
+              </Link>
+            ))}
+          </div>
+        ) : null}
+
+        {/* Share — bottom */}
         <ShareButtons title={post.title} slug={post.slug} position="bottom" />
       </main>
 
