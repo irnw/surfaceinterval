@@ -12,16 +12,8 @@ export default async function EditPostPage({
 }) {
   const { id } = await params;
   const supabase = await createSupabaseServerClient();
-
-  const { data: post } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", id)
-    .single();
-
+  const { data: post } = await supabase.from("posts").select("*").eq("id", id).single();
   if (!post) return notFound();
-
-  const bodyText = Array.isArray(post.body) ? post.body.join("\n\n") : "";
 
   async function action(formData: FormData) {
     "use server";
@@ -40,16 +32,10 @@ export default async function EditPostPage({
 
   return (
     <div className="admin-panel">
-      <div
-        className="panel-head"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 12,
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="panel-head" style={{
+        display: "flex", justifyContent: "space-between",
+        alignItems: "center", gap: 12, flexWrap: "wrap",
+      }}>
         <h2>Edit Post</h2>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <Link href={`/posts/${post.slug}?preview=1`} className="nav-pill">
@@ -65,7 +51,8 @@ export default async function EditPostPage({
           slug: post.slug,
           category: post.category,
           excerpt: post.excerpt,
-          body: bodyText,
+          // Pass raw body — PostEditorForm uses parseBody() to handle both formats
+          body: post.body,
           hero: post.hero_image ?? "",
           heroCaption: post.hero_image_caption ?? "",
           inline: post.inline_image ?? "",
@@ -93,7 +80,6 @@ export default async function EditPostPage({
         <form action={duplicateAction}>
           <button type="submit">Duplicate Post</button>
         </form>
-
         <ConfirmActionForm
           action={deleteAction}
           label="Delete Post"

@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { supabaseAdmin } from "../lib/supabase-admin";
 
-function toArray(text: string) { return text.split("\n").map((p) => p.trim()).filter(Boolean); }
 function toTags(text: string) { return text.split(",").map((t) => t.trim()).filter(Boolean); }
 function toImageArray(text: string) { return text.split(",").map((i) => i.trim()).filter(Boolean); }
 function toCaptionArray(text: string) { return text.split("\n").map((i) => i.trim()); }
@@ -17,6 +16,19 @@ function parseEditorsPickOrder(value: FormDataEntryValue | null) {
 function textOrNull(value: FormDataEntryValue | null) {
   const text = String(value || "").trim();
   return text || null;
+}
+
+// Parse body — accepts JSON block array string from BlockEditor
+function parseBody(raw: FormDataEntryValue | null): unknown[] {
+  const str = String(raw || "").trim();
+  if (!str) return [];
+  try {
+    const parsed = JSON.parse(str);
+    if (Array.isArray(parsed)) return parsed;
+  } catch { /* fall through */ }
+  // Fallback: treat as plain text, split into paragraphs
+  return str.split("\n").map((p) => p.trim()).filter(Boolean)
+    .map((content) => ({ id: Math.random().toString(36).slice(2), type: "text", content }));
 }
 
 function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: boolean }) {
@@ -37,7 +49,7 @@ function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: bo
     slug: String(formData.get("slug") || "").trim(),
     category: String(formData.get("category") || "").trim(),
     excerpt: String(formData.get("excerpt") || "").trim(),
-    body: toArray(String(formData.get("body") || "")),
+    body: parseBody(formData.get("body")),
     hero_image: textOrNull(formData.get("hero")),
     hero_image_caption: textOrNull(formData.get("heroCaption")),
     inline_image: textOrNull(formData.get("inline")),
@@ -163,7 +175,6 @@ export async function saveSiteSettings(formData: FormData) {
         .map((item) => ({ image: String(item.image || "").trim(), caption: String(item.caption || "").trim() }));
     }
   } catch { heroSlides = []; }
-
   const settingsId = await getPrimarySettingsRowId();
   const { error } = await supabaseAdmin.from("settings").update({
     hero_slides: heroSlides,

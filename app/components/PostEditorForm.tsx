@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import MediaLibrary from "./MediaLibrary";
-import PostBodyEditor from "./PostBodyEditor";
+import BlockEditor from "./BlockEditor";
+import { Block, parseBody } from "../lib/block-types";
 
 type Props = {
   initial?: {
     title?: string; slug?: string; category?: string; excerpt?: string;
-    body?: string; hero?: string; heroCaption?: string; inline?: string;
+    body?: unknown; hero?: string; heroCaption?: string; inline?: string;
     inlineCaption?: string; galleryImages?: string[]; galleryCaptions?: string[];
     postType?: string; readTime?: string; status?: string; featured?: boolean;
     editorsPick?: boolean; editorsPickOrder?: number | null;
@@ -49,7 +50,6 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [category, setCategory] = useState(initial?.category || "Diving");
   const [readTime, setReadTime] = useState(initial?.readTime || "");
   const [status, setStatus] = useState(initial?.status || "draft");
-  // scheduledAt is ALWAYS preserved — never auto-cleared
   const [scheduledAt, setScheduledAt] = useState(initial?.scheduledAt || "");
   const [featured, setFeatured] = useState(initial?.featured || false);
   const [editorsPick, setEditorsPick] = useState(initial?.editorsPick || false);
@@ -58,7 +58,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   );
   const [tags, setTags] = useState(initial?.tags?.join(", ") || "");
   const [excerpt, setExcerpt] = useState(initial?.excerpt || "");
-  const [body, setBody] = useState(initial?.body || "");
+  const [blocks, setBlocks] = useState<Block[]>(() => parseBody(initial?.body));
   const [series, setSeries] = useState(initial?.series || "");
   const [location, setLocation] = useState(initial?.location || "");
   const [gear, setGear] = useState(initial?.gear || "");
@@ -67,37 +67,21 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
   const [mediaTarget, setMediaTarget] = useState<"hero" | "inline" | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // Track whether slug was manually edited (don't auto-generate after that)
   const slugManuallyEdited = useRef(!!initial?.slug);
 
-  const snap = (v: object) => JSON.stringify(v);
-  const initialSnapshot = useMemo(() => snap({
-    title: initial?.title || "", slug: initial?.slug || "",
-    hero: initial?.hero || "", heroCaption: initial?.heroCaption || "",
-    inline: initial?.inline || "", inlineCaption: initial?.inlineCaption || "",
-    galleryImages: initial?.galleryImages?.join(", ") || "",
-    galleryCaptions: initial?.galleryCaptions?.join("\n") || "",
-    postType: initial?.postType || "standard", category: initial?.category || "Diving",
-    readTime: initial?.readTime || "", status: initial?.status || "draft",
-    scheduledAt: initial?.scheduledAt || "",
-    featured: initial?.featured || false, editorsPick: initial?.editorsPick || false,
-    editorsPickOrder: initial?.editorsPickOrder != null ? String(initial.editorsPickOrder) : "",
-    tags: initial?.tags?.join(", ") || "", excerpt: initial?.excerpt || "",
-    body: initial?.body || "", series: initial?.series || "",
-    location: initial?.location || "", gear: initial?.gear || "",
-    camera: initial?.camera || "", diveLog: initial?.diveLog || "",
-  }), [initial]);
+  // Dirty check — simplified, blocks compared by JSON
+  const initialBlocksJson = useMemo(
+    () => JSON.stringify(parseBody(initial?.body)),
+    [initial?.body]
+  );
+  const isDirty =
+    title !== (initial?.title || "") ||
+    slug !== (initial?.slug || "") ||
+    excerpt !== (initial?.excerpt || "") ||
+    status !== (initial?.status || "draft") ||
+    category !== (initial?.category || "Diving") ||
+    JSON.stringify(blocks) !== initialBlocksJson;
 
-  const currentSnapshot = snap({
-    title, slug, hero, heroCaption, inline, inlineCaption, galleryImages,
-    galleryCaptions, postType, category, readTime, status, scheduledAt,
-    featured, editorsPick, editorsPickOrder, tags, excerpt, body,
-    series, location, gear, camera, diveLog,
-  });
-
-  const isDirty = initialSnapshot !== currentSnapshot;
-
-  // Auto-generate slug only for NEW posts (no initial slug)
   useEffect(() => {
     if (slugManuallyEdited.current) return;
     setSlug(
@@ -110,8 +94,6 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
   useEffect(() => { if (!editorsPick) setEditorsPickOrder(""); }, [editorsPick]);
 
-  // ✅ NO auto-clear of scheduledAt — user controls it explicitly
-
   useEffect(() => {
     function onBeforeUnload(e: BeforeUnloadEvent) {
       if (!isDirty || submitting) return;
@@ -123,30 +105,41 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Validate: if status=scheduled, a date must be set
     if (status === "scheduled" && !scheduledAt) {
       alert("Please set a publish date and time before scheduling.");
       return;
     }
     setSubmitting(true);
     const fd = new FormData();
-    fd.set("title", title); fd.set("slug", slug); fd.set("category", category);
-    fd.set("excerpt", excerpt); fd.set("body", body);
-    fd.set("hero", hero); fd.set("heroCaption", heroCaption);
-    fd.set("inline", inline); fd.set("inlineCaption", inlineCaption);
-    fd.set("galleryImages", galleryImages); fd.set("galleryCaptions", galleryCaptions);
-    fd.set("postType", postType); fd.set("readTime", readTime);
-    fd.set("status", status); fd.set("scheduledAt", scheduledAt);
+    fd.set("title", title);
+    fd.set("slug", slug);
+    fd.set("category", category);
+    fd.set("excerpt", excerpt);
+    // Serialize blocks as JSON string — actions.ts will parse it
+    fd.set("body", JSON.stringify(blocks));
+    fd.set("hero", hero);
+    fd.set("heroCaption", heroCaption);
+    fd.set("inline", inline);
+    fd.set("inlineCaption", inlineCaption);
+    fd.set("galleryImages", galleryImages);
+    fd.set("galleryCaptions", galleryCaptions);
+    fd.set("postType", postType);
+    fd.set("readTime", readTime);
+    fd.set("status", status);
+    fd.set("scheduledAt", scheduledAt);
     fd.set("featured", featured ? "true" : "false");
     fd.set("editorsPick", editorsPick ? "true" : "false");
     fd.set("editorsPickOrder", editorsPickOrder);
     fd.set("existingPublishedAt", initial?.existingPublishedAt || "");
-    fd.set("tags", tags); fd.set("series", series); fd.set("location", location);
-    fd.set("gear", gear); fd.set("camera", camera); fd.set("diveLog", diveLog);
+    fd.set("tags", tags);
+    fd.set("series", series);
+    fd.set("location", location);
+    fd.set("gear", gear);
+    fd.set("camera", camera);
+    fd.set("diveLog", diveLog);
     await onSubmit(fd);
   }
 
-  // Button label logic — only "Schedule Post" if status=scheduled AND a date is set
   const saveLabel = submitting
     ? "Saving…"
     : status === "scheduled" && scheduledAt
@@ -190,12 +183,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             </div>
           </div>
 
-          {/* Schedule field — always shown when status=scheduled, regardless of existing/new post */}
           {status === "scheduled" && (
             <div className="pef-field pef-schedule-field">
               <label className="pef-label">
                 Publish at
-                <span className="pef-label-hint">auto-publishes at this exact date &amp; time via cron</span>
+                <span className="pef-label-hint">auto-publishes at this exact date &amp; time</span>
               </label>
               <input
                 type="datetime-local"
@@ -213,10 +205,7 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
           <input
             className="pef-slug-input"
             value={slug}
-            onChange={(e) => {
-              slugManuallyEdited.current = true;
-              setSlug(e.target.value);
-            }}
+            onChange={(e) => { slugManuallyEdited.current = true; setSlug(e.target.value); }}
             placeholder="auto-generated"
           />
         </div>
@@ -228,18 +217,17 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             placeholder="One or two sentences that describe this post" />
         </div>
 
+        {/* ── Block editor replaces body textarea ── */}
         <div className="pef-field">
           <label className="pef-label">
             Body
-            <span className="pef-label-hint">one paragraph per line · paste images or GIFs directly</span>
+            <span className="pef-label-hint">text and image blocks · drag or use arrows to reorder</span>
           </label>
-          <PostBodyEditor value={body} onChange={setBody}
-            placeholder="Write here. Paste images or GIFs directly into this field." />
+          <BlockEditor blocks={blocks} onChange={setBlocks} />
         </div>
 
-        <Section label="Images">
+        <Section label="Hero image">
           <div className="pef-field">
-            <label className="pef-label">Hero Image</label>
             <div className="pef-image-row">
               <input className="pef-input" value={hero} onChange={(e) => setHero(e.target.value)} placeholder="URL" />
               <button type="button" className="pef-btn-ghost" onClick={() => setMediaTarget("hero")}>Choose</button>
@@ -248,21 +236,11 @@ export default function PostEditorForm({ initial, onSubmit }: Props) {
             {hero && <img src={hero} alt="" className="pef-image-preview" />}
             <input className="pef-input pef-input--caption" value={heroCaption}
               onChange={(e) => setHeroCaption(e.target.value)}
-              placeholder="Caption — e.g. Addu Atoll, Maldives · March 2026" />
+              placeholder="Caption — overlays inside hero image" />
           </div>
+        </Section>
 
-          <div className="pef-field">
-            <label className="pef-label">Inline Image</label>
-            <div className="pef-image-row">
-              <input className="pef-input" value={inline} onChange={(e) => setInline(e.target.value)} placeholder="URL" />
-              <button type="button" className="pef-btn-ghost" onClick={() => setMediaTarget("inline")}>Choose</button>
-              {inline && <button type="button" className="pef-btn-ghost pef-btn-ghost--muted" onClick={() => setInline("")}>Clear</button>}
-            </div>
-            {inline && <img src={inline} alt="" className="pef-image-preview" />}
-            <input className="pef-input pef-input--caption" value={inlineCaption}
-              onChange={(e) => setInlineCaption(e.target.value)} placeholder="Optional caption" />
-          </div>
-
+        <Section label="Gallery (gallery post type only)">
           <div className="pef-field">
             <label className="pef-label">Gallery Images <span className="pef-label-hint">comma separated URLs</span></label>
             <textarea className="pef-textarea" value={galleryImages}
