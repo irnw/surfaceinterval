@@ -17,7 +17,6 @@ function textOrNull(value: FormDataEntryValue | null) {
   const text = String(value || "").trim();
   return text || null;
 }
-
 function parseBody(raw: FormDataEntryValue | null): unknown[] {
   const str = String(raw || "").trim();
   if (!str) return [];
@@ -40,7 +39,6 @@ function buildPostPayload(formData: FormData, options?: { keepPublishedDate?: bo
         ? textOrNull(formData.get("existingPublishedAt")) || new Date().toISOString()
         : new Date().toISOString()
       : null;
-
   return {
     title: String(formData.get("title") || "").trim(),
     slug: String(formData.get("slug") || "").trim(),
@@ -160,10 +158,10 @@ export async function createDashboardUser(formData: FormData) {
 }
 
 export async function saveSiteSettings(formData: FormData) {
-  const heroSlidesRaw = String(formData.get("heroSlidesPayload") || "[]");
+  // Hero slides
   let heroSlides: Array<{ image: string; caption: string }> = [];
   try {
-    const parsed = JSON.parse(heroSlidesRaw);
+    const parsed = JSON.parse(String(formData.get("heroSlidesPayload") || "[]"));
     if (Array.isArray(parsed)) {
       heroSlides = parsed
         .filter((item) => item && typeof item.image === "string" && item.image.trim().length > 0)
@@ -172,11 +170,10 @@ export async function saveSiteSettings(formData: FormData) {
     }
   } catch { heroSlides = []; }
 
-  // Parse reading shelf
+  // Reading shelf
   let readingShelf: Array<{ title: string; author: string; note: string }> = [];
   try {
-    const raw = String(formData.get("readingShelfPayload") || "[]");
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(String(formData.get("readingShelfPayload") || "[]"));
     if (Array.isArray(parsed)) {
       readingShelf = parsed
         .filter((b) => b?.title?.trim())
@@ -192,6 +189,7 @@ export async function saveSiteSettings(formData: FormData) {
   const settingsId = await getPrimarySettingsRowId();
   const { error } = await supabaseAdmin.from("settings").update({
     hero_slides: heroSlides,
+    about_photo: String(formData.get("about_photo") || "").trim() || null,
     about_title: String(formData.get("about_title") || "").trim(),
     about_intro: String(formData.get("about_intro") || "").trim(),
     about_body: String(formData.get("about_body") || "").trim(),

@@ -20,30 +20,20 @@ export const metadata: Metadata = {
   },
 };
 
-type ShelfBook = {
-  title: string;
-  author: string;
-  note?: string;
-};
+type ShelfBook = { title: string; author: string; note?: string };
 
 export default async function AboutPage() {
   const supabase = await createSupabaseServerClient();
 
   const { data: settings } = await supabase
-    .from("settings")
-    .select("*")
-    .order("id", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .from("settings").select("*")
+    .order("id", { ascending: true }).limit(1).maybeSingle();
 
   const paragraphs = String(settings?.about_body || "")
-    .split("\n")
-    .map((p: string) => p.trim())
-    .filter(Boolean);
+    .split("\n").map((p: string) => p.trim()).filter(Boolean);
 
   const shelf: ShelfBook[] = Array.isArray(settings?.reading_shelf)
-    ? (settings.reading_shelf as ShelfBook[]).slice(0, 6)
-    : [];
+    ? (settings.reading_shelf as ShelfBook[]).slice(0, 6) : [];
 
   return (
     <>
@@ -51,7 +41,7 @@ export default async function AboutPage() {
 
       <main className="about-shell">
 
-        {/* ── HERO ── */}
+        {/* Hero */}
         <div className="about-hero">
           <div className="about-hero-text">
             <div className="about-kicker">About</div>
@@ -64,10 +54,10 @@ export default async function AboutPage() {
             </p>
           </div>
 
-          {/* Portrait — upload your photo via Media and update hero_image in settings */}
-          {settings?.hero_image ? (
+          {/* Portrait — set via Settings > About Page > Portrait Photo */}
+          {settings?.about_photo ? (
             <div className="about-portrait">
-              <img src={settings.hero_image} alt="Irene W" />
+              <img src={settings.about_photo} alt="Irene W" />
             </div>
           ) : (
             <div className="about-portrait about-portrait--placeholder">
@@ -76,10 +66,9 @@ export default async function AboutPage() {
           )}
         </div>
 
-        {/* ── DIVIDER ── */}
         <div className="about-rule" />
 
-        {/* ── CREDENTIALS STRIP ── */}
+        {/* Credentials strip */}
         <div className="about-credentials">
           <div className="about-credential">
             <div className="about-credential-label">Certification</div>
@@ -105,7 +94,7 @@ export default async function AboutPage() {
 
         <div className="about-rule" />
 
-        {/* ── BODY TEXT ── */}
+        {/* Body text */}
         {paragraphs.length > 0 && (
           <article className="about-body prose">
             {paragraphs.map((paragraph: string, index: number) => (
@@ -114,15 +103,13 @@ export default async function AboutPage() {
           </article>
         )}
 
-        {/* ── ON THE SHELF ── */}
+        {/* On the Shelf */}
         {shelf.length > 0 && (
           <div className="about-shelf-section">
             <div className="about-rule" />
             <div className="about-shelf-head">
               <div className="about-shelf-label">On the Shelf</div>
-              <p className="about-shelf-intro">
-                A few books currently within reach.
-              </p>
+              <p className="about-shelf-intro">A few books currently within reach.</p>
             </div>
             <div className="about-shelf-grid">
               {shelf.map((book, i) => (
@@ -143,7 +130,7 @@ export default async function AboutPage() {
 
         <div className="about-rule" />
 
-        {/* ── COLLABORATION ── */}
+        {/* Collaboration */}
         <div className="about-collab">
           <div className="about-collab-label">Work together</div>
           <p className="about-collab-text">
@@ -151,10 +138,7 @@ export default async function AboutPage() {
               "Open to selected collaborations across editorial work, travel and diving features, gear storytelling, and brand partnerships that fit the tone of this journal."}
           </p>
           {settings?.contact_email && (
-            <a
-              href={`mailto:${settings.contact_email}`}
-              className="about-collab-link"
-            >
+            <a href={`mailto:${settings.contact_email}`} className="about-collab-link">
               {settings.contact_email}
             </a>
           )}

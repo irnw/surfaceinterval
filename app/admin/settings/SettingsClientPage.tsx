@@ -20,6 +20,8 @@ export default function SettingsClientPage({
       ? initialSettings.hero_slides.slice(0, 5) : []
   );
   const [heroPickerOpen, setHeroPickerOpen] = useState<number | null>(null);
+  const [aboutPhotoPickerOpen, setAboutPhotoPickerOpen] = useState(false);
+  const [aboutPhoto, setAboutPhoto] = useState(initialSettings?.about_photo || "");
   const [aboutTitle, setAboutTitle] = useState(initialSettings?.about_title || "");
   const [aboutIntro, setAboutIntro] = useState(initialSettings?.about_intro || "");
   const [aboutBody, setAboutBody] = useState(initialSettings?.about_body || "");
@@ -31,11 +33,9 @@ export default function SettingsClientPage({
   const [divesLogged, setDivesLogged] = useState(initialSettings?.dives_logged || "");
   const [countriesReached, setCountriesReached] = useState(initialSettings?.countries_reached || "");
 
-  // Reading shelf — max 6 books
   const [shelf, setShelf] = useState<ShelfBook[]>(
     Array.isArray(initialSettings?.reading_shelf)
-      ? initialSettings.reading_shelf.slice(0, 6)
-      : []
+      ? initialSettings.reading_shelf.slice(0, 6) : []
   );
 
   function updateBook(index: number, field: keyof ShelfBook, value: string) {
@@ -50,9 +50,7 @@ export default function SettingsClientPage({
   }
 
   function removeBook(index: number) {
-    const copy = [...shelf];
-    copy.splice(index, 1);
-    setShelf(copy);
+    const copy = [...shelf]; copy.splice(index, 1); setShelf(copy);
   }
 
   function updateSlide(index: number, next: HeroSlide) {
@@ -82,13 +80,12 @@ export default function SettingsClientPage({
       <form action={saveSiteSettings}>
         <input type="hidden" name="heroSlidesPayload" value={JSON.stringify(heroSlides)} />
         <input type="hidden" name="readingShelfPayload" value={JSON.stringify(shelf)} />
+        <input type="hidden" name="about_photo" value={aboutPhoto} />
 
         {/* ── HOMEPAGE STATS ── */}
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">Homepage Stats</h3>
-          <p className="admin-settings-note">
-            Update after each trip or milestone. Appears on the homepage stats strip.
-          </p>
+          <p className="admin-settings-note">Update after each trip or milestone.</p>
           <div className="admin-settings-grid">
             <div className="admin-setting">
               <label>Dives Logged</label>
@@ -139,6 +136,30 @@ export default function SettingsClientPage({
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">About Page</h3>
           <div className="admin-settings-grid">
+
+            {/* Portrait photo */}
+            <div className="admin-setting is-full">
+              <label>Portrait Photo</label>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <input value={aboutPhoto} placeholder="Photo URL"
+                  onChange={(e) => setAboutPhoto(e.target.value)}
+                  style={{ flex: 1 }} />
+                <button type="button" onClick={() => setAboutPhotoPickerOpen(true)}
+                  style={{ whiteSpace: "nowrap" }}>
+                  Select from Media
+                </button>
+                {aboutPhoto && (
+                  <button type="button" onClick={() => setAboutPhoto("")}>Clear</button>
+                )}
+              </div>
+              {aboutPhoto && (
+                <div style={{ marginTop: 10 }}>
+                  <img src={aboutPhoto} alt="Portrait"
+                    style={{ height: 120, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
+                </div>
+              )}
+            </div>
+
             <div className="admin-setting">
               <label>About Title</label>
               <input name="about_title" value={aboutTitle}
@@ -167,7 +188,7 @@ export default function SettingsClientPage({
         <div className="admin-settings-section">
           <h3 className="admin-settings-title">On the Shelf</h3>
           <p className="admin-settings-note">
-            A curated list of books currently on your shelf — shown on the About page. Maximum 6.
+            A curated list of books shown on the About page. Maximum 6.
           </p>
           <div className="shelf-manager">
             {shelf.map((book, index) => (
@@ -176,7 +197,7 @@ export default function SettingsClientPage({
                   <strong>Book {index + 1}</strong>
                   <button type="button" onClick={() => removeBook(index)}>Remove</button>
                 </div>
-                <div className="admin-settings-grid">
+                <div className="admin-settings-grid" style={{ padding: 14 }}>
                   <div className="admin-setting">
                     <label>Title</label>
                     <input value={book.title} placeholder="Book title"
@@ -188,8 +209,8 @@ export default function SettingsClientPage({
                       onChange={(e) => updateBook(index, "author", e.target.value)} />
                   </div>
                   <div className="admin-setting is-full">
-                    <label>Note <span style={{ fontWeight: 400, color: "var(--muted)" }}>(optional — one line)</span></label>
-                    <input value={book.note} placeholder="Why it's there, what it made you think about..."
+                    <label>Note <span style={{ fontWeight: 400, color: "var(--muted)" }}>(optional)</span></label>
+                    <input value={book.note} placeholder="Why it's there..."
                       onChange={(e) => updateBook(index, "note", e.target.value)} />
                   </div>
                 </div>
@@ -237,6 +258,7 @@ export default function SettingsClientPage({
         </div>
       </form>
 
+      {/* Hero slide media picker */}
       {heroPickerOpen !== null ? (
         <div className="media-modal-overlay" onClick={() => setHeroPickerOpen(null)}>
           <div className="media-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -247,6 +269,22 @@ export default function SettingsClientPage({
             <MediaLibrary onSelect={(url) => {
               updateSlide(heroPickerOpen, { ...heroSlides[heroPickerOpen], image: url });
               setHeroPickerOpen(null);
+            }} />
+          </div>
+        </div>
+      ) : null}
+
+      {/* About photo media picker */}
+      {aboutPhotoPickerOpen ? (
+        <div className="media-modal-overlay" onClick={() => setAboutPhotoPickerOpen(false)}>
+          <div className="media-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="media-modal-head">
+              <h3>Select portrait photo</h3>
+              <button type="button" onClick={() => setAboutPhotoPickerOpen(false)}>Close</button>
+            </div>
+            <MediaLibrary onSelect={(url) => {
+              setAboutPhoto(url);
+              setAboutPhotoPickerOpen(false);
             }} />
           </div>
         </div>
