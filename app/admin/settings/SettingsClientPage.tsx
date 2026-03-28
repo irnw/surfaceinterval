@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import MediaLibrary from "../../components/MediaLibrary";
+import ImageCropper from "../../components/ImageCropper";
 import { saveSiteSettings } from "../actions";
 
 type HeroSlide = { image: string; caption: string };
@@ -21,6 +22,7 @@ export default function SettingsClientPage({
   );
   const [heroPickerOpen, setHeroPickerOpen] = useState<number | null>(null);
   const [aboutPhotoPickerOpen, setAboutPhotoPickerOpen] = useState(false);
+  const [aboutPhotoCropSrc, setAboutPhotoCropSrc] = useState<string | null>(null);
   const [aboutPhoto, setAboutPhoto] = useState(initialSettings?.about_photo || "");
   const [aboutTitle, setAboutTitle] = useState(initialSettings?.about_title || "");
   const [aboutIntro, setAboutIntro] = useState(initialSettings?.about_intro || "");
@@ -137,25 +139,29 @@ export default function SettingsClientPage({
           <h3 className="admin-settings-title">About Page</h3>
           <div className="admin-settings-grid">
 
-            {/* Portrait photo */}
+            {/* Portrait photo with crop */}
             <div className="admin-setting is-full">
               <label>Portrait Photo</label>
-              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "flex-start", flexWrap: "wrap" }}>
                 <input value={aboutPhoto} placeholder="Photo URL"
                   onChange={(e) => setAboutPhoto(e.target.value)}
-                  style={{ flex: 1 }} />
-                <button type="button" onClick={() => setAboutPhotoPickerOpen(true)}
-                  style={{ whiteSpace: "nowrap" }}>
-                  Select from Media
+                  style={{ flex: 1, minWidth: 200 }} />
+                <button type="button" onClick={() => setAboutPhotoPickerOpen(true)}>
+                  Choose from Media
                 </button>
                 {aboutPhoto && (
-                  <button type="button" onClick={() => setAboutPhoto("")}>Clear</button>
+                  <>
+                    <button type="button" onClick={() => setAboutPhotoCropSrc(aboutPhoto)}>
+                      Crop
+                    </button>
+                    <button type="button" onClick={() => setAboutPhoto("")}>Clear</button>
+                  </>
                 )}
               </div>
               {aboutPhoto && (
                 <div style={{ marginTop: 10 }}>
                   <img src={aboutPhoto} alt="Portrait"
-                    style={{ height: 120, borderRadius: 8, objectFit: "cover", border: "1px solid var(--line)" }} />
+                    style={{ height: 160, borderRadius: 10, objectFit: "cover", border: "1px solid var(--line)" }} />
                 </div>
               )}
             </div>
@@ -258,7 +264,7 @@ export default function SettingsClientPage({
         </div>
       </form>
 
-      {/* Hero slide media picker */}
+      {/* Hero slide picker */}
       {heroPickerOpen !== null ? (
         <div className="media-modal-overlay" onClick={() => setHeroPickerOpen(null)}>
           <div className="media-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -274,7 +280,7 @@ export default function SettingsClientPage({
         </div>
       ) : null}
 
-      {/* About photo media picker */}
+      {/* About photo picker */}
       {aboutPhotoPickerOpen ? (
         <div className="media-modal-overlay" onClick={() => setAboutPhotoPickerOpen(false)}>
           <div className="media-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -288,6 +294,19 @@ export default function SettingsClientPage({
             }} />
           </div>
         </div>
+      ) : null}
+
+      {/* Portrait crop modal */}
+      {aboutPhotoCropSrc ? (
+        <ImageCropper
+          src={aboutPhotoCropSrc}
+          aspectRatio={3 / 4}
+          onComplete={(url) => {
+            setAboutPhoto(url);
+            setAboutPhotoCropSrc(null);
+          }}
+          onCancel={() => setAboutPhotoCropSrc(null)}
+        />
       ) : null}
     </div>
   );
