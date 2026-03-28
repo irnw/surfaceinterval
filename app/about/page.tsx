@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
 };
 
-type ShelfBook = { title: string; author: string; note?: string };
+type ShelfBook = { title: string; author: string; note?: string; cover?: string };
 
 export default async function AboutPage() {
   const supabase = await createSupabaseServerClient();
@@ -41,7 +41,7 @@ export default async function AboutPage() {
 
       <main className="about-shell">
 
-        {/* Hero */}
+        {/* ── HERO ── */}
         <div className="about-hero">
           <div className="about-hero-text">
             <div className="about-kicker">About</div>
@@ -54,7 +54,6 @@ export default async function AboutPage() {
             </p>
           </div>
 
-          {/* Portrait — set via Settings > About Page > Portrait Photo */}
           {settings?.about_photo ? (
             <div className="about-portrait">
               <img src={settings.about_photo} alt="Irene W" />
@@ -68,33 +67,43 @@ export default async function AboutPage() {
 
         <div className="about-rule" />
 
-        {/* Credentials strip */}
+        {/* ── CREDENTIALS STRIP — all from settings ── */}
         <div className="about-credentials">
-          <div className="about-credential">
-            <div className="about-credential-label">Certification</div>
-            <div className="about-credential-value">PADI Rescue Diver · EFR</div>
-          </div>
-          <div className="about-credential">
-            <div className="about-credential-label">Diving since</div>
-            <div className="about-credential-value">2015</div>
-          </div>
-          <div className="about-credential">
-            <div className="about-credential-label">Oceans dived</div>
-            <div className="about-credential-value">Indian · Red Sea · Pacific</div>
-          </div>
-          <div className="about-credential">
-            <div className="about-credential-label">Camera</div>
-            <div className="about-credential-value">OM System OM-1 · GoPro Hero 13</div>
-          </div>
-          <div className="about-credential">
-            <div className="about-credential-label">Based in</div>
-            <div className="about-credential-value">Singapore</div>
-          </div>
+          {settings?.about_certification && (
+            <div className="about-credential">
+              <div className="about-credential-label">Certification</div>
+              <div className="about-credential-value">{settings.about_certification}</div>
+            </div>
+          )}
+          {settings?.about_diving_since && (
+            <div className="about-credential">
+              <div className="about-credential-label">Diving since</div>
+              <div className="about-credential-value">{settings.about_diving_since}</div>
+            </div>
+          )}
+          {settings?.about_oceans && (
+            <div className="about-credential">
+              <div className="about-credential-label">Oceans dived</div>
+              <div className="about-credential-value">{settings.about_oceans}</div>
+            </div>
+          )}
+          {settings?.about_camera && (
+            <div className="about-credential">
+              <div className="about-credential-label">Camera</div>
+              <div className="about-credential-value">{settings.about_camera}</div>
+            </div>
+          )}
+          {settings?.about_based && (
+            <div className="about-credential">
+              <div className="about-credential-label">Based in</div>
+              <div className="about-credential-value">{settings.about_based}</div>
+            </div>
+          )}
         </div>
 
         <div className="about-rule" />
 
-        {/* Body text */}
+        {/* ── BODY TEXT ── */}
         {paragraphs.length > 0 && (
           <article className="about-body prose">
             {paragraphs.map((paragraph: string, index: number) => (
@@ -103,7 +112,7 @@ export default async function AboutPage() {
           </article>
         )}
 
-        {/* On the Shelf */}
+        {/* ── ON THE SHELF ── */}
         {shelf.length > 0 && (
           <div className="about-shelf-section">
             <div className="about-rule" />
@@ -114,7 +123,13 @@ export default async function AboutPage() {
             <div className="about-shelf-grid">
               {shelf.map((book, i) => (
                 <div key={i} className="about-shelf-book">
-                  <div className="about-shelf-spine" />
+                  {book.cover ? (
+                    <div className="about-shelf-cover">
+                      <img src={book.cover} alt={`Cover of ${book.title}`} />
+                    </div>
+                  ) : (
+                    <div className="about-shelf-spine" />
+                  )}
                   <div className="about-shelf-book-body">
                     <div className="about-shelf-book-title">{book.title}</div>
                     <div className="about-shelf-book-author">{book.author}</div>
@@ -130,7 +145,7 @@ export default async function AboutPage() {
 
         <div className="about-rule" />
 
-        {/* Collaboration */}
+        {/* ── COLLABORATION ── */}
         <div className="about-collab">
           <div className="about-collab-label">Work together</div>
           <p className="about-collab-text">

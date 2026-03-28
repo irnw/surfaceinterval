@@ -4309,3 +4309,283 @@ html[data-theme="dark"] .media-modal-card {
 }
 
 .footer-rss:hover { opacity: 1; color: var(--purple); }
+
+/* ============================================================
+   PASTE AT BOTTOM OF globals.css
+   On the Shelf — homepage section + settings manager
+   ============================================================ */
+
+
+/* =========================
+   HOMEPAGE — ON THE SHELF
+========================= */
+
+.shelf-section {
+  padding: 64px 0 72px;
+  border-top: 1px solid var(--line);
+}
+
+.shelf-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.shelf-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+
+.shelf-kicker {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+
+.shelf-see-more {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.15s;
+}
+
+.shelf-see-more:hover { color: var(--purple); }
+
+/* Book grid — up to 6, wraps naturally */
+.shelf-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 1024px) {
+  .shelf-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .shelf-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.shelf-book {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Cover */
+.shelf-book-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--purple-soft);
+  box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.shelf-book:hover .shelf-book-cover {
+  transform: translateY(-3px);
+  box-shadow: 4px 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.shelf-book-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shelf-book-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--purple-soft);
+}
+
+.shelf-book-cover-placeholder span {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--purple);
+  opacity: 0.5;
+}
+
+/* Book text */
+.shelf-book-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.shelf-book-title {
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.shelf-book-author {
+  font-size: 0.62rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+.shelf-book-note {
+  font-size: 0.62rem;
+  color: var(--text-soft);
+  line-height: 1.45;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* Stats — 3-column variant */
+.stats-grid--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 600px) {
+  .stats-grid--three { grid-template-columns: 1fr; }
+}
+
+
+/* =========================
+   SETTINGS — SHELF MANAGER
+   (book card with cover preview)
+========================= */
+
+.shelf-book-card-body {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+  padding: 14px;
+}
+
+@media (max-width: 600px) {
+  .shelf-book-card-body { grid-template-columns: 1fr; }
+}
+
+.shelf-cover-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shelf-cover-preview {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--purple-soft);
+  border: 1px solid var(--line);
+}
+
+.shelf-cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.shelf-cover-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shelf-cover-empty span {
+  font-size: 0.58rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.shelf-cover-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.shelf-fetch-btn {
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--purple-deep);
+  background: var(--purple-deep);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: center;
+}
+
+.shelf-fetch-btn:hover:not(:disabled) { background: var(--purple); border-color: var(--purple); }
+.shelf-fetch-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.shelf-fetch-btn--ghost {
+  background: transparent;
+  color: var(--text-soft);
+  border-color: var(--line-strong);
+}
+
+.shelf-fetch-btn--ghost:hover:not(:disabled) {
+  background: var(--purple-soft);
+  color: var(--purple-deep);
+  border-color: var(--purple);
+}
+
+.shelf-fields-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ============================================================
+   PASTE AT BOTTOM OF globals.css
+   About page — shelf with cover images
+   ============================================================ */
+
+.about-shelf-cover {
+  width: 60px;
+  aspect-ratio: 2 / 3;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 1px 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.about-shelf-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Override about-shelf-book layout when cover is present */
+.about-shelf-book {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* Settings subtitle */
+.admin-settings-subtitle {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin: 24px 0 6px;
+}

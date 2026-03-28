@@ -6,6 +6,7 @@ import Hero from "./components/Hero";
 import EditorialHome from "./components/EditorialHome";
 import FeatureBand from "./components/FeatureBand";
 import Stats from "./components/Stats";
+import OnTheShelf from "./components/OnTheShelf";
 import Footer from "./components/Footer";
 import { createSupabaseServerClient } from "./lib/supabase-server";
 import { getDisplayReadTime } from "./lib/read-time";
@@ -81,6 +82,11 @@ export default async function HomePage() {
 
   const latestDispatches = allPosts.slice(0, 3);
 
+  // Reading shelf — up to 6 books from settings
+  const readingShelf = Array.isArray(settings?.reading_shelf)
+    ? settings.reading_shelf.slice(0, 6)
+    : [];
+
   return (
     <>
       <Header />
@@ -96,6 +102,9 @@ export default async function HomePage() {
       {featuredPost ? <FeatureBand featuredPost={featuredPost} /> : null}
 
       <Stats settings={settings} postCount={allPosts.length} />
+
+      {/* On the Shelf — only renders if books are saved in Settings */}
+      <OnTheShelf books={readingShelf} />
 
       <Footer settings={settings} />
     </>
