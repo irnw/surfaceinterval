@@ -3304,3 +3304,27 @@ html[data-theme="dark"] .media-modal-card {
   color: var(--muted);
   white-space: nowrap;
 }
+
+/* ============================================================
+   PASTE AT THE BOTTOM OF globals.css
+   Hero image caption — overlays inside image, bottom left
+   ============================================================ */
+
+.post-hero {
+  position: relative;
+}
+
+.post-hero-caption {
+  position: absolute;
+  bottom: 16px;
+  left: 20px;
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.88);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+  margin: 0;
+  padding: 0;
+  display: block;
+}

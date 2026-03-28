@@ -102,15 +102,14 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
           <div className="preview-banner">Preview Mode · Draft Post</div>
         ) : null}
 
+        {/* ── Hero image — caption overlays inside the image ── */}
         {post.hero_image ? (
-          <>
-            <div className="post-hero">
-              <img src={post.hero_image} alt={post.title} />
-            </div>
+          <div className="post-hero">
+            <img src={post.hero_image} alt={post.title} />
             {post.hero_image_caption ? (
               <div className="caption post-hero-caption">{post.hero_image_caption}</div>
             ) : null}
-          </>
+          </div>
         ) : null}
 
         <div className="post-head">
