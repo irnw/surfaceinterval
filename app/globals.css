@@ -3223,7 +3223,8 @@ button {
   position: relative;
   /* editorial: wide landscape crop, cinematic */
   width: 100%;
-  aspect-ratio: 4 / 3;
+  max-width: 400px;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   background: var(--purple-soft);
   border-radius: 0;           /* sharp corners — matches site aesthetic */
