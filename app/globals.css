@@ -3184,7 +3184,7 @@ button {
    ═══════════════════════════════════════════════ */
 
 .about-shell {
-  max-width: 640px;
+  max-width: 640px;       /* was 1100px — this is the critical fix */
   margin: 0 auto;
   padding: 72px 24px 100px;
 }
@@ -3221,13 +3221,12 @@ button {
 
 .about-portrait {
   position: relative;
-  /* editorial: wide landscape crop, cinematic */
   width: 100%;
-  max-width: 100%;
-  aspect-ratio: 4 / 3;
+  max-width: 100%;        /* full column width — looks better at 640px */
+  aspect-ratio: 4 / 3;   /* landscape — shows more of the scene, less face-forward */
   overflow: hidden;
   background: var(--purple-soft);
-  border-radius: 0;           /* sharp corners — matches site aesthetic */
+  border-radius: 0;
 }
 
 .about-portrait-img {
@@ -4430,9 +4429,9 @@ html[data-theme="dark"] .media-modal-card {
 ══════════════════════════════════════════ */
 
 .about-shell {
-  max-width: min(78vw, 640px) !important;
-  margin: 0 auto !important;
-  padding: 72px 24px 100px!important;
+  max-width: 640px;       /* was 1100px — this is the critical fix */
+  margin: 0 auto;
+  padding: 72px 24px 100px;
 }
 
 @media (max-width: 768px) {
@@ -4513,9 +4512,9 @@ html[data-theme="dark"] .media-modal-card {
 ══════════════════════════════════════════ */
 
 .about-shell {
-  max-width: min(78vw, 640px) !important;
-  margin-left: auto !important;
-  padding: 72px 24px 100px !important;
+  max-width: 640px;       /* was 1100px — this is the critical fix */
+  margin: 0 auto;
+  padding: 72px 24px 100px;
 }
 
 @media (max-width: 768px) {
