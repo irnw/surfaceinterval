@@ -53,7 +53,8 @@ export default function Header() {
             <Link href="/category/diving" className={navLinkClass(pathname, "/category/diving")}>Diving</Link>
             <Link href="/category/travel" className={navLinkClass(pathname, "/category/travel")}>Travel</Link>
             <Link href="/category/gear" className={navLinkClass(pathname, "/category/gear")}>Gear</Link>
-            <Link href="/category/life" className={navLinkClass(pathname, "/category/life")}>Life</Link>
+            {/* "Life" is deliberate — maps to /category/personal */}
+            <Link href="/category/personal" className={navLinkClass(pathname, "/category/personal")}>Life</Link>
             <Link href="/archive" className={navLinkClass(pathname, "/archive")}>Archive</Link>
             <Link href="/about" className={navLinkClass(pathname, "/about")}>About</Link>
 

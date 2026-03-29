@@ -28,8 +28,6 @@ interface PostsManagerProps {
   postActions: PostAction[];
 }
 
-const SGT_SLOTS = [{ label: "8 AM SGT", utcHour: 0 }];
-
 function buildScheduledAt(date: string): string {
   if (!date) return "";
   return `${date}T00:00:00.000Z`;
@@ -44,40 +42,30 @@ function parseStoredDate(utcIso: string): string {
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric", month: "short", year: "2-digit"
-  });
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" });
 }
 
 function formatScheduled(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" })
-    + " · 8am SGT";
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" }) + " · 8am SGT";
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, string> = {
+  const cls: Record<string, string> = {
     published: "pm-badge pm-badge--published",
     scheduled: "pm-badge pm-badge--scheduled",
     draft: "pm-badge pm-badge--draft",
   };
-  const labels: Record<string, string> = {
-    published: "Published", scheduled: "Scheduled", draft: "Draft"
-  };
-  return <span className={map[status] || "pm-badge pm-badge--draft"}>{labels[status] || status}</span>;
+  const labels: Record<string, string> = { published: "Published", scheduled: "Scheduled", draft: "Draft" };
+  return <span className={cls[status] || "pm-badge pm-badge--draft"}>{labels[status] || status}</span>;
 }
 
-// Single post row with inline quick edit
 function PostRow({
-  post,
-  updateAction,
-  deleteAction,
-  checked,
-  onCheck,
+  post, updateAction, deleteAction, checked, onCheck,
 }: {
   post: Post;
-  updateAction: (formData: FormData) => Promise<void>;
+  updateAction: (fd: FormData) => Promise<void>;
   deleteAction: () => Promise<void>;
   checked: boolean;
   onCheck: (id: number, checked: boolean) => void;
@@ -115,22 +103,14 @@ function PostRow({
 
   return (
     <div className={`pm-row ${checked ? "pm-row--checked" : ""}`}>
-      {/* Checkbox */}
       <div className="pm-row-check">
-        <input
-          type="checkbox"
-          className="pm-checkbox"
-          checked={checked}
-          onChange={(e) => onCheck(post.id, e.target.checked)}
-        />
+        <input type="checkbox" className="pm-checkbox" checked={checked}
+          onChange={(e) => onCheck(post.id, e.target.checked)} />
       </div>
 
-      {/* Post info */}
       <div className="pm-row-info">
         <div className="pm-row-title">
-          <Link href={`/admin/edit/${post.id}`} className="pm-title-link">
-            {post.title}
-          </Link>
+          <Link href={`/admin/edit/${post.id}`} className="pm-title-link">{post.title}</Link>
           {post.is_featured && <span className="pm-flag pm-flag--feat">Featured</span>}
           {post.is_editors_pick && (
             <span className="pm-flag pm-flag--pick">
@@ -143,128 +123,68 @@ function PostRow({
           <span className="pm-meta-sep">·</span>
           <span className="pm-meta-slug">/posts/{post.slug}</span>
           {post.status === "scheduled" && post.scheduled_at && (
-            <>
-              <span className="pm-meta-sep">·</span>
-              <span className="pm-meta-sched">⏰ {formatScheduled(post.scheduled_at)}</span>
-            </>
+            <><span className="pm-meta-sep">·</span><span className="pm-meta-sched">⏰ {formatScheduled(post.scheduled_at)}</span></>
           )}
           {post.status === "published" && (
-            <>
-              <span className="pm-meta-sep">·</span>
-              <span className="pm-meta-date">{formatDate(post.published_at)}</span>
-            </>
+            <><span className="pm-meta-sep">·</span><span className="pm-meta-date">{formatDate(post.published_at)}</span></>
           )}
         </div>
       </div>
 
-      {/* Status badge */}
-      <div className="pm-row-status">
-        <StatusBadge status={post.status} />
-      </div>
+      <div className="pm-row-status"><StatusBadge status={post.status} /></div>
 
-      {/* Action buttons */}
       <div className="pm-row-actions">
         <Link href={`/admin/edit/${post.id}`} className="pm-action-btn">Edit</Link>
         <Link href={`/posts/${post.slug}`} target="_blank" className="pm-action-btn">View</Link>
         {!confirmDelete ? (
-          <button
-            type="button"
-            className="pm-action-btn pm-action-btn--delete"
-            onClick={() => setConfirmDelete(true)}
-          >
-            Delete
-          </button>
+          <button type="button" className="pm-action-btn pm-action-btn--delete"
+            onClick={() => setConfirmDelete(true)}>Delete</button>
         ) : (
           <span className="pm-delete-confirm">
             <span className="pm-delete-confirm-label">Sure?</span>
-            <button
-              type="button"
-              className="pm-action-btn pm-action-btn--delete-yes"
-              onClick={handleDelete}
-              disabled={deleting}
-            >
-              {deleting ? "Deleting…" : "Yes"}
+            <button type="button" className="pm-action-btn pm-action-btn--delete-yes"
+              onClick={handleDelete} disabled={deleting}>
+              {deleting ? "…" : "Yes"}
             </button>
-            <button
-              type="button"
-              className="pm-action-btn"
-              onClick={() => setConfirmDelete(false)}
-            >
-              No
-            </button>
+            <button type="button" className="pm-action-btn" onClick={() => setConfirmDelete(false)}>No</button>
           </span>
         )}
       </div>
 
-      {/* Quick edit controls */}
       <div className="pm-row-qe">
         <div className="pm-qe-controls">
           <div className="pm-qe-field">
             <label className="pm-qe-label">Status</label>
-            <select
-              className="pm-qe-select"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-            >
+            <select className="pm-qe-select" value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="draft">Draft</option>
               <option value="published">Published</option>
               <option value="scheduled">Scheduled</option>
             </select>
           </div>
-
           <label className="pm-qe-toggle">
-            <input
-              type="checkbox"
-              checked={featured}
-              onChange={(e) => setFeatured(e.target.checked)}
-            />
+            <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} />
             <span>Featured</span>
           </label>
-
           <label className="pm-qe-toggle">
-            <input
-              type="checkbox"
-              checked={editorsPick}
-              onChange={(e) => setEditorsPick(e.target.checked)}
-            />
+            <input type="checkbox" checked={editorsPick} onChange={(e) => setEditorsPick(e.target.checked)} />
             <span>Editor's Pick</span>
           </label>
-
           {editorsPick && (
             <div className="pm-qe-field pm-qe-field--slim">
               <label className="pm-qe-label">Order</label>
-              <input
-                type="number"
-                min="1"
-                className="pm-qe-num"
-                value={pickOrder}
-                onChange={(e) => setPickOrder(e.target.value)}
-                placeholder="#"
-              />
+              <input type="number" min="1" className="pm-qe-num" value={pickOrder}
+                onChange={(e) => setPickOrder(e.target.value)} placeholder="#" />
             </div>
           )}
-
-          <button
-            type="button"
-            className="pm-qe-apply"
-            onClick={handleApply}
-            disabled={saving}
-          >
+          <button type="button" className="pm-qe-apply" onClick={handleApply} disabled={saving}>
             {saving ? "Saving…" : "Apply"}
           </button>
         </div>
-
-        {/* Schedule date — only shown when scheduled */}
         {isScheduled && (
           <div className="pm-qe-schedule">
             <label className="pm-qe-label">Publish on</label>
-            <input
-              type="date"
-              className="pm-qe-date"
-              value={scheduleDate}
-              min={todaySGT}
-              onChange={(e) => setScheduleDate(e.target.value)}
-            />
+            <input type="date" className="pm-qe-date" value={scheduleDate}
+              min={todaySGT} onChange={(e) => setScheduleDate(e.target.value)} />
             <span className="pm-qe-slot">8:00 AM SGT</span>
           </div>
         )}
@@ -275,47 +195,52 @@ function PostRow({
 
 export default function PostsManager({ posts, postActions }: PostsManagerProps) {
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [bulkStatus, setBulkStatus] = useState<string | null>(null);
   const [bulkScheduleDate, setBulkScheduleDate] = useState("");
   const [bulkApplying, setBulkApplying] = useState(false);
+  const [applyingAll, setApplyingAll] = useState(false);
 
   const allChecked = selected.size === posts.length && posts.length > 0;
   const someChecked = selected.size > 0;
   const todaySGT = new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
 
   function toggleAll(checked: boolean) {
-    if (checked) setSelected(new Set(posts.map((p) => p.id)));
-    else setSelected(new Set());
+    setSelected(checked ? new Set(posts.map((p) => p.id)) : new Set());
   }
-
   function toggleOne(id: number, checked: boolean) {
     const next = new Set(selected);
-    if (checked) next.add(id);
-    else next.delete(id);
+    checked ? next.add(id) : next.delete(id);
     setSelected(next);
   }
-
   function getAction(postId: number) {
     return postActions.find((a) => a.postId === postId);
   }
 
-  async function handleBulkStatusChange(newStatus: string) {
-    if (selected.size === 0) return;
-    if (newStatus === "scheduled" && !bulkScheduleDate) {
-      alert("Please choose a date for scheduled posts.");
-      return;
+  // Apply All Changes — triggers every individual row's current form state
+  // by clicking all Apply buttons on the page
+  async function handleApplyAll() {
+    setApplyingAll(true);
+    const applyBtns = document.querySelectorAll<HTMLButtonElement>('.pm-qe-apply');
+    for (const btn of Array.from(applyBtns)) {
+      btn.click();
+      // Small delay to avoid server overload
+      await new Promise((r) => setTimeout(r, 120));
     }
+    setApplyingAll(false);
+  }
+
+  async function handleBulkStatus(newStatus: string) {
+    if (selected.size === 0) return;
+    if (newStatus === "scheduled" && !bulkScheduleDate) { alert("Choose a date first."); return; }
     setBulkApplying(true);
-    const ids = Array.from(selected);
-    await Promise.all(ids.map((id) => {
+    for (const id of Array.from(selected)) {
       const action = getAction(id);
-      if (!action) return Promise.resolve();
+      if (!action) continue;
       const fd = new FormData();
       fd.set("status", newStatus);
       fd.set("scheduledAt", newStatus === "scheduled" ? buildScheduledAt(bulkScheduleDate) : "");
       fd.set("tzOffset", "0");
-      return action.updateAction(fd);
-    }));
+      await action.updateAction(fd);
+    }
     setBulkApplying(false);
     setSelected(new Set());
   }
@@ -324,9 +249,7 @@ export default function PostsManager({ posts, postActions }: PostsManagerProps) 
     if (selected.size === 0) return;
     if (!confirm(`Delete ${selected.size} post${selected.size > 1 ? "s" : ""}? This cannot be undone.`)) return;
     setBulkApplying(true);
-    const ids = Array.from(selected);
-    // Delete sequentially to avoid race conditions
-    for (const id of ids) {
+    for (const id of Array.from(selected)) {
       const action = getAction(id);
       if (action) await action.deleteAction();
     }
@@ -343,80 +266,46 @@ export default function PostsManager({ posts, postActions }: PostsManagerProps) 
           <span className="pm-count">{posts.length} total</span>
         </div>
         <div className="pm-head-right">
+          {/* Apply All Changes — applies every row's current quick-edit state */}
+          <button
+            type="button"
+            className="pm-apply-all-btn"
+            onClick={handleApplyAll}
+            disabled={applyingAll}
+          >
+            {applyingAll ? "Applying…" : "Apply All Changes"}
+          </button>
           <Link href="/admin/new" className="pm-new-btn">+ New Post</Link>
         </div>
       </div>
 
-      {/* Bulk action bar — slides in when posts selected */}
+      {/* Bulk action bar */}
       {someChecked && (
         <div className="pm-bulk-bar">
-          <span className="pm-bulk-count">
-            {selected.size} selected
-          </span>
+          <span className="pm-bulk-count">{selected.size} selected</span>
           <div className="pm-bulk-actions">
-            <button
-              type="button"
-              className="pm-bulk-btn"
-              onClick={() => handleBulkStatusChange("draft")}
-              disabled={bulkApplying}
-            >
-              → Draft
-            </button>
-            <button
-              type="button"
-              className="pm-bulk-btn"
-              onClick={() => handleBulkStatusChange("published")}
-              disabled={bulkApplying}
-            >
-              → Publish
-            </button>
+            <button type="button" className="pm-bulk-btn"
+              onClick={() => handleBulkStatus("draft")} disabled={bulkApplying}>→ Draft</button>
+            <button type="button" className="pm-bulk-btn"
+              onClick={() => handleBulkStatus("published")} disabled={bulkApplying}>→ Publish</button>
             <div className="pm-bulk-schedule">
-              <input
-                type="date"
-                className="pm-bulk-date"
-                value={bulkScheduleDate}
-                min={todaySGT}
-                onChange={(e) => setBulkScheduleDate(e.target.value)}
-                placeholder="Date"
-              />
-              <button
-                type="button"
-                className="pm-bulk-btn"
-                onClick={() => handleBulkStatusChange("scheduled")}
-                disabled={bulkApplying}
-              >
-                → Schedule
-              </button>
+              <input type="date" className="pm-bulk-date" value={bulkScheduleDate}
+                min={todaySGT} onChange={(e) => setBulkScheduleDate(e.target.value)} />
+              <button type="button" className="pm-bulk-btn"
+                onClick={() => handleBulkStatus("scheduled")} disabled={bulkApplying}>→ Schedule</button>
             </div>
-            <button
-              type="button"
-              className="pm-bulk-btn pm-bulk-btn--delete"
-              onClick={handleBulkDelete}
-              disabled={bulkApplying}
-            >
-              Delete Selected
-            </button>
+            <button type="button" className="pm-bulk-btn pm-bulk-btn--delete"
+              onClick={handleBulkDelete} disabled={bulkApplying}>Delete Selected</button>
           </div>
-          <button
-            type="button"
-            className="pm-bulk-clear"
-            onClick={() => setSelected(new Set())}
-          >
-            ✕
-          </button>
+          <button type="button" className="pm-bulk-clear" onClick={() => setSelected(new Set())}>✕</button>
         </div>
       )}
 
-      {/* Column header row */}
+      {/* Column headers */}
       <div className="pm-col-head">
         <div className="pm-col-check">
-          <input
-            type="checkbox"
-            className="pm-checkbox"
-            checked={allChecked}
-            onChange={(e) => toggleAll(e.target.checked)}
-            title="Select all"
-          />
+          <input type="checkbox" className="pm-checkbox" checked={allChecked}
+            onChange={(e) => toggleAll(e.target.checked)} title="Select all" />
         </div>
         <div className="pm-col-title">Post</div>
         <div className="pm-col-status">Status</div>
@@ -434,14 +323,9 @@ export default function PostsManager({ posts, postActions }: PostsManagerProps) 
             const action = getAction(post.id);
             if (!action) return null;
             return (
-              <PostRow
-                key={post.id}
-                post={post}
-                updateAction={action.updateAction}
-                deleteAction={action.deleteAction}
-                checked={selected.has(post.id)}
-                onCheck={toggleOne}
-              />
+              <PostRow key={post.id} post={post}
+                updateAction={action.updateAction} deleteAction={action.deleteAction}
+                checked={selected.has(post.id)} onCheck={toggleOne} />
             );
           })
         )}

@@ -39,19 +39,23 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
           : <div className="hero-v2-placeholder" />
         }
         <div className="hero-v2-scrim" />
-        <div className="hero-v2-eyebrow">TRAVEL · OCEAN · PHOTOGRAPHY · LIFE</div>
+        <div className="hero-v2-eyebrow">From the deep end of the world</div>
+
         <div className="hero-v2-bottom">
           <div className="hero-v2-bottom-left">
+            {/* Title — Surface [white] Interval [purple], one line */}
             <h1 className="hero-v2-title">
               <span className="hero-v2-title-main">Surface</span>
               <span className="hero-v2-title-accent"> Interval</span>
-               <div className="hero-byline"> BY IRENE W 
-               </div>
             </h1>
+            {/* BY IRENE W — deliberate byline, below the title */}
+            <div className="hero-v2-byline-credit">BY IRENE W</div>
+            {/* Caption below byline */}
             {slides[activeIndex]?.caption && (
               <div className="hero-v2-caption">{slides[activeIndex].caption}</div>
             )}
           </div>
+
           {slides.length > 1 && (
             <div className="hero-v2-dots">
               {slides.map((_, i) => (
@@ -63,6 +67,7 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
           )}
         </div>
       </div>
+
       <div className="hero-v2-strip">
         <div className="hero-v2-strip-inner">
           <div className="hero-v2-strip-copy">
@@ -73,7 +78,7 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
             <Link href="/category/diving" className="hero-v2-tag">Diving</Link>
             <Link href="/category/travel" className="hero-v2-tag">Travel</Link>
             <Link href="/category/gear" className="hero-v2-tag">Gear</Link>
-            <Link href="/category/life" className="hero-v2-tag">Life</Link>
+            <Link href="/category/personal" className="hero-v2-tag">Life</Link>
           </div>
         </div>
         <div className="hero-v2-scroll-cue">
