@@ -3183,13 +3183,6 @@ button {
    ABOUT PAGE — redesigned
    ═══════════════════════════════════════════════ */
 
-.about-shell {
-  max-width: 860px !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  padding: 72px 40px 100px !important;
-}
-
 /* Header */
 .about-header {
   margin-bottom: 56px;
@@ -4420,34 +4413,6 @@ html[data-theme="dark"] .media-modal-card {
   font-weight: 500 !important;
 }
 
-
-/* ══════════════════════════════════════════
-   2. ABOUT PAGE — align width with post pages
-   
-   Post pages use min(78vw, 1100px).
-   About page currently uses max-width: 860px.
-   Aligning them removes the third unique width.
-══════════════════════════════════════════ */
-
-.about-shell {
-  max-width: 860px !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  padding: 72px 40px 100px !important;
-}
-
-@media (max-width: 900px) {
-  .about-shell {
-    padding: 56px 28px 80px !important;
-  }
-}
-
-@media (max-width: 600px) {
-  .about-shell {
-    padding: 48px 20px 72px !important;
-  }
-}
-
 /* ============================================================
    PASTE AT VERY BOTTOM OF globals.css
    1. Category / tag pages — remove uppercase from post titles & descriptions
@@ -4506,34 +4471,6 @@ html[data-theme="dark"] .media-modal-card {
   letter-spacing: 0.16em !important;
   color: var(--purple) !important;
   font-weight: 500 !important;
-}
-
-
-/* ══════════════════════════════════════════
-   2. ABOUT PAGE — align width with post pages
-   
-   Post pages use min(78vw, 1100px).
-   About page currently uses max-width: 860px.
-   Aligning them removes the third unique width.
-══════════════════════════════════════════ */
-
-.about-shell {
-  max-width: 860px !important;
-  width: 100% !important;
-  margin: 0 auto !important;
-  padding: 72px 40px 100px !important;
-}
-
-@media (max-width: 900px) {
-  .about-shell {
-    padding: 56px 28px 80px !important;
-  }
-}
-
-@media (max-width: 600px) {
-  .about-shell {
-    padding: 48px 20px 72px !important;
-  }
 }
 
 /* ============================================================
@@ -4986,5 +4923,30 @@ html[data-theme="dark"] .media-modal-card {
 
   .dispatch-card-body {
     padding: 18px 20px 22px;
+  }
+}
+/* ══════════════════════════════════════════
+   ABOUT SHELL — matches post-shell exactly
+   Single canonical rule — delete ALL other
+   .about-shell blocks above this one
+══════════════════════════════════════════ */
+
+.about-shell {
+  max-width: min(78vw, 1100px) !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 34px 32px 100px !important;
+}
+
+@media (max-width: 900px) {
+  .about-shell {
+    max-width: 100% !important;
+    padding: 28px 28px 80px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .about-shell {
+    padding: 24px 20px 72px !important;
   }
 }
