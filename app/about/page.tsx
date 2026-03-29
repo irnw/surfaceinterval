@@ -4,6 +4,8 @@ export const revalidate = 0
 import { createSupabaseServerClient } from "../lib/supabase-server"
 import Image from 'next/image'
 import type { Metadata } from 'next'
+import Header from "../components/Header"
+import Footer from "../components/Footer"
 
 export const metadata: Metadata = {
   title: 'About',
@@ -33,86 +35,92 @@ export default async function AboutPage() {
   const collabText: string    = settings?.about_collab ?? ''
   const collabEmail: string   = settings?.about_email ?? ''
 
-  const bodyParagraphs = bodyText.split('\n').map(p => p.trim()).filter(Boolean)
+  const bodyParagraphs   = bodyText.split('\n').map(p => p.trim()).filter(Boolean)
   const collabParagraphs = collabText.split('\n').map(p => p.trim()).filter(Boolean)
 
   return (
-    <main className="about-shell">
+    <>
+      <Header />
 
-      {/* ── HEADER ─────────────────────────────────────── */}
-      <header className="about-header">
-        <p className="about-kicker">Irene W.</p>
-        <p className="about-intro">{tagline}</p>
-      </header>
+      <main className="about-shell">
 
-      {/* ── PORTRAIT ───────────────────────────────────── */}
-      {photoUrl && (
-        <figure className="about-portrait-wrap">
-          <div className="about-portrait">
-            <Image
-              src={photoUrl}
-              alt="Irene W."
-              fill
-              sizes="(max-width: 768px) 100vw, 640px"
-              className="about-portrait-img"
-              priority
-            />
-          </div>
-        </figure>
-      )}
+        {/* ── HEADER ─────────────────────────────────────── */}
+        <header className="about-header">
+          <p className="about-kicker">Irene W.</p>
+          <p className="about-intro">{tagline}</p>
+        </header>
 
-      {/* ── BODY COPY ──────────────────────────────────── */}
-      {bodyParagraphs.length > 0 && (
-        <section className="about-body prose">
-          {bodyParagraphs.map((para, i) => (
-            <p key={i}>{para}</p>
-          ))}
-        </section>
-      )}
-
-      {/* ── CREDENTIALS ────────────────────────────────── */}
-      {(certification || oceansDived || basedIn) && (
-        <aside className="about-credentials">
-          {certification && (
-            <div className="about-credential">
-              <span className="about-credential-label">Certification</span>
-              <span className="about-credential-value">{certification}</span>
+        {/* ── PORTRAIT ───────────────────────────────────── */}
+        {photoUrl && (
+          <figure className="about-portrait-wrap">
+            <div className="about-portrait">
+              <Image
+                src={photoUrl}
+                alt="Irene W."
+                fill
+                sizes="(max-width: 768px) 100vw, 640px"
+                className="about-portrait-img"
+                priority
+              />
             </div>
-          )}
-          {oceansDived && (
-            <div className="about-credential">
-              <span className="about-credential-label">Dived in</span>
-              <span className="about-credential-value">{oceansDived}</span>
-            </div>
-          )}
-          {basedIn && (
-            <div className="about-credential">
-              <span className="about-credential-label">Based in</span>
-              <span className="about-credential-value">{basedIn}</span>
-            </div>
-          )}
-        </aside>
-      )}
-
-      {/* ── COLLAB / CONTACT ───────────────────────────── */}
-      <section className="about-collab">
-        <p className="about-collab-label">Let&rsquo;s talk</p>
-        {collabParagraphs.length > 0
-          ? collabParagraphs.map((para, i) => (
-              <p key={i} className="about-collab-text">{para}</p>
-            ))
-          : (
-              <p className="about-collab-text">
-                A line, a thought, or a different perspective — all welcome.
-              </p>
-            )}
-        {collabEmail && (
-          <a href={`mailto:${collabEmail}`} className="about-collab-link">
-            {collabEmail}
-          </a>
+          </figure>
         )}
-      </section>
 
-    </main>
+        {/* ── BODY COPY ──────────────────────────────────── */}
+        {bodyParagraphs.length > 0 && (
+          <section className="about-body prose">
+            {bodyParagraphs.map((para, i) => (
+              <p key={i}>{para}</p>
+            ))}
+          </section>
+        )}
+
+        {/* ── CREDENTIALS ────────────────────────────────── */}
+        {(certification || oceansDived || basedIn) && (
+          <aside className="about-credentials">
+            {certification && (
+              <div className="about-credential">
+                <span className="about-credential-label">Certification</span>
+                <span className="about-credential-value">{certification}</span>
+              </div>
+            )}
+            {oceansDived && (
+              <div className="about-credential">
+                <span className="about-credential-label">Dived in</span>
+                <span className="about-credential-value">{oceansDived}</span>
+              </div>
+            )}
+            {basedIn && (
+              <div className="about-credential">
+                <span className="about-credential-label">Based in</span>
+                <span className="about-credential-value">{basedIn}</span>
+              </div>
+            )}
+          </aside>
+        )}
+
+        {/* ── COLLAB / CONTACT ───────────────────────────── */}
+        <section className="about-collab">
+          <p className="about-collab-label">Let&rsquo;s talk</p>
+          {collabParagraphs.length > 0
+            ? collabParagraphs.map((para, i) => (
+                <p key={i} className="about-collab-text">{para}</p>
+              ))
+            : (
+                <p className="about-collab-text">
+                  A line, a thought, or a different perspective — all welcome.
+                </p>
+              )}
+          {collabEmail && (
+            <a href={`mailto:${collabEmail}`} className="about-collab-link">
+              {collabEmail}
+            </a>
+          )}
+        </section>
+
+      </main>
+
+      <Footer settings={settings} />
+    </>
   )
 }
