@@ -3185,7 +3185,7 @@ button {
 
 /* Header */
 .about-header {
-  margin-bottom: 56px;
+  margin-bottom: 0;
 }
 
 .about-kicker {
@@ -3236,7 +3236,7 @@ button {
   color: var(--text-soft);
   font-size: 0.97rem;
   line-height: 1.88;
-  margin-bottom: 52px;
+  margin-bottom: 20px;
 }
 
 .about-body p {

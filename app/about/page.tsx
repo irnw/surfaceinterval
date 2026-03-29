@@ -46,7 +46,7 @@ export default async function AboutPage() {
 
         {/* ── HEADER ─────────────────────────────────────── */}
         <header className="about-header">
-          <p className="about-kicker">Irene W.</p>
+          <p className="about-kicker">By Irene W</p>
           <p className="about-intro">{tagline}</p>
         </header>
 
