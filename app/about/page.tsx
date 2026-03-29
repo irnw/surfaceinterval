@@ -100,29 +100,29 @@ export default async function AboutPage() {
         )}
 
         {/* ── COLLAB / CONTACT ───────────────────────────── */}
-        <section className="about-collab">
-          <p className="about-collab-label">Let&rsquo;s talk</p>
-          {collabParagraphs.length > 0
-            ? collabParagraphs.map((para, i) => (
-                <p key={i} className="about-collab-text">{para}</p>
-              ))
-            : (
-                <p className="about-collab-text">
-                  <p>A line, a thought, or a different perspective — all welcome.</p>
-                  <p>If something here resonated, feel free to reach out.</p>
-                  
-                  <p>Open to notes, reflections, or anything this space brings up.</p>
-                  <p>Simple is enough.</p>
-                  
-                  <p>No need to overthink it.</p>
-                </p>
-              )}
-          {collabEmail && (
-             <a href={`mailto:${settings.contact_email}`} className="about-collab-link">
+        <div className="about-collab">
+            <div className="about-collab-label">Let's Talk</div>
+
+            {settings?.collaboration_note ? (
+                <p className="about-collab-text">{settings.collaboration_note}</p>
+            ) : (
+                <div className="about-collab-text">
+                <p>A line, a thought, or a different perspective — all welcome.</p>
+                <p>If something here resonated, feel free to reach out.</p>
+
+                <p>Open to notes, reflections, or anything this space brings up.</p>
+                <p>Simple is enough.</p>
+
+                <p>No need to overthink it.</p>
+                </div>
+            )}
+
+            {settings?.contact_email && (
+                <a href={`mailto:${settings.contact_email}`} className="about-collab-link">
                 {settings.contact_email}
-            </a>
-          )}
-        </section>
+                </a>
+            )}
+        </div>
 
       </main>
 
