@@ -3220,11 +3220,11 @@ button {
 }
 
 .about-portrait {
-  object-position: center 30%;
+  position: relative;
   /* editorial: wide landscape crop, cinematic */
   width: 100%;
   max-width: 100%;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--purple-soft);
   border-radius: 0;           /* sharp corners — matches site aesthetic */
@@ -4514,15 +4514,15 @@ html[data-theme="dark"] .media-modal-card {
 
 .about-shell {
   max-width: min(78vw, 640px) !important;
-  margin: 0 auto !important;
+  margin-left: auto !important;
   padding: 72px 24px 100px !important;
 }
 
 @media (max-width: 768px) {
   .about-shell {
-    max-width: min(78vw, 640px) !important;
-    margin: 0 auto !important;
-    padding: 72px 24px 100px!important;
+    max-width: 100% !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
 }
 
