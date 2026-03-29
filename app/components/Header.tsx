@@ -19,7 +19,6 @@ export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [isSignedIn, setIsSignedIn] = useState(false);
-
   const isHome = pathname === "/";
 
   useEffect(() => {
@@ -27,9 +26,7 @@ export default function Header() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsSignedIn(!!session);
-    });
+    supabase.auth.getSession().then(({ data: { session } }) => setIsSignedIn(!!session));
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => setIsSignedIn(!!session)
     );
@@ -41,9 +38,15 @@ export default function Header() {
       <div className="masthead-inner">
         <div className={`brand ${isHome ? "brand-home" : "brand-inner"}`}>
           <Link href="/">
-            <div className="brand-title">Surface Interval</div>
+            {/* On the homepage the brand name is in the hero — show only on inner pages */}
+            {isHome ? (
+              <div className="brand-title brand-title--home-subtle">SI</div>
+            ) : (
+              <div className="brand-title">Surface Interval</div>
+            )}
           </Link>
-          <div className="brand-sub">By Irene W</div>
+          {/* "By Irene W" only on inner pages — hero carries it on homepage */}
+          {!isHome && <div className="brand-sub">By Irene W</div>}
         </div>
 
         <div className="masthead-right">
@@ -70,12 +73,8 @@ export default function Header() {
 
             <ThemeToggle />
 
-            {/* Dashboard link — only shown when signed in, subtle pill style */}
             {isSignedIn && (
-              <Link
-                href="/admin"
-                className={`nav-pill ${pathname.startsWith("/admin") ? "is-active" : ""}`}
-              >
+              <Link href="/admin" className={`nav-pill ${pathname.startsWith("/admin") ? "is-active" : ""}`}>
                 Dashboard
               </Link>
             )}

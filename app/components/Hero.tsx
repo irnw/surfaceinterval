@@ -14,8 +14,7 @@ export default function Hero({
   settings: Record<string, any> | null;
 }) {
   const slides = useMemo<HeroSlide[]>(() => {
-    const rawSlides = Array.isArray(settings?.hero_slides)
-      ? settings.hero_slides : [];
+    const rawSlides = Array.isArray(settings?.hero_slides) ? settings.hero_slides : [];
     return rawSlides
       .filter((item: any) => item && typeof item.image === "string" && item.image.trim().length > 0)
       .slice(0, 5)
@@ -34,20 +33,12 @@ export default function Hero({
     return () => window.clearInterval(timer);
   }, [slides.length]);
 
-  const eyebrow = settings?.hero_eyebrow || "Travel · Ocean · Photography · Life";
-  const titleMain = settings?.hero_title_main || "Surface";
-  const titleAccent = settings?.hero_title_accent || "Interval";
-  const byline = settings?.hero_byline || "By Irene W";
-  const copyStrong = settings?.hero_copy_strong || "A journal from the deep end of the world.";
-  const copySoft = settings?.hero_copy_soft || "Dive logs, travel, gear, and the quieter moments in between.";
-
   return (
     <section className="hero-v2">
 
-      {/* ── Full-bleed photo area ── */}
+      {/* ── Full-bleed photo ── */}
       <div className="hero-v2-media">
 
-        {/* Slides */}
         {slides.length > 0 ? (
           slides.map((slide, index) => (
             <div
@@ -60,32 +51,29 @@ export default function Hero({
           <div className="hero-v2-placeholder" />
         )}
 
-        {/* Dark scrim — bottom gradient for text legibility */}
+        {/* Scrim */}
         <div className="hero-v2-scrim" />
 
-        {/* Eyebrow — top left */}
-        <div className="hero-v2-eyebrow">{eyebrow}</div>
-
-        {/* Byline — top right */}
-        <div className="hero-v2-byline">{byline}</div>
-
-        {/* Title — anchored bottom left, massive */}
-        <div className="hero-v2-title-block">
-          <h1 className="hero-v2-title">
-            <span className="hero-v2-title-main">{titleMain}</span>
-            <br />
-            <span className="hero-v2-title-accent">{titleAccent}</span>
-          </h1>
+        {/* Top left — editorial kicker only, no title repetition */}
+        <div className="hero-v2-eyebrow">
+          From the deep end of the world
         </div>
 
-        {/* Caption — bottom left, above dots */}
-        {slides[activeIndex]?.caption && (
-          <div className="hero-v2-caption">
-            {slides[activeIndex].caption}
-          </div>
-        )}
+        {/* Title — bottom left, two-tone serif, massive */}
+        <div className="hero-v2-title-block">
+          <h1 className="hero-v2-title">
+            <span className="hero-v2-title-main">Surface</span>
+            <span className="hero-v2-title-accent"> Interval</span>
+          </h1>
+          {/* Caption sits directly under title */}
+          {slides[activeIndex]?.caption && (
+            <div className="hero-v2-caption">
+              {slides[activeIndex].caption}
+            </div>
+          )}
+        </div>
 
-        {/* Dots — bottom right */}
+        {/* Slide dots — bottom right */}
         {slides.length > 1 && (
           <div className="hero-v2-dots">
             {slides.map((_, index) => (
@@ -94,19 +82,23 @@ export default function Hero({
                 type="button"
                 className={`hero-v2-dot ${index === activeIndex ? "is-active" : ""}`}
                 onClick={() => setActiveIndex(index)}
-                aria-label={`Go to slide ${index + 1}`}
+                aria-label={`Slide ${index + 1}`}
               />
             ))}
           </div>
         )}
       </div>
 
-      {/* ── Intro strip — below the image ── */}
+      {/* ── Intro strip — below image ── */}
       <div className="hero-v2-strip">
         <div className="hero-v2-strip-inner">
           <div className="hero-v2-strip-copy">
-            <p className="hero-v2-copy-strong">{copyStrong}</p>
-            <p className="hero-v2-copy-soft">{copySoft}</p>
+            <p className="hero-v2-copy-strong">
+              {settings?.hero_copy_strong || "A personal journal at the intersection of depth, distance, and detail."}
+            </p>
+            <p className="hero-v2-copy-soft">
+              {settings?.hero_copy_soft || "Essays, dive logs, travel, and the quieter moments in between."}
+            </p>
           </div>
           <div className="hero-v2-tags">
             <Link href="/category/diving" className="hero-v2-tag">Diving</Link>
