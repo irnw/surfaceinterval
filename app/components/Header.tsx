@@ -38,14 +38,12 @@ export default function Header() {
       <div className="masthead-inner">
         <div className={`brand ${isHome ? "brand-home" : "brand-inner"}`}>
           <Link href="/">
-            {/* On the homepage the brand name is in the hero — show only on inner pages */}
             {isHome ? (
               <div className="brand-title brand-title--home-subtle">SI</div>
             ) : (
               <div className="brand-title">Surface Interval</div>
             )}
           </Link>
-          {/* "By Irene W" only on inner pages — hero carries it on homepage */}
           {!isHome && <div className="brand-sub">By Irene W</div>}
         </div>
 
@@ -55,6 +53,7 @@ export default function Header() {
             <Link href="/category/diving" className={navLinkClass(pathname, "/category/diving")}>Diving</Link>
             <Link href="/category/travel" className={navLinkClass(pathname, "/category/travel")}>Travel</Link>
             <Link href="/category/gear" className={navLinkClass(pathname, "/category/gear")}>Gear</Link>
+            <Link href="/category/personal" className={navLinkClass(pathname, "/category/personal")}>Personal</Link>
             <Link href="/archive" className={navLinkClass(pathname, "/archive")}>Archive</Link>
             <Link href="/about" className={navLinkClass(pathname, "/about")}>About</Link>
 

@@ -5864,3 +5864,246 @@ html[data-theme="dark"] .media-modal-card {
 @media (max-width: 480px) {
   .hero-v2-title  { font-size: clamp(1.6rem, 12vw, 2.6rem); white-space: normal; }
 }
+
+/* ============================================================
+   PASTE AT BOTTOM OF globals.css
+   Section head · Editorial improvements · Feature band · Story list
+   ============================================================ */
+
+/* =========================
+   SECTION HEAD — clear hierarchy
+   "Latest Dispatches" is the label (small caps, muted)
+   "View all" is the action (distinct colour, right-aligned)
+========================= */
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 32px 0 20px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  /* Override previous small-caps muted style */
+  text-transform: none;
+}
+
+.section-link {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--purple-deep);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+  padding-bottom: 1px;
+}
+
+.section-link:hover {
+  border-color: var(--purple-deep);
+  color: var(--purple);
+}
+
+/* =========================
+   STORY LIST — more editorial rhythm
+========================= */
+
+.story-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: start;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.story-row:last-child { border-bottom: none; }
+
+.story-kicker {
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--purple);
+  margin-bottom: 8px;
+}
+
+.story-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+}
+
+.story-title a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.story-title a:hover { color: var(--purple-deep); }
+
+.story-body {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.story-meta {
+  font-size: 0.6rem;
+  color: var(--muted);
+  margin-top: 10px;
+  letter-spacing: 0.04em;
+}
+
+/* =========================
+   SIDE RAIL — cleaner
+========================= */
+
+.rail-card {
+  padding: 0;
+  border-left: 1px solid var(--line);
+  padding-left: 24px;
+}
+
+.rail-title {
+  font-size: 0.54rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.rail-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.rail-item:last-child { border-bottom: none; }
+
+.rail-item-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 5px;
+}
+
+.rail-item-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.rail-item-title a:hover { color: var(--purple-deep); }
+
+.rail-meta {
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+/* =========================
+   FEATURE BAND — more authority
+========================= */
+
+.feature-band {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.feature-label {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+  margin-bottom: 10px;
+}
+
+/* =========================
+   STATS — sharper visual weight
+========================= */
+
+.stats-grid {
+  display: grid;
+  gap: 0;
+}
+
+.stats-grid--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.stat {
+  padding: 36px 32px;
+  border-right: 1px solid var(--line);
+}
+
+.stat:last-child { border-right: none; }
+
+.stat-label {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.stat-sub {
+  font-size: 0.7rem;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .stats-grid--three { grid-template-columns: 1fr; }
+  .stat { border-right: none; border-bottom: 1px solid var(--line); padding: 24px 20px; }
+  .stat:last-child { border-bottom: none; }
+}
+
+/* =========================
+   SHELF — subtle refinement
+========================= */
+
+.shelf-section {
+  padding: 52px 0 64px;
+}
+
+.shelf-head {
+  margin-bottom: 32px;
+}
+
+/* =========================
+   GENERAL SECTION SPACING
+========================= */
+
+.section {
+  padding-top: 0;
+  padding-bottom: 64px;
+}
