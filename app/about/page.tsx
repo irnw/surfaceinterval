@@ -108,12 +108,18 @@ export default async function AboutPage() {
               ))
             : (
                 <p className="about-collab-text">
-                  A line, a thought, or a different perspective — all welcome.
+                  <p>A line, a thought, or a different perspective — all welcome.</p>
+                  <p>If something here resonated, feel free to reach out.</p>
+                  
+                  <p>Open to notes, reflections, or anything this space brings up.</p>
+                  <p>Simple is enough.</p>
+                  
+                  <p>No need to overthink it.</p>
                 </p>
               )}
           {collabEmail && (
-            <a href={`mailto:${collabEmail}`} className="about-collab-link">
-              {collabEmail}
+             <a href={`mailto:${settings.contact_email}`} className="about-collab-link">
+                {settings.contact_email}
             </a>
           )}
         </section>
