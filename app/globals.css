@@ -270,7 +270,7 @@ button, input, textarea, select { font: inherit; }
 .hero-v2-media {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 7.5;
   overflow: hidden;
   background: #111;
 }
