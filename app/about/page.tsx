@@ -124,7 +124,8 @@ export default async function AboutPage() {
           <div className="about-collab-label">Work together</div>
           <p className="about-collab-text">
             {settings?.collaboration_note ||
-              "Open to selected collaborations across editorial work, travel and diving features, gear storytelling, and brand partnerships that fit the tone of this journal."}
+              "Open to selected collaborations across editorial work, travel and diving features, gear storytelling, and brand partnerships that fit the tone of this journal.
+              Alternatively, if you have a line, a thought, or a different perspective to share, I&apos;d love to hear from you."}
           </p>
           {settings?.contact_email && (
             <a href={`mailto:${settings.contact_email}`} className="about-collab-link">

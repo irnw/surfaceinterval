@@ -47,7 +47,7 @@ export default async function ContactPage() {
           </h1>
           <div className="post-standfirst">
             {settings?.contact_intro ||
-              "For editorial, brand, and creative enquiries, get in touch."}
+              "A line, a thought, or a different perspective — all welcome."}
           </div>
         </div>
 
