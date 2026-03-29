@@ -21,32 +21,36 @@ export default async function AboutPage() {
     .limit(1)
     .maybeSingle()
 
+  // ── Title ────────────────────────────────────────
+  const title: string = settings?.about_title ?? 'By Irene W.'
+
+  // ── Tagline / intro ──────────────────────────────
+  const tagline: string = settings?.about_intro ?? ''
+
   // ── Photo ────────────────────────────────────────
   const photoUrl: string | null = settings?.about_photo ?? null
 
-  // ── Header ───────────────────────────────────────
-  // about_intro is the tagline shown under "By Irene W."
-  const tagline: string =
-    settings?.about_intro ??
-    'For the quieter moments in between. Not to document — just to slow things down enough to see clearly.'
-
   // ── Body ─────────────────────────────────────────
   const bodyText: string = settings?.about_body ?? ''
+  const bodyParagraphs = bodyText.split('\n').map((p: string) => p.trim()).filter(Boolean)
 
-  // ── Credentials ──────────────────────────────────
-  // Dashboard field names confirmed: about_certification, about_diving_since,
-  // about_oceans, about_camera, about_based
-  const certification: string  = settings?.about_certification ?? ''
-  const divingSince: string    = settings?.about_diving_since ?? ''
-  const oceansDived: string    = settings?.about_oceans ?? ''
-  const camera: string         = settings?.about_camera ?? ''
-  const basedIn: string        = settings?.about_based ?? ''   // ← was about_based_in (wrong)
+  // ── Credentials (3 only: certification, oceans, based in) ──
+  const certification: string = settings?.about_certification ?? ''
+  const oceansDived: string   = settings?.about_oceans ?? ''
+  const basedIn: string       = settings?.about_based ?? ''
 
-  // ── Collab / contact ─────────────────────────────
-  const collabNote: string  = settings?.collaboration_note ?? ''
+  // ── Let's Talk ───────────────────────────────────
+  // Reads contact_intro + contact_body from dashboard
+  const collabIntro: string = settings?.contact_intro ?? ''
+  const collabBody: string  = settings?.contact_body ?? ''
   const collabEmail: string = settings?.contact_email ?? ''
 
-  const bodyParagraphs = bodyText.split('\n').map(p => p.trim()).filter(Boolean)
+  // Combine intro + body into paragraphs, fallback to default
+  const collabLines = [collabIntro, collabBody]
+    .join('\n')
+    .split('\n')
+    .map((p: string) => p.trim())
+    .filter(Boolean)
 
   return (
     <>
@@ -56,7 +60,7 @@ export default async function AboutPage() {
 
         {/* ── HEADER ─────────────────────────────── */}
         <header className="about-header">
-          <p className="about-kicker">By Irene W.</p>
+          <p className="about-kicker">{title}</p>
           <p className="about-intro">{tagline}</p>
         </header>
 
@@ -79,14 +83,14 @@ export default async function AboutPage() {
         {/* ── BODY COPY ──────────────────────────── */}
         {bodyParagraphs.length > 0 && (
           <section className="about-body prose">
-            {bodyParagraphs.map((para, i) => (
+            {bodyParagraphs.map((para: string, i: number) => (
               <p key={i}>{para}</p>
             ))}
           </section>
         )}
 
-        {/* ── CREDENTIALS ────────────────────────── */}
-        {(certification || divingSince || oceansDived || camera || basedIn) && (
+        {/* ── CREDENTIALS (certification · oceans · based in) ── */}
+        {(certification || oceansDived || basedIn) && (
           <aside className="about-credentials">
             {certification && (
               <div className="about-credential">
@@ -94,22 +98,10 @@ export default async function AboutPage() {
                 <span className="about-credential-value">{certification}</span>
               </div>
             )}
-            {divingSince && (
-              <div className="about-credential">
-                <span className="about-credential-label">Diving since</span>
-                <span className="about-credential-value">{divingSince}</span>
-              </div>
-            )}
             {oceansDived && (
               <div className="about-credential">
                 <span className="about-credential-label">Dived in</span>
                 <span className="about-credential-value">{oceansDived}</span>
-              </div>
-            )}
-            {camera && (
-              <div className="about-credential">
-                <span className="about-credential-label">Camera</span>
-                <span className="about-credential-value">{camera}</span>
               </div>
             )}
             {basedIn && (
@@ -121,16 +113,18 @@ export default async function AboutPage() {
           </aside>
         )}
 
-        {/* ── COLLAB / CONTACT ───────────────────── */}
+        {/* ── LET'S TALK ─────────────────────────── */}
         <section className="about-collab">
           <p className="about-collab-label">Let&rsquo;s talk</p>
-          {collabNote ? (
-            <p className="about-collab-text">{collabNote}</p>
-          ) : (
-            <p className="about-collab-text">
-              A line, a thought, or a different perspective — all welcome.
-            </p>
-          )}
+          {collabLines.length > 0
+            ? collabLines.map((para: string, i: number) => (
+                <p key={i} className="about-collab-text">{para}</p>
+              ))
+            : (
+              <p className="about-collab-text">
+                A line, a thought, or a different perspective — all welcome.
+              </p>
+            )}
           {collabEmail && (
             <a href={`mailto:${collabEmail}`} className="about-collab-link">
               {collabEmail}
