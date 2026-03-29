@@ -73,7 +73,7 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
             <Link href="/category/diving" className="hero-v2-tag">Diving</Link>
             <Link href="/category/travel" className="hero-v2-tag">Travel</Link>
             <Link href="/category/gear" className="hero-v2-tag">Gear</Link>
-            <Link href="/category/personal" className="hero-v2-tag">Personal</Link>
+            <Link href="/category/life" className="hero-v2-tag">Life</Link>
           </div>
         </div>
         <div className="hero-v2-scroll-cue">
