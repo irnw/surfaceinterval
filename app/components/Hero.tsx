@@ -15,36 +15,34 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
   }, [settings]);
 
   const [activeIndex, setActiveIndex] = useState(0);
-
   useEffect(() => { setActiveIndex(0); }, [slides.length]);
   useEffect(() => {
     if (slides.length <= 1) return;
-    const timer = window.setInterval(() => setActiveIndex((prev) => (prev + 1) % slides.length), 4500);
+    const timer = window.setInterval(() => setActiveIndex((p) => (p + 1) % slides.length), 4500);
     return () => window.clearInterval(timer);
   }, [slides.length]);
 
-  const copyStrong = settings?.hero_copy_strong || "Depth, distance, and the details that stay with you.";
-  const copySoft = settings?.hero_copy_soft || "Dive logs, long-form travel, gear worth writing about, and the quieter observations in between.";
+  // Copy — editable via settings, defaults below
+  const copyStrong = settings?.hero_copy_strong
+    || "Written from below the surface — and everywhere it leads.";
+  const copySoft = settings?.hero_copy_soft
+    || "Dive logs, long-form travel, gear worth writing about, and the quieter moments in between.";
 
   return (
     <section className="hero-v2">
       <div className="hero-v2-media">
-        {slides.length > 0 ? (
-          slides.map((slide, index) => (
-            <div
-              key={`${slide.image}-${index}`}
-              className={`hero-v2-slide ${index === activeIndex ? "is-active" : ""}`}
-              style={{ backgroundImage: `url(${slide.image})` }}
-            />
-          ))
-        ) : (
-          <div className="hero-v2-placeholder" />
-        )}
-
+        {slides.length > 0
+          ? slides.map((slide, i) => (
+              <div
+                key={`${slide.image}-${i}`}
+                className={`hero-v2-slide ${i === activeIndex ? "is-active" : ""}`}
+                style={{ backgroundImage: `url(${slide.image})` }}
+              />
+            ))
+          : <div className="hero-v2-placeholder" />
+        }
         <div className="hero-v2-scrim" />
-
         <div className="hero-v2-eyebrow">From the deep end of the world</div>
-
         <div className="hero-v2-bottom">
           <div className="hero-v2-bottom-left">
             <h1 className="hero-v2-title">
@@ -57,21 +55,16 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
           </div>
           {slides.length > 1 && (
             <div className="hero-v2-dots">
-              {slides.map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className={`hero-v2-dot ${index === activeIndex ? "is-active" : ""}`}
-                  onClick={() => setActiveIndex(index)}
-                  aria-label={`Slide ${index + 1}`}
-                />
+              {slides.map((_, i) => (
+                <button key={i} type="button"
+                  className={`hero-v2-dot ${i === activeIndex ? "is-active" : ""}`}
+                  onClick={() => setActiveIndex(i)} aria-label={`Slide ${i + 1}`} />
               ))}
             </div>
           )}
         </div>
       </div>
 
-      {/* Intro strip */}
       <div className="hero-v2-strip">
         <div className="hero-v2-strip-inner">
           <div className="hero-v2-strip-copy">
