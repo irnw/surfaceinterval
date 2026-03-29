@@ -26,7 +26,7 @@ export default async function AboutPage() {
   const tagline: string =
     settings?.about_tagline ??
     settings?.tagline ??
-    'For the quieter moments in between. Not to document — just to slow things down enough to see clearly.'
+    'Diving deep, travelling far, and paying attention to what shifts in between. For the quieter moments in between.'
 
   const bodyText: string      = settings?.about_body ?? ''
   const certification: string = settings?.about_certification ?? ''
