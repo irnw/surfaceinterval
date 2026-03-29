@@ -22,10 +22,8 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
     return () => window.clearInterval(timer);
   }, [slides.length]);
 
-  const copyStrong = settings?.hero_copy_strong
-    || "Written from below the surface — and everywhere it leads.";
-  const copySoft = settings?.hero_copy_soft
-    || "Dive logs, long-form travel, gear worth writing about, and the quieter moments in between.";
+  const copyStrong = settings?.hero_copy_strong || "Written from below the surface — and everywhere it leads.";
+  const copySoft = settings?.hero_copy_soft || "Dive logs, long-form travel, gear worth writing about, and the quieter moments in between.";
 
   return (
     <section className="hero-v2">
@@ -48,7 +46,7 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
               <span className="hero-v2-title-main">Surface</span>
               <span className="hero-v2-title-accent"> Interval</span>
             </h1>
-            {/* BY IRENE W — deliberate byline, below the title */}
+            {/* BY IRENE W — deliberate byline below title */}
             <div className="hero-v2-byline-credit">BY IRENE W</div>
             {/* Caption below byline */}
             {slides[activeIndex]?.caption && (

@@ -47,8 +47,7 @@ function formatDate(iso: string | null): string {
 
 function formatScheduled(iso: string | null): string {
   if (!iso) return "";
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" }) + " · 8am SGT";
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "2-digit" }) + " · 8am SGT";
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -61,9 +60,7 @@ function StatusBadge({ status }: { status: string }) {
   return <span className={cls[status] || "pm-badge pm-badge--draft"}>{labels[status] || status}</span>;
 }
 
-function PostRow({
-  post, updateAction, deleteAction, checked, onCheck,
-}: {
+function PostRow({ post, updateAction, deleteAction, checked, onCheck }: {
   post: Post;
   updateAction: (fd: FormData) => Promise<void>;
   deleteAction: () => Promise<void>;
@@ -146,7 +143,8 @@ function PostRow({
               onClick={handleDelete} disabled={deleting}>
               {deleting ? "…" : "Yes"}
             </button>
-            <button type="button" className="pm-action-btn" onClick={() => setConfirmDelete(false)}>No</button>
+            <button type="button" className="pm-action-btn"
+              onClick={() => setConfirmDelete(false)}>No</button>
           </span>
         )}
       </div>
@@ -215,14 +213,11 @@ export default function PostsManager({ posts, postActions }: PostsManagerProps) 
     return postActions.find((a) => a.postId === postId);
   }
 
-  // Apply All Changes — triggers every individual row's current form state
-  // by clicking all Apply buttons on the page
   async function handleApplyAll() {
     setApplyingAll(true);
     const applyBtns = document.querySelectorAll<HTMLButtonElement>('.pm-qe-apply');
     for (const btn of Array.from(applyBtns)) {
       btn.click();
-      // Small delay to avoid server overload
       await new Promise((r) => setTimeout(r, 120));
     }
     setApplyingAll(false);
@@ -259,27 +254,20 @@ export default function PostsManager({ posts, postActions }: PostsManagerProps) 
 
   return (
     <div className="pm-root">
-      {/* Header */}
       <div className="pm-head">
         <div className="pm-head-left">
           <h2 className="pm-title">Posts</h2>
           <span className="pm-count">{posts.length} total</span>
         </div>
         <div className="pm-head-right">
-          {/* Apply All Changes — applies every row's current quick-edit state */}
-          <button
-            type="button"
-            className="pm-apply-all-btn"
-            onClick={handleApplyAll}
-            disabled={applyingAll}
-          >
+          <button type="button" className="pm-apply-all-btn"
+            onClick={handleApplyAll} disabled={applyingAll}>
             {applyingAll ? "Applying…" : "Apply All Changes"}
           </button>
           <Link href="/admin/new" className="pm-new-btn">+ New Post</Link>
         </div>
       </div>
 
-      {/* Bulk action bar */}
       {someChecked && (
         <div className="pm-bulk-bar">
           <span className="pm-bulk-count">{selected.size} selected</span>
@@ -301,7 +289,6 @@ export default function PostsManager({ posts, postActions }: PostsManagerProps) 
         </div>
       )}
 
-      {/* Column headers */}
       <div className="pm-col-head">
         <div className="pm-col-check">
           <input type="checkbox" className="pm-checkbox" checked={allChecked}
@@ -312,7 +299,6 @@ export default function PostsManager({ posts, postActions }: PostsManagerProps) 
         <div className="pm-col-actions">Actions</div>
       </div>
 
-      {/* Post rows */}
       <div className="pm-list">
         {posts.length === 0 ? (
           <div className="pm-empty">

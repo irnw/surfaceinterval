@@ -4052,3 +4052,267 @@ html[data-theme="dark"] .media-modal-card {
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* ============================================================
+   PASTE AT VERY BOTTOM OF globals.css
+   1. Post hero caption alignment (match block captions)
+   2. Post shell fluid width (75-80% on wide screens)
+   3. All site-wide typography and audit fixes
+   ============================================================ */
+
+
+/* ══════════════════════════════════════════
+   1. CAPTION ALIGNMENT
+   Make post-hero-caption identical to post-block-caption:
+   same size, same colour, same position treatment
+══════════════════════════════════════════ */
+
+/* Hero image caption — now matches block captions exactly */
+.post-hero-caption {
+  position: absolute !important;
+  bottom: 14px !important;
+  left: 16px !important;
+  font-size: 0.6rem !important;        /* same as block caption */
+  font-weight: 400 !important;
+  letter-spacing: 0.1em !important;    /* same as block caption */
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.88) !important;  /* same as block caption */
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+  line-height: 1 !important;
+}
+
+/* Block captions — set the standard explicitly so both match */
+.post-block-caption {
+  position: absolute !important;
+  bottom: 14px !important;
+  left: 16px !important;
+  font-size: 0.6rem !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+  line-height: 1 !important;
+}
+
+
+/* ══════════════════════════════════════════
+   2. POST SHELL — fluid width
+   75-80% on standard laptop, grows on wider displays,
+   capped at 1100px so ultra-wide stays readable
+══════════════════════════════════════════ */
+
+.post-shell {
+  /* fluid: 78vw at any screen width, capped at 1100px for ultra-wide */
+  max-width: min(78vw, 1100px) !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: 32px !important;
+  padding-right: 32px !important;
+}
+
+/* At narrow laptop (1280px): 78vw = 998px — good */
+/* At standard laptop (1470px): 78vw = 1147px → capped at 1100px — good */
+/* At wide monitor (1920px): 78vw = 1498px → capped at 1100px — still readable */
+/* At ultra-wide (2560px): 78vw = 1997px → capped at 1100px — safe */
+/* On mobile: 100% with padding */
+
+@media (max-width: 768px) {
+  .post-shell {
+    max-width: 100% !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+
+/* ══════════════════════════════════════════
+   3. POST PAGE — reading experience
+══════════════════════════════════════════ */
+
+.post-title {
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.1 !important;
+}
+
+.post-standfirst {
+  font-size: 1.1rem !important;
+  line-height: 1.7 !important;
+  color: var(--text-soft) !important;
+  font-family: var(--font-serif) !important;
+  font-weight: 400 !important;
+  font-style: italic !important;
+  margin-top: 16px !important;
+}
+
+.post-meta {
+  font-size: 0.6rem !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+  margin-bottom: 16px !important;
+}
+
+.post-head {
+  padding-top: 40px !important;
+  padding-bottom: 32px !important;
+}
+
+.prose.prose-editorial {
+  font-size: 1rem !important;
+  line-height: 1.85 !important;
+  color: var(--text-soft) !important;
+}
+
+.prose.prose-editorial .post-block-text p {
+  margin-bottom: 1.6em !important;
+  font-size: 1rem !important;
+  line-height: 1.85 !important;
+}
+
+.post-hero {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.post-hero img {
+  width: 100% !important;
+  aspect-ratio: 16 / 9 !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+.share-strip {
+  padding: 20px 0 !important;
+  border-top: 1px solid var(--line) !important;
+  border-bottom: 1px solid var(--line) !important;
+  margin: 24px 0 !important;
+}
+.share-strip--top { border-top: none !important; margin-top: 0 !important; }
+
+.post-tags {
+  margin-top: 32px !important;
+  padding-top: 24px !important;
+  border-top: 1px solid var(--line) !important;
+}
+
+.field-note {
+  border-left: 2px solid var(--purple) !important;
+  padding: 16px 20px !important;
+  margin-bottom: 32px !important;
+  background: var(--purple-soft) !important;
+  border-radius: 0 8px 8px 0 !important;
+}
+.field-note-label {
+  font-size: 0.54rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: var(--purple-deep) !important;
+  margin-bottom: 8px !important;
+}
+.field-note-body {
+  font-size: 0.88rem !important;
+  line-height: 1.65 !important;
+  color: var(--text-soft) !important;
+}
+
+
+/* ══════════════════════════════════════════
+   4. HERO — byline credit style
+══════════════════════════════════════════ */
+
+.hero-v2-byline-credit {
+  font-size: 0.52rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 6px;
+  margin-bottom: 2px;
+}
+
+
+/* ══════════════════════════════════════════
+   5. ARCHIVE PAGE
+══════════════════════════════════════════ */
+
+.archive-row-meta {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  gap: 4px !important;
+  font-size: 0.68rem !important;
+  color: var(--muted) !important;
+  white-space: nowrap !important;
+  padding-top: 4px !important;
+}
+
+.archive-row-title {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.3 !important;
+  margin-bottom: 6px !important;
+}
+.archive-row-title a { color: var(--text) !important; text-decoration: none !important; }
+.archive-row-title a:hover { color: var(--purple-deep) !important; }
+
+.archive-row-desc { font-size: 0.84rem !important; line-height: 1.6 !important; color: var(--muted) !important; }
+
+.archive-row-kicker-row { display: flex !important; align-items: center !important; gap: 6px !important; margin-bottom: 8px !important; }
+.archive-row-kicker { font-size: 0.54rem !important; font-weight: 500 !important; letter-spacing: 0.16em !important; text-transform: uppercase !important; color: var(--purple) !important; }
+.archive-row-series { font-size: 0.54rem !important; color: var(--purple) !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; }
+
+.archive-month { font-size: 0.7rem !important; font-weight: 500 !important; letter-spacing: 0.14em !important; text-transform: uppercase !important; color: var(--muted) !important; padding-bottom: 16px !important; border-bottom: 1px solid var(--line) !important; }
+.archive-year { font-family: var(--font-serif) !important; font-size: 1.8rem !important; font-weight: 700 !important; color: var(--text) !important; letter-spacing: -0.02em !important; }
+.archive-year-count { font-size: 0.62rem !important; color: var(--muted) !important; }
+
+
+/* ══════════════════════════════════════════
+   6. ABOUT PAGE
+══════════════════════════════════════════ */
+
+.about-title { font-size: clamp(1.8rem, 4vw, 2.8rem) !important; font-weight: 700 !important; letter-spacing: -0.025em !important; line-height: 1.15 !important; }
+.about-intro { font-size: 1rem !important; line-height: 1.75 !important; color: var(--text-soft) !important; }
+.about-body.prose p { font-size: 0.96rem !important; line-height: 1.85 !important; color: var(--text-soft) !important; margin-bottom: 1.4em !important; }
+.about-collab-text { font-size: 0.92rem !important; line-height: 1.75 !important; }
+.about-credential-label { font-size: 0.52rem !important; letter-spacing: 0.16em !important; text-transform: uppercase !important; color: var(--muted) !important; margin-bottom: 5px !important; }
+.about-credential-value { font-size: 0.82rem !important; line-height: 1.4 !important; color: var(--text-soft) !important; }
+
+
+/* ══════════════════════════════════════════
+   7. FOOTER
+══════════════════════════════════════════ */
+
+.footer { padding-top: 28px !important; padding-bottom: 28px !important; }
+.footer-brand { font-family: var(--font-serif) !important; font-size: 0.88rem !important; font-weight: 700 !important; letter-spacing: -0.01em !important; margin-bottom: 4px !important; }
+.footer-copy { font-size: 0.66rem !important; color: var(--muted) !important; letter-spacing: 0.04em !important; }
+.footer-links { display: flex !important; gap: 20px !important; font-size: 0.72rem !important; }
+.footer-right { font-size: 0.66rem !important; color: var(--muted) !important; text-align: right !important; }
+
+
+/* ══════════════════════════════════════════
+   8. ADMIN — Apply All Changes button
+══════════════════════════════════════════ */
+
+.pm-head-right { display: flex !important; align-items: center !important; gap: 10px !important; }
+
+.pm-apply-all-btn {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.pm-apply-all-btn:hover:not(:disabled) { background: var(--purple-soft); color: var(--purple-deep); border-color: var(--purple); }
+.pm-apply-all-btn:disabled { opacity: 0.45; cursor: not-allowed; }
