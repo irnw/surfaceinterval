@@ -21,31 +21,19 @@ export default async function AboutPage() {
     .limit(1)
     .maybeSingle()
 
-  // ── Title ────────────────────────────────────────
-  const title: string = settings?.about_title ?? 'By Irene W.'
-
-  // ── Tagline / intro ──────────────────────────────
-  const tagline: string = settings?.about_intro ?? ''
-
-  // ── Photo ────────────────────────────────────────
+  const title: string        = settings?.about_title  ?? 'Irene W.'
+  const tagline: string      = settings?.about_intro  ?? ''
   const photoUrl: string | null = settings?.about_photo ?? null
+  const bodyText: string     = settings?.about_body   ?? ''
+  const collabIntro: string  = settings?.contact_intro ?? ''
+  const collabBody: string   = settings?.contact_body  ?? ''
+  const collabEmail: string  = settings?.contact_email ?? ''
 
-  // ── Body ─────────────────────────────────────────
-  const bodyText: string = settings?.about_body ?? ''
-  const bodyParagraphs = bodyText.split('\n').map((p: string) => p.trim()).filter(Boolean)
+  const bodyParagraphs = bodyText
+    .split('\n')
+    .map((p: string) => p.trim())
+    .filter(Boolean)
 
-  // ── Credentials (3 only: certification, oceans, based in) ──
-  const certification: string = settings?.about_certification ?? ''
-  const oceansDived: string   = settings?.about_oceans ?? ''
-  const basedIn: string       = settings?.about_based ?? ''
-
-  // ── Let's Talk ───────────────────────────────────
-  // Reads contact_intro + contact_body from dashboard
-  const collabIntro: string = settings?.contact_intro ?? ''
-  const collabBody: string  = settings?.contact_body ?? ''
-  const collabEmail: string = settings?.contact_email ?? ''
-
-  // Combine intro + body into paragraphs, fallback to default
   const collabLines = [collabIntro, collabBody]
     .join('\n')
     .split('\n')
@@ -89,30 +77,6 @@ export default async function AboutPage() {
           </section>
         )}
 
-        {/* ── CREDENTIALS (certification · oceans · based in) ── */}
-        {(certification || oceansDived || basedIn) && (
-          <aside className="about-credentials">
-            {certification && (
-              <div className="about-credential">
-                <span className="about-credential-label">Certification</span>
-                <span className="about-credential-value">{certification}</span>
-              </div>
-            )}
-            {oceansDived && (
-              <div className="about-credential">
-                <span className="about-credential-label">Dived in</span>
-                <span className="about-credential-value">{oceansDived}</span>
-              </div>
-            )}
-            {basedIn && (
-              <div className="about-credential">
-                <span className="about-credential-label">Based in</span>
-                <span className="about-credential-value">{basedIn}</span>
-              </div>
-            )}
-          </aside>
-        )}
-
         {/* ── LET'S TALK ─────────────────────────── */}
         <section className="about-collab">
           <p className="about-collab-label">Let&rsquo;s talk</p>
@@ -122,7 +86,7 @@ export default async function AboutPage() {
               ))
             : (
               <p className="about-collab-text">
-                A line, a thought, or a different perspective — all welcome.
+                A line, a thought, or a different perspective — always welcome.
               </p>
             )}
           {collabEmail && (
