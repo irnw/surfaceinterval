@@ -15,6 +15,11 @@ type Settings = {
   quote_author?: string | null;
 };
 
+function formatDate(iso?: string | null) {
+  if (!iso) return "Mar 2026";
+  return new Date(iso).toLocaleDateString("en-GB", { month: "short", year: "numeric" });
+}
+
 export default function EditorialHome({
   posts,
   settings,
@@ -26,107 +31,131 @@ export default function EditorialHome({
   editorsPicks: Post[];
   featuredPost: Post | null;
 }) {
+  // Grid posts: exclude featured post from the grid, show up to 4
+  const gridPosts = posts
+    .filter((p) => !featuredPost || p.slug !== featuredPost.slug)
+    .slice(0, 4);
+
   return (
-    <section className="section">
-      <div className="section-head">
-        <div className="section-title">Latest Dispatches</div>
+    <div className="editorial-home">
 
-        {featuredPost ? (
-          <Link
-            className="section-link"
-            href={`/posts/${featuredPost.slug}`}
-          >
-            Read featured story
-          </Link>
-        ) : (
-          <span className="section-link">Latest stories</span>
-        )}
-      </div>
-
-      <div className="editorial-grid">
-        <div className="story-list">
-          {posts.map((post) => (
-            <article key={post.slug} className="story-row">
-              <div>
-                <div className="story-kicker">{post.category}</div>
-
-                <h2 className="story-title">
-                  <Link href={`/posts/${post.slug}`}>{post.title}</Link>
-                </h2>
-
-                <div className="story-body">{post.excerpt}</div>
-
-                <div className="story-meta">
-                  By Irene W · {post.read_time ?? "8 min read"} ·{" "}
-                  {post.published_at
-                    ? new Date(post.published_at).toLocaleDateString("en-GB", {
-                        month: "short",
-                        year: "numeric",
-                      })
-                    : "Mar 2026"}
-                </div>
-              </div>
-
-              {post.hero_image ? (
-                <div
-                  className="story-thumb"
-                  style={{
-                    background: `url('${post.hero_image}') center/cover`,
-                  }}
+      {/* ── Featured story ── */}
+      {featuredPost && (
+        <section className="featured-dispatch">
+          <div className="featured-dispatch-inner">
+            <Link href={`/posts/${featuredPost.slug}`} className="featured-dispatch-image-wrap">
+              {featuredPost.hero_image ? (
+                <img
+                  src={featuredPost.hero_image}
+                  alt={featuredPost.title}
+                  className="featured-dispatch-img"
                 />
               ) : (
-                <div className="story-thumb" />
+                <div className="featured-dispatch-img-placeholder" />
               )}
-            </article>
-          ))}
-        </div>
+              <div className="featured-dispatch-scrim" />
+            </Link>
 
-        <aside className="side-rail">
-          <div className="rail-card">
-            <div className="rail-title">Editor&apos;s Picks</div>
+            <div className="featured-dispatch-body">
+              <div className="featured-dispatch-kicker">
+                <span className="featured-dispatch-cat">{featuredPost.category}</span>
+                <span className="featured-dispatch-label">Featured dispatch</span>
+              </div>
 
-            {editorsPicks.length > 0 ? (
-              editorsPicks.map((post) => (
-                <div key={post.slug} className="rail-item">
-                  <div className="rail-kicker">{post.category}</div>
+              <h2 className="featured-dispatch-title">
+                <Link href={`/posts/${featuredPost.slug}`}>
+                  {featuredPost.title}
+                </Link>
+              </h2>
 
-                  <div className="rail-item-title">
-                    <Link href={`/posts/${post.slug}`}>{post.title}</Link>
+              <p className="featured-dispatch-excerpt">{featuredPost.excerpt}</p>
+
+              <div className="featured-dispatch-meta">
+                By Irene W · {featuredPost.read_time ?? "8 min read"} · {formatDate(featuredPost.published_at)}
+              </div>
+
+              <Link href={`/posts/${featuredPost.slug}`} className="featured-dispatch-cta">
+                Read dispatch
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Recent dispatches grid ── */}
+      {gridPosts.length > 0 && (
+        <section className="dispatches-section">
+          <div className="dispatches-section-inner">
+            <div className="dispatches-head">
+              <h2 className="dispatches-title">Recent Dispatches</h2>
+              <Link href="/archive" className="dispatches-view-all">
+                View all dispatches →
+              </Link>
+            </div>
+
+            <div className="dispatches-grid">
+              {gridPosts.map((post) => (
+                <article key={post.slug} className="dispatch-card">
+                  <Link href={`/posts/${post.slug}`} className="dispatch-card-image-wrap">
+                    {post.hero_image ? (
+                      <img
+                        src={post.hero_image}
+                        alt={post.title}
+                        className="dispatch-card-img"
+                      />
+                    ) : (
+                      <div className="dispatch-card-img-placeholder" />
+                    )}
+                  </Link>
+
+                  <div className="dispatch-card-body">
+                    <div className="dispatch-card-kicker">{post.category}</div>
+
+                    <h3 className="dispatch-card-title">
+                      <Link href={`/posts/${post.slug}`}>{post.title}</Link>
+                    </h3>
+
+                    <p className="dispatch-card-excerpt">{post.excerpt}</p>
+
+                    <div className="dispatch-card-meta">
+                      {post.read_time ?? "8 min read"} · {formatDate(post.published_at)}
+                    </div>
                   </div>
+                </article>
+              ))}
+            </div>
 
-                  <div className="rail-meta">
-                    {post.read_time ?? "8 min"} ·{" "}
-                    {post.published_at
-                      ? new Date(post.published_at).toLocaleDateString("en-GB", {
-                          month: "short",
-                          year: "numeric",
-                        })
-                      : "—"}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rail-item">
-                <div className="rail-item-title">No editor&apos;s picks yet</div>
-                <div className="rail-meta">
-                  Mark posts in the dashboard to feature them here.
+            {/* Editors picks — below the grid, as a slim horizontal strip */}
+            {editorsPicks.length > 0 && (
+              <div className="editors-picks-strip">
+                <div className="editors-picks-label">Editor&apos;s Picks</div>
+                <div className="editors-picks-list">
+                  {editorsPicks.map((post) => (
+                    <Link key={post.slug} href={`/posts/${post.slug}`} className="editors-pick-item">
+                      <span className="editors-pick-cat">{post.category}</span>
+                      <span className="editors-pick-title">{post.title}</span>
+                    </Link>
+                  ))}
                 </div>
               </div>
             )}
-          </div>
 
-          <div className="rail-card quote-box">
-            <div className="rail-title">About this journal</div>
-            <div className="quote">
-              {settings?.quote_text ||
-                "Surface Interval is the pause between dives. It is where the stories settle."}
-            </div>
-            <div className="quote-name">
-              — {settings?.quote_author || "Irene W"}
-            </div>
+            {/* About this journal quote */}
+            {(settings?.quote_text) && (
+              <div className="journal-quote">
+                <blockquote className="journal-quote-text">
+                  {settings.quote_text}
+                </blockquote>
+                <cite className="journal-quote-name">— {settings.quote_author || "Irene W"}</cite>
+              </div>
+            )}
           </div>
-        </aside>
-      </div>
-    </section>
+        </section>
+      )}
+
+    </div>
   );
 }

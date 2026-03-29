@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import Header from "./components/Header";
 import Hero from "./components/Hero";
 import EditorialHome from "./components/EditorialHome";
-import FeatureBand from "./components/FeatureBand";
 import Stats from "./components/Stats";
 import OnTheShelf from "./components/OnTheShelf";
 import Footer from "./components/Footer";
@@ -13,21 +12,16 @@ import { getDisplayReadTime } from "./lib/read-time";
 
 export const metadata: Metadata = {
   title: "Surface Interval",
-  description: "Dive logs, travel, gear, and the quieter moments in between.",
+  description: "Dive logs, long-form travel, gear worth writing about, and the quieter moments in between.",
   openGraph: {
     title: "Surface Interval",
-    description: "Dive logs, travel, gear, and the quieter moments in between.",
+    description: "Dive logs, long-form travel, gear worth writing about, and the quieter moments in between.",
     type: "website",
-    images: [{
-      url: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1800&q=80",
-      width: 1800, height: 1200, alt: "Surface Interval homepage",
-    }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Surface Interval",
-    description: "Dive logs, travel, gear, and the quieter moments in between.",
-    images: ["https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1800&q=80"],
+    description: "Dive logs, long-form travel, gear worth writing about, and the quieter moments in between.",
   },
 };
 
@@ -35,12 +29,17 @@ export default async function HomePage() {
   const supabase = await createSupabaseServerClient();
 
   const { data: posts, error: postsError } = await supabase
-    .from("posts").select("*").eq("status", "published")
+    .from("posts")
+    .select("*")
+    .eq("status", "published")
     .order("published_at", { ascending: false });
 
   const { data: settings } = await supabase
-    .from("settings").select("*")
-    .order("id", { ascending: true }).limit(1).maybeSingle();
+    .from("settings")
+    .select("*")
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
 
   if (postsError) console.error("Homepage posts error:", postsError.message);
 
@@ -49,8 +48,10 @@ export default async function HomePage() {
     read_time: getDisplayReadTime(post.read_time, post.body),
   }));
 
+  // Featured post — is_featured flag
   const featuredPost = allPosts.find((p) => p.is_featured) || null;
 
+  // Editor's picks — up to 3, exclude featured
   const editorsPicks = allPosts
     .filter((p) => {
       if (!p.is_editors_pick) return false;
@@ -66,23 +67,27 @@ export default async function HomePage() {
     })
     .slice(0, 3);
 
-  // Cap Latest Dispatches at 5
-  const latestDispatches = allPosts.slice(0, 5);
+  // Grid posts — latest 5 (featured post will be excluded inside EditorialHome)
+  const latestPosts = allPosts.slice(0, 5);
 
   const readingShelf = Array.isArray(settings?.reading_shelf)
-    ? settings.reading_shelf.slice(0, 6) : [];
+    ? settings.reading_shelf.slice(0, 6)
+    : [];
 
   return (
     <>
       <Header />
       <Hero settings={settings} />
+
+      {/* Featured hero + 2-col grid — FeatureBand component removed */}
       <EditorialHome
-        posts={latestDispatches}
+        posts={latestPosts}
         settings={settings}
         editorsPicks={editorsPicks}
         featuredPost={featuredPost}
       />
-      {featuredPost ? <FeatureBand featuredPost={featuredPost} /> : null}
+
+      {/* Stats · Shelf · Footer */}
       <Stats settings={settings} postCount={allPosts.length} />
       <OnTheShelf books={readingShelf} />
       <Footer settings={settings} />
