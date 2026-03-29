@@ -3220,11 +3220,11 @@ button {
 }
 
 .about-portrait {
-  position: relative;
+  object-position: center 30%;
   /* editorial: wide landscape crop, cinematic */
   width: 100%;
   max-width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   background: var(--purple-soft);
   border-radius: 0;           /* sharp corners — matches site aesthetic */
