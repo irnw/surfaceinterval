@@ -121,10 +121,10 @@ export default async function AboutPage() {
 
         {/* ── COLLABORATION ── */}
         <div className="about-collab">
-          <div className="about-collab-label">Work together</div>
+          <div className="about-collab-label">Let's Talk</div>
           <p className="about-collab-text">
             {settings?.collaboration_note ||
-              "Open to selected collaborations across editorial work, travel and diving features, gear storytelling, and brand partnerships that fit the tone of this journal. Alternatively, if you have a line, a thought, or a different perspective to share, I&apos;d love to hear from you."}
+              "A line, a thought, or a different perspective — all welcome.If something here resonated, feel free to reach out. Open to notes, reflections, or anything this space brings up. Simple is enough. No need to overthink it."}
           </p>
           {settings?.contact_email && (
             <a href={`mailto:${settings.contact_email}`} className="about-collab-link">
