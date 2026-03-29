@@ -3702,3 +3702,18 @@ html[data-theme="dark"] .media-modal-card {
 .dark .hero-byline {
   color: rgba(255, 255, 255, 0.5);
 }
+
+.hero-standfirst {
+  font-size: 18px;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.hero-description {
+  font-size: 15px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.dark .hero-description {
+  color: rgba(255, 255, 255, 0.65);
+}
