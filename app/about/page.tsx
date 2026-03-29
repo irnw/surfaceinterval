@@ -1,152 +1,121 @@
-export const revalidate = 0;
-
-import type { Metadata } from "next";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import { createSupabaseServerClient } from "../lib/supabase-server";
+// app/about/page.tsx
+import { createSupabaseServerClient } from "../lib/supabase-server"
+import Image from 'next/image'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: "About",
-  description: "About Surface Interval and the editorial lens behind it.",
-  openGraph: {
-    title: "About · Surface Interval",
-    description: "About Surface Interval and the editorial lens behind it.",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "About · Surface Interval",
-    description: "About Surface Interval and the editorial lens behind it.",
-  },
-};
+  title: 'About · Surface Interval',
+  description: 'Surface Interval — a personal editorial journal on diving, travel and photography, by Irene W.',
+}
 
 export default async function AboutPage() {
-  const supabase = await createSupabaseServerClient();
-
+  const supabase = await createSupabaseServerClient()
   const { data: settings } = await supabase
-    .from("settings").select("*")
-    .order("id", { ascending: true }).limit(1).maybeSingle();
+    .from('settings')
+    .select('*')
+    .order('id', { ascending: true })
+    .limit(1)
+    .maybeSingle()
 
-  const paragraphs = String(settings?.about_body || "")
-    .split("\n").map((p: string) => p.trim()).filter(Boolean);
+  const photoUrl = settings?.about_photo_url ?? null
+  const bodyText: string = settings?.about_body ?? ''
+  const collabText: string = settings?.about_collab ?? ''
+  const collabEmail: string = settings?.about_email ?? 'irene.wsh@live.com'
+
+  const certification: string = settings?.about_certification ?? ''
+  const oceansDived: string = settings?.about_oceans ?? ''
+  const basedIn: string = settings?.about_based_in ?? ''
+
+  const bodyParagraphs = bodyText
+    .split('\n')
+    .map((p) => p.trim())
+    .filter(Boolean)
+
+  const collabParagraphs = collabText
+    .split('\n')
+    .map((p) => p.trim())
+    .filter(Boolean)
 
   return (
-    <>
-      <Header />
+    <main className="about-shell">
 
-      <main className="about-shell">
+      {/* ── HEADER ─────────────────────────────────────── */}
+      <header className="about-header">
+        <p className="about-kicker">Irene W.</p>
+        <p className="about-intro">
+          For the quieter moments in between.{' '}
+          Not to document — just to slow things down enough to see clearly.
+        </p>
+      </header>
 
-        {/* ── HERO ── */}
-        <div className="about-hero">
-          <div className="about-hero-text">
-            <div className="about-kicker">About</div>
-            <h1 className="about-title">
-              {settings?.about_title || ""}
-            </h1>
-            <p className="about-intro">
-              {settings?.about_intro ||
-                "Surface Interval is a writing and image-led journal about diving, travel, gear, and the quieter observations that stay with you after the trip is over."}
-            </p>
+      {/* ── PORTRAIT ───────────────────────────────────── */}
+      {photoUrl && (
+        <figure className="about-portrait-wrap">
+          <div className="about-portrait">
+            <Image
+              src={photoUrl}
+              alt="Irene W."
+              fill
+              sizes="(max-width: 768px) 100vw, 640px"
+              className="about-portrait-img"
+              priority
+            />
           </div>
+        </figure>
+      )}
 
-          {settings?.about_photo ? (
-            <div className="about-portrait">
-              <img src={settings.about_photo} alt="Irene W" />
-            </div>
-          ) : (
-            <div className="about-portrait about-portrait--placeholder">
-              <div className="about-portrait-label">Irene W</div>
-            </div>
-          )}
-        </div>
+      {/* ── BODY COPY ──────────────────────────────────── */}
+      {bodyParagraphs.length > 0 && (
+        <section className="about-body prose">
+          {bodyParagraphs.map((para, i) => (
+            <p key={i}>{para}</p>
+          ))}
+        </section>
+      )}
 
-        <div className="about-rule" />
+      {/* ── CREDENTIALS ────────────────────────────────── */}
+      {(certification || oceansDived || basedIn) && (
+        <aside className="about-credentials">
+          {certification && (
+            <div className="about-credential">
+              <span className="about-credential-label">Certification</span>
+              <span className="about-credential-value">{certification}</span>
+            </div>
+          )}
+          {oceansDived && (
+            <div className="about-credential">
+              <span className="about-credential-label">Dived in</span>
+              <span className="about-credential-value">{oceansDived}</span>
+            </div>
+          )}
+          {basedIn && (
+            <div className="about-credential">
+              <span className="about-credential-label">Based in</span>
+              <span className="about-credential-value">{basedIn}</span>
+            </div>
+          )}
+        </aside>
+      )}
 
-        {/* ── CREDENTIALS STRIP — all from settings ── */}
-        <div className="about-credentials">
-          {(settings?.about_certification || "PADI Rescue Diver · EFR") && (
-            <div className="about-credential">
-              <div className="about-credential-label">Certification</div>
-              <div className="about-credential-value">
-                {settings?.about_certification || "PADI Rescue Diver · EFR"}
-              </div>
-            </div>
+      {/* ── COLLAB / CONTACT ───────────────────────────── */}
+      <section className="about-collab">
+        <p className="about-collab-label">Let&rsquo;s talk</p>
+        {collabParagraphs.length > 0
+          ? collabParagraphs.map((para, i) => (
+              <p key={i} className="about-collab-text">{para}</p>
+            ))
+          : (
+            <p className="about-collab-text">
+              A line, a thought, or a different perspective — all welcome.
+            </p>
           )}
-          {(settings?.about_diving_since || "2015") && (
-            <div className="about-credential">
-              <div className="about-credential-label">Diving since</div>
-              <div className="about-credential-value">
-                {settings?.about_diving_since || "2015"}
-              </div>
-            </div>
-          )}
-          {(settings?.about_oceans || "Indian · Red Sea · Pacific") && (
-            <div className="about-credential">
-              <div className="about-credential-label">Oceans dived</div>
-              <div className="about-credential-value">
-                {settings?.about_oceans || "Indian · Red Sea · Pacific"}
-              </div>
-            </div>
-          )}
-          {(settings?.about_camera || "OM System OM-1 · GoPro Hero 13") && (
-            <div className="about-credential">
-              <div className="about-credential-label">Camera</div>
-              <div className="about-credential-value">
-                {settings?.about_camera || "OM System OM-1 · GoPro Hero 13"}
-              </div>
-            </div>
-          )}
-          {(settings?.about_based || "Singapore") && (
-            <div className="about-credential">
-              <div className="about-credential-label">Based in</div>
-              <div className="about-credential-value">
-                {settings?.about_based || "Singapore"}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="about-rule" />
-
-        {/* ── BODY TEXT ── */}
-        {paragraphs.length > 0 && (
-          <article className="about-body prose">
-            {paragraphs.map((paragraph: string, index: number) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </article>
+        {collabEmail && (
+          <a href={`mailto:${collabEmail}`} className="about-collab-link">
+            {collabEmail}
+          </a>
         )}
+      </section>
 
-        {paragraphs.length > 0 && <div className="about-rule" />}
-
-        {/* ── COLLABORATION ── */}
-        <div className="about-collab">
-             <div className="about-collab-label">Let's Talk</div>
-
-            {settings?.collaboration_note ? (
-                <p className="about-collab-text">{settings.collaboration_note}</p>
-            ) : (
-                 <div className="about-collab-text">
-                    <p>A line, a thought, or a different perspective — all welcome.</p>
-                    <p>If something here resonated, feel free to reach out.</p>
-
-                    <p>Open to notes, reflections, or anything this space brings up.</p>
-                    <p>Simple is enough.</p>
-
-                    <p>No need to overthink it.</p>
-                </div>
-            )}
-
-            {settings?.contact_email && (
-             <a href={`mailto:${settings.contact_email}`} className="about-collab-link">
-                {settings.contact_email}
-             </a>
-         )}
-        </div>
-
-      </main>
-
-      <Footer settings={settings} />
-    </>
-  );
+    </main>
+  )
 }
