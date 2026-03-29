@@ -20,8 +20,6 @@ export const metadata: Metadata = {
   },
 };
 
-type ShelfBook = { title: string; author: string; note?: string; cover?: string };
-
 export default async function AboutPage() {
   const supabase = await createSupabaseServerClient();
 
@@ -31,9 +29,6 @@ export default async function AboutPage() {
 
   const paragraphs = String(settings?.about_body || "")
     .split("\n").map((p: string) => p.trim()).filter(Boolean);
-
-  const shelf: ShelfBook[] = Array.isArray(settings?.reading_shelf)
-    ? (settings.reading_shelf as ShelfBook[]).slice(0, 6) : [];
 
   return (
     <>
@@ -69,34 +64,44 @@ export default async function AboutPage() {
 
         {/* ── CREDENTIALS STRIP — all from settings ── */}
         <div className="about-credentials">
-          {settings?.about_certification && (
+          {(settings?.about_certification || "PADI Rescue Diver · EFR") && (
             <div className="about-credential">
               <div className="about-credential-label">Certification</div>
-              <div className="about-credential-value">{settings.about_certification}</div>
+              <div className="about-credential-value">
+                {settings?.about_certification || "PADI Rescue Diver · EFR"}
+              </div>
             </div>
           )}
-          {settings?.about_diving_since && (
+          {(settings?.about_diving_since || "2015") && (
             <div className="about-credential">
               <div className="about-credential-label">Diving since</div>
-              <div className="about-credential-value">{settings.about_diving_since}</div>
+              <div className="about-credential-value">
+                {settings?.about_diving_since || "2015"}
+              </div>
             </div>
           )}
-          {settings?.about_oceans && (
+          {(settings?.about_oceans || "Indian · Red Sea · Pacific") && (
             <div className="about-credential">
               <div className="about-credential-label">Oceans dived</div>
-              <div className="about-credential-value">{settings.about_oceans}</div>
+              <div className="about-credential-value">
+                {settings?.about_oceans || "Indian · Red Sea · Pacific"}
+              </div>
             </div>
           )}
-          {settings?.about_camera && (
+          {(settings?.about_camera || "OM System OM-1 · GoPro Hero 13") && (
             <div className="about-credential">
               <div className="about-credential-label">Camera</div>
-              <div className="about-credential-value">{settings.about_camera}</div>
+              <div className="about-credential-value">
+                {settings?.about_camera || "OM System OM-1 · GoPro Hero 13"}
+              </div>
             </div>
           )}
-          {settings?.about_based && (
+          {(settings?.about_based || "Singapore") && (
             <div className="about-credential">
               <div className="about-credential-label">Based in</div>
-              <div className="about-credential-value">{settings.about_based}</div>
+              <div className="about-credential-value">
+                {settings?.about_based || "Singapore"}
+              </div>
             </div>
           )}
         </div>
@@ -112,38 +117,7 @@ export default async function AboutPage() {
           </article>
         )}
 
-        {/* ── ON THE SHELF ── */}
-        {shelf.length > 0 && (
-          <div className="about-shelf-section">
-            <div className="about-rule" />
-            <div className="about-shelf-head">
-              <div className="about-shelf-label">On the Shelf</div>
-              <p className="about-shelf-intro">A few books currently within reach.</p>
-            </div>
-            <div className="about-shelf-grid">
-              {shelf.map((book, i) => (
-                <div key={i} className="about-shelf-book">
-                  {book.cover ? (
-                    <div className="about-shelf-cover">
-                      <img src={book.cover} alt={`Cover of ${book.title}`} />
-                    </div>
-                  ) : (
-                    <div className="about-shelf-spine" />
-                  )}
-                  <div className="about-shelf-book-body">
-                    <div className="about-shelf-book-title">{book.title}</div>
-                    <div className="about-shelf-book-author">{book.author}</div>
-                    {book.note && (
-                      <div className="about-shelf-book-note">{book.note}</div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="about-rule" />
+        {paragraphs.length > 0 && <div className="about-rule" />}
 
         {/* ── COLLABORATION ── */}
         <div className="about-collab">

@@ -166,12 +166,15 @@ export async function saveSiteSettings(formData: FormData) {
       heroSlides = parsed
         .filter((item) => item && typeof item.image === "string" && item.image.trim().length > 0)
         .slice(0, 5)
-        .map((item) => ({ image: String(item.image || "").trim(), caption: String(item.caption || "").trim() }));
+        .map((item) => ({
+          image: String(item.image || "").trim(),
+          caption: String(item.caption || "").trim(),
+        }));
     }
   } catch { heroSlides = []; }
 
-  // Reading shelf
-  let readingShelf: Array<{ title: string; author: string; note: string }> = [];
+  // Reading shelf — include cover field
+  let readingShelf: Array<{ title: string; author: string; note: string; cover: string }> = [];
   try {
     const parsed = JSON.parse(String(formData.get("readingShelfPayload") || "[]"));
     if (Array.isArray(parsed)) {
@@ -182,6 +185,7 @@ export async function saveSiteSettings(formData: FormData) {
           title: String(b.title || "").trim(),
           author: String(b.author || "").trim(),
           note: String(b.note || "").trim(),
+          cover: String(b.cover || "").trim(), // ✅ cover saved correctly
         }));
     }
   } catch { readingShelf = []; }
@@ -193,6 +197,11 @@ export async function saveSiteSettings(formData: FormData) {
     about_title: String(formData.get("about_title") || "").trim(),
     about_intro: String(formData.get("about_intro") || "").trim(),
     about_body: String(formData.get("about_body") || "").trim(),
+    about_certification: String(formData.get("about_certification") || "").trim(),
+    about_diving_since: String(formData.get("about_diving_since") || "").trim(),
+    about_oceans: String(formData.get("about_oceans") || "").trim(),
+    about_camera: String(formData.get("about_camera") || "").trim(),
+    about_based: String(formData.get("about_based") || "").trim(),
     collaboration_note: String(formData.get("collaboration_note") || "").trim(),
     contact_title: String(formData.get("contact_title") || "").trim(),
     contact_intro: String(formData.get("contact_intro") || "").trim(),
