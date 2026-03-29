@@ -41,7 +41,7 @@ export default async function AboutPage() {
           <div className="about-hero-text">
             <div className="about-kicker">About</div>
             <h1 className="about-title">
-              {settings?.about_title || "A journal from the deep end of the world."}
+              {settings?.about_title || ""}
             </h1>
             <p className="about-intro">
               {settings?.about_intro ||
