@@ -3687,3 +3687,18 @@ html[data-theme="dark"] .media-modal-card {
   .about-shelf-grid { grid-template-columns: 1fr; }
   .ins-cards { grid-template-columns: 1fr; }
 }
+
+.hero-byline {
+  margin-top: 6px;
+  margin-bottom: 14px;
+
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.dark .hero-byline {
+  color: rgba(255, 255, 255, 0.5);
+}
