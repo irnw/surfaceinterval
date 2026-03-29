@@ -121,16 +121,27 @@ export default async function AboutPage() {
 
         {/* ── COLLABORATION ── */}
         <div className="about-collab">
-          <div className="about-collab-label">Let's Talk</div>
-          <p className="about-collab-text">
-            {settings?.collaboration_note ||
-              "A line, a thought, or a different perspective — all welcome.If something here resonated, feel free to reach out. Open to notes, reflections, or anything this space brings up. Simple is enough. No need to overthink it."}
-          </p>
-          {settings?.contact_email && (
-            <a href={`mailto:${settings.contact_email}`} className="about-collab-link">
-              {settings.contact_email}
-            </a>
-          )}
+             <div className="about-collab-label">Let's Talk</div>
+
+            {settings?.collaboration_note ? (
+                <p className="about-collab-text">{settings.collaboration_note}</p>
+            ) : (
+                 <div className="about-collab-text">
+                    <p>A line, a thought, or a different perspective — all welcome.</p>
+                    <p>If something here resonated, feel free to reach out.</p>
+
+                    <p>Open to notes, reflections, or anything this space brings up.</p>
+                    <p>Simple is enough.</p>
+
+                    <p>No need to overthink it.</p>
+                </div>
+            )}
+
+            {settings?.contact_email && (
+             <a href={`mailto:${settings.contact_email}`} className="about-collab-link">
+                {settings.contact_email}
+             </a>
+         )}
         </div>
 
       </main>
