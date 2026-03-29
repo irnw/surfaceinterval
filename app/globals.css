@@ -5113,3 +5113,152 @@ html[data-theme="dark"] .media-modal-card {
 .footer {
   position: relative;
 }
+
+/* ============================================================
+   PASTE AT BOTTOM OF globals.css
+   Footer admin word · Homepage design improvements
+   ============================================================ */
+
+/* =========================
+   FOOTER — discreet admin word
+========================= */
+
+/* "writing" link — completely invisible, inherits all surrounding styles */
+.footer-admin-word {
+  color: inherit;
+  text-decoration: none;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  cursor: text; /* looks like plain text, not a link */
+}
+
+/* Only reveals itself on deliberate hover */
+.footer-admin-word:hover {
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+
+/* =========================
+   HOMEPAGE IMPROVEMENTS
+========================= */
+
+/*
+  1. STATS — give the numbers more breathing room and visual weight
+     The current values feel small relative to the section padding
+*/
+.stats {
+  padding: 52px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.stat-value {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.stat-sub {
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+/*
+  2. SHELF SECTION — more breathing room, cleaner separation from stats
+*/
+.shelf-section {
+  padding: 64px 0 80px;
+}
+
+.shelf-kicker {
+  font-size: 0.58rem;
+  letter-spacing: 0.24em;
+}
+
+/*
+  3. SHELF BOOKS — slightly more generous cover height on desktop
+     so the art direction reads better
+*/
+.shelf-book-cover {
+  border-radius: 4px;
+  box-shadow: 3px 6px 18px rgba(0, 0, 0, 0.14);
+}
+
+.shelf-book-title {
+  font-size: 0.75rem;
+  line-height: 1.25;
+  margin-bottom: 3px;
+}
+
+.shelf-book-author {
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+}
+
+/*
+  4. SECTION HEAD — add a proper dividing line above Latest Dispatches
+     so it reads as a deliberate editorial section, not just content
+*/
+.section {
+  border-top: 1px solid var(--line);
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.section-link {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.section-link:hover { color: var(--purple-deep); }
+
+/*
+  5. FEATURE BAND — pull up slightly to reduce dead space between
+     editorial grid and feature band on content-heavy homepages
+*/
+.feature {
+  margin-top: 0;
+}
+
+/*
+  6. STORY LIST — add a tiny bit more vertical rhythm between cards
+*/
+.story-item + .story-item,
+.story-list > * + * {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}

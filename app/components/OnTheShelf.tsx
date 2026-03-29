@@ -19,13 +19,12 @@ export default function OnTheShelf({ books }: OnTheShelfProps) {
       <div className="shelf-inner">
         <div className="shelf-head">
           <div className="shelf-kicker">On the Shelf</div>
-          <Link href="/about" className="shelf-see-more">About Irene →</Link>
+          <Link href="/about" className="shelf-see-more">About Irene W →</Link>
         </div>
 
         <div className="shelf-grid">
           {books.map((book, i) => (
             <div key={i} className="shelf-book">
-              {/* Cover image */}
               <div className="shelf-book-cover">
                 {book.cover ? (
                   <img src={book.cover} alt={`Cover of ${book.title}`} />
@@ -35,8 +34,6 @@ export default function OnTheShelf({ books }: OnTheShelfProps) {
                   </div>
                 )}
               </div>
-
-              {/* Book info */}
               <div className="shelf-book-info">
                 <div className="shelf-book-title">{book.title}</div>
                 <div className="shelf-book-author">{book.author}</div>
