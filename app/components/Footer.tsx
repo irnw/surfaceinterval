@@ -33,6 +33,11 @@ export default function Footer({ settings }: { settings: FooterSettings | null }
       <div className="footer-right">
         {settings?.footer_right || "Modern editorial journal · photography-led long-form writing"}
       </div>
+
+      {/* Discreet admin entry — plain text, bottom of page, not visible unless you know it's there */}
+      <div className="footer-admin-entry">
+        <Link href="/login" className="footer-admin-link">·</Link>
+      </div>
     </footer>
   );
 }

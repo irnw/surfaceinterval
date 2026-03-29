@@ -4589,3 +4589,527 @@ html[data-theme="dark"] .media-modal-card {
   color: var(--text-soft);
   margin: 24px 0 6px;
 }
+
+/* ============================================================
+   PASTE AT BOTTOM OF globals.css
+   PostsManager (pm-) · Footer admin entry
+   ============================================================ */
+
+
+/* =========================
+   POSTS MANAGER
+========================= */
+
+.pm-root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Head */
+.pm-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 0 20px;
+  border-bottom: 2px solid var(--line-strong);
+}
+
+.pm-head-left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.pm-title {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.pm-count {
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+.pm-new-btn {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--purple-deep);
+  color: #fff;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.pm-new-btn:hover { background: var(--purple); }
+
+/* Bulk bar */
+.pm-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--purple-soft);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.pm-bulk-count {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--purple-deep);
+  white-space: nowrap;
+}
+
+.pm-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.pm-bulk-btn {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--text-soft);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.pm-bulk-btn:hover:not(:disabled) { background: var(--purple-soft); color: var(--purple-deep); border-color: var(--purple); }
+.pm-bulk-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pm-bulk-btn--delete {
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #dc2626;
+}
+.pm-bulk-btn--delete:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: #dc2626;
+}
+
+.pm-bulk-schedule {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pm-bulk-date {
+  font-size: 0.68rem;
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+}
+
+.pm-bulk-clear {
+  font-size: 0.7rem;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  margin-left: auto;
+}
+
+/* Column header */
+.pm-col-head {
+  display: grid;
+  grid-template-columns: 36px 1fr 110px 180px;
+  gap: 0 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.pm-col-head > div {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Post row */
+.pm-row {
+  border-bottom: 1px solid var(--line);
+  transition: background 0.1s;
+}
+
+.pm-row:hover { background: var(--surface); }
+.pm-row--checked { background: var(--purple-soft); }
+.pm-row--checked:hover { background: var(--purple-soft); }
+
+/* Top half of row — info line */
+.pm-row > .pm-row-check,
+.pm-row > .pm-row-info,
+.pm-row > .pm-row-status,
+.pm-row > .pm-row-actions {
+  /* These are the grid children in the top row */
+}
+
+/* Row grid layout */
+.pm-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 110px 180px;
+  grid-template-rows: auto auto;
+  gap: 0 12px;
+  padding: 0;
+  align-items: start;
+}
+
+.pm-row-check {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 0 14px 16px;
+}
+
+.pm-row-info {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 14px 0 6px;
+}
+
+.pm-row-status {
+  grid-column: 3;
+  grid-row: 1;
+  padding: 14px 0 6px;
+  display: flex;
+  align-items: center;
+}
+
+.pm-row-actions {
+  grid-column: 4;
+  grid-row: 1;
+  padding: 10px 16px 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.pm-row-qe {
+  grid-column: 2 / 5;
+  grid-row: 2;
+  padding: 0 16px 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Checkbox */
+.pm-checkbox {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--purple-deep);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Post title + meta */
+.pm-row-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.pm-title-link {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.pm-title-link:hover { color: var(--purple-deep); }
+
+.pm-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pm-meta-cat {
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+
+.pm-meta-sep { font-size: 0.6rem; color: var(--muted); }
+
+.pm-meta-slug {
+  font-size: 0.6rem;
+  color: var(--muted);
+  font-family: var(--font-mono, monospace);
+}
+
+.pm-meta-sched {
+  font-size: 0.6rem;
+  color: var(--text-soft);
+}
+
+.pm-meta-date {
+  font-size: 0.6rem;
+  color: var(--muted);
+}
+
+/* Flags */
+.pm-flag {
+  font-size: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.pm-flag--feat {
+  background: rgba(143, 122, 232, 0.12);
+  color: var(--purple-deep);
+}
+
+.pm-flag--pick {
+  background: rgba(90, 180, 120, 0.12);
+  color: #2d7a4f;
+}
+
+/* Status badge */
+.pm-badge {
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.pm-badge--published { background: rgba(45, 122, 79, 0.1); color: #2d7a4f; }
+.pm-badge--scheduled { background: rgba(143, 122, 232, 0.12); color: var(--purple-deep); }
+.pm-badge--draft { background: var(--surface); color: var(--muted); border: 1px solid var(--line-strong); }
+
+/* Action buttons */
+.pm-action-btn {
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.pm-action-btn:hover { background: var(--purple-soft); color: var(--purple-deep); border-color: var(--purple); }
+
+.pm-action-btn--delete {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.25);
+}
+.pm-action-btn--delete:hover {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.pm-action-btn--delete-yes {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+.pm-action-btn--delete-yes:hover { background: #b91c1c; }
+
+.pm-delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pm-delete-confirm-label {
+  font-size: 0.58rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* Quick edit controls */
+.pm-qe-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pm-qe-field {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pm-qe-label {
+  font-size: 0.52rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.pm-qe-select {
+  font-size: 0.68rem;
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.pm-qe-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 0.62rem;
+  color: var(--text-soft);
+  user-select: none;
+}
+
+.pm-qe-toggle input {
+  accent-color: var(--purple-deep);
+  width: 13px;
+  height: 13px;
+}
+
+.pm-qe-num {
+  width: 48px;
+  font-size: 0.68rem;
+  padding: 4px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+  text-align: center;
+}
+
+.pm-qe-field--slim { gap: 4px; }
+
+.pm-qe-apply {
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--purple-deep);
+  background: var(--purple-deep);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-left: auto;
+}
+
+.pm-qe-apply:hover:not(:disabled) { background: var(--purple); border-color: var(--purple); }
+.pm-qe-apply:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Schedule row */
+.pm-qe-schedule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pm-qe-date {
+  font-size: 0.68rem;
+  padding: 4px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.pm-qe-slot {
+  font-size: 0.6rem;
+  color: var(--purple-deep);
+  font-weight: 500;
+  padding: 4px 10px;
+  background: var(--purple-soft);
+  border-radius: 999px;
+}
+
+/* Empty state */
+.pm-empty {
+  padding: 40px 16px;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.pm-empty a { color: var(--purple-deep); text-decoration: none; }
+.pm-empty a:hover { text-decoration: underline; }
+
+/* Responsive */
+@media (max-width: 720px) {
+  .pm-col-head { grid-template-columns: 36px 1fr 90px; }
+  .pm-col-head .pm-col-actions { display: none; }
+  .pm-row { grid-template-columns: 36px 1fr 90px; }
+  .pm-row-actions { grid-column: 2 / 4; grid-row: 2; padding: 0 0 6px; }
+  .pm-row-qe { grid-column: 1 / 4; grid-row: 3; }
+}
+
+
+/* =========================
+   FOOTER — discreet admin entry
+========================= */
+
+.footer-admin-entry {
+  position: absolute;
+  bottom: 10px;
+  right: 16px;
+}
+
+.footer-admin-link {
+  font-size: 0.6rem;
+  color: var(--line-strong);
+  text-decoration: none;
+  opacity: 0.3;
+  transition: opacity 0.2s;
+  padding: 4px 6px;
+}
+
+.footer-admin-link:hover {
+  opacity: 0.8;
+  color: var(--muted);
+}
+
+/* Make footer position relative so the absolute entry is contained */
+.footer {
+  position: relative;
+}

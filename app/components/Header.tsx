@@ -27,17 +27,12 @@ export default function Header() {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsSignedIn(!!session);
     });
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setIsSignedIn(!!session);
-      }
+      (_event, session) => setIsSignedIn(!!session)
     );
-
     return () => subscription.unsubscribe();
   }, []);
 
@@ -75,17 +70,13 @@ export default function Header() {
 
             <ThemeToggle />
 
-            {/* ✅ Fixed: /login not /admin/login */}
-            {isSignedIn ? (
+            {/* Dashboard link — only shown when signed in, subtle pill style */}
+            {isSignedIn && (
               <Link
                 href="/admin"
                 className={`nav-pill ${pathname.startsWith("/admin") ? "is-active" : ""}`}
               >
                 Dashboard
-              </Link>
-            ) : (
-              <Link href="/login" className="nav-pill">
-                Admin
               </Link>
             )}
           </nav>
