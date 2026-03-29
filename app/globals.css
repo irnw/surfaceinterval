@@ -3223,8 +3223,8 @@ button {
   position: relative;
   /* editorial: wide landscape crop, cinematic */
   width: 100%;
-  max-width: 400px;
-  aspect-ratio: 3 / 4;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--purple-soft);
   border-radius: 0;           /* sharp corners — matches site aesthetic */
@@ -3232,7 +3232,7 @@ button {
 
 .about-portrait-img {
   object-fit: cover;
-  object-position: center top;
+  object-position: center center;
   width: 100%;
   height: 100%;
   display: block;
@@ -4430,11 +4430,9 @@ html[data-theme="dark"] .media-modal-card {
 ══════════════════════════════════════════ */
 
 .about-shell {
-  max-width: min(78vw, 1100px) !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  padding-left: 32px !important;
-  padding-right: 32px !important;
+  max-width: min(78vw, 640px) !important;
+  margin: 0 auto !important;
+  padding: 72px 24px 100px!important;
 }
 
 @media (max-width: 768px) {
