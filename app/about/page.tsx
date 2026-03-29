@@ -1,10 +1,12 @@
 // app/about/page.tsx
+export const revalidate = 0
+
 import { createSupabaseServerClient } from "../lib/supabase-server"
 import Image from 'next/image'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'About · Surface Interval',
+  title: 'About',
   description: 'Surface Interval — a personal editorial journal on diving, travel and photography, by Irene W.',
 }
 
@@ -17,24 +19,22 @@ export default async function AboutPage() {
     .limit(1)
     .maybeSingle()
 
-  const photoUrl = settings?.about_photo_url ?? null
-  const bodyText: string = settings?.about_body ?? ''
-  const collabText: string = settings?.about_collab ?? ''
-  const collabEmail: string = settings?.about_email ?? 'irene.wsh@live.com'
+  const photoUrl: string | null = settings?.about_photo ?? null
 
+  const tagline: string =
+    settings?.about_tagline ??
+    settings?.tagline ??
+    'For the quieter moments in between. Not to document — just to slow things down enough to see clearly.'
+
+  const bodyText: string      = settings?.about_body ?? ''
   const certification: string = settings?.about_certification ?? ''
-  const oceansDived: string = settings?.about_oceans ?? ''
-  const basedIn: string = settings?.about_based_in ?? ''
+  const oceansDived: string   = settings?.about_oceans ?? ''
+  const basedIn: string       = settings?.about_based_in ?? ''
+  const collabText: string    = settings?.about_collab ?? ''
+  const collabEmail: string   = settings?.about_email ?? ''
 
-  const bodyParagraphs = bodyText
-    .split('\n')
-    .map((p) => p.trim())
-    .filter(Boolean)
-
-  const collabParagraphs = collabText
-    .split('\n')
-    .map((p) => p.trim())
-    .filter(Boolean)
+  const bodyParagraphs = bodyText.split('\n').map(p => p.trim()).filter(Boolean)
+  const collabParagraphs = collabText.split('\n').map(p => p.trim()).filter(Boolean)
 
   return (
     <main className="about-shell">
@@ -42,10 +42,7 @@ export default async function AboutPage() {
       {/* ── HEADER ─────────────────────────────────────── */}
       <header className="about-header">
         <p className="about-kicker">Irene W.</p>
-        <p className="about-intro">
-          For the quieter moments in between.{' '}
-          Not to document — just to slow things down enough to see clearly.
-        </p>
+        <p className="about-intro">{tagline}</p>
       </header>
 
       {/* ── PORTRAIT ───────────────────────────────────── */}
@@ -105,10 +102,10 @@ export default async function AboutPage() {
               <p key={i} className="about-collab-text">{para}</p>
             ))
           : (
-            <p className="about-collab-text">
-              A line, a thought, or a different perspective — all welcome.
-            </p>
-          )}
+              <p className="about-collab-text">
+                A line, a thought, or a different perspective — all welcome.
+              </p>
+            )}
         {collabEmail && (
           <a href={`mailto:${collabEmail}`} className="about-collab-link">
             {collabEmail}
