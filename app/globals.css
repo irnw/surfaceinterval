@@ -3217,7 +3217,7 @@ button {
   position: relative;
   width: 100%;
   max-width: 100%;        /* full column width — looks better at 640px */
-  aspect-ratio: 4 / 3;   /* landscape — shows more of the scene, less face-forward */
+  aspect-ratio: 4 / 2.5;   /* landscape — shows more of the scene, less face-forward */
   overflow: hidden;
   background: var(--purple-soft);
   border-radius: 0;
