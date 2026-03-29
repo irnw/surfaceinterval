@@ -39,12 +39,14 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
           : <div className="hero-v2-placeholder" />
         }
         <div className="hero-v2-scrim" />
-        <div className="hero-v2-eyebrow">From the deep end of the world</div>
+        <div className="hero-v2-eyebrow">TRAVEL · OCEAN · PHOTOGRAPHY · LIFE</div>
         <div className="hero-v2-bottom">
           <div className="hero-v2-bottom-left">
             <h1 className="hero-v2-title">
               <span className="hero-v2-title-main">Surface</span>
               <span className="hero-v2-title-accent"> Interval</span>
+               <div className="hero-byline"> BY IRENE W 
+               </div>
             </h1>
             {slides[activeIndex]?.caption && (
               <div className="hero-v2-caption">{slides[activeIndex].caption}</div>
