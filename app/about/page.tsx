@@ -60,21 +60,7 @@ export default async function AboutPage() {
           )}
         </div>
 
-
         <div className="about-rule" />
-
-        {/* ── BODY TEXT ── */}
-        {paragraphs.length > 0 && (
-          <article className="about-body prose">
-            {paragraphs.map((paragraph: string, index: number) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </article>
-        )}
-
-        {paragraphs.length > 0 && <div className="about-rule" />}
-
-         <div className="about-rule" />
 
         {/* ── CREDENTIALS STRIP — all from settings ── */}
         <div className="about-credentials">
@@ -119,6 +105,19 @@ export default async function AboutPage() {
             </div>
           )}
         </div>
+
+        <div className="about-rule" />
+
+        {/* ── BODY TEXT ── */}
+        {paragraphs.length > 0 && (
+          <article className="about-body prose">
+            {paragraphs.map((paragraph: string, index: number) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </article>
+        )}
+
+        {paragraphs.length > 0 && <div className="about-rule" />}
 
         {/* ── COLLABORATION ── */}
         <div className="about-collab">
