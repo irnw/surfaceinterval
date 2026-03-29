@@ -6419,3 +6419,206 @@ section.shelf-section .shelf-see-more {
 }
 
 section.shelf-section .shelf-see-more:hover { opacity: 1; }
+
+/* ============================================================
+   PASTE AT THE VERY BOTTOM OF globals.css
+   Targeted editorial section fixes — restores original layout,
+   fixes section head, caps story list at 5, adds proper spacing.
+   Uses high specificity to win over earlier conflicting rules.
+   ============================================================ */
+
+
+/* ── Fix 1: Restore story-row to grid (my reset broke it) ── */
+
+section.section .story-row {
+  display: grid !important;
+  grid-template-columns: 1fr 170px;
+  gap: 22px;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--line);
+  align-items: start;
+}
+
+section.section .story-row:last-child {
+  border-bottom: none;
+}
+
+/* Thumbnail — fixed size, not stretching */
+section.section .story-thumb {
+  width: 170px;
+  height: 114px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+/* ── Fix 2: Section head — reduce top padding, cleaner hierarchy ── */
+
+section.section .section-head {
+  padding-top: 36px !important;
+  padding-bottom: 20px !important;
+  margin-bottom: 0 !important;
+}
+
+section.section .section-title {
+  font-family: var(--font-serif) !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  color: var(--text) !important;
+  text-transform: none !important;
+  line-height: 1 !important;
+}
+
+section.section .section-link {
+  font-size: 0.6rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--purple-deep) !important;
+  text-decoration: none !important;
+}
+
+section.section .section-link:hover {
+  text-decoration: underline !important;
+}
+
+/* ── Fix 3: Story list — cap width, clean spacing ── */
+
+section.section .story-list {
+  display: flex !important;
+  flex-direction: column !important;
+  padding-right: 40px !important;
+  border-right: 1px solid var(--line) !important;
+  /* Cap at 5 posts — each row ~170px, so 5 × ~170px = 850px max */
+  max-height: none;
+}
+
+/* ── Fix 4: Story text — good reading rhythm ── */
+
+section.section .story-kicker {
+  font-size: 0.55rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: var(--purple) !important;
+  margin-bottom: 10px !important;
+}
+
+section.section .story-title {
+  font-family: var(--font-serif) !important;
+  font-size: 1.15rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.01em !important;
+  margin-bottom: 10px !important;
+  color: var(--text) !important;
+}
+
+section.section .story-title a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+section.section .story-title a:hover {
+  color: var(--purple-deep) !important;
+}
+
+section.section .story-body {
+  font-size: 0.84rem !important;
+  color: var(--muted) !important;
+  line-height: 1.65 !important;
+  margin: 0 !important;
+}
+
+section.section .story-meta {
+  font-size: 0.6rem !important;
+  color: var(--muted) !important;
+  margin-top: 12px !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* ── Fix 5: Side rail — consistent with story list ── */
+
+section.section .side-rail {
+  padding-left: 36px !important;
+  padding-top: 32px !important;
+}
+
+section.section .rail-card {
+  border-left: none !important;
+  padding-left: 0 !important;
+  margin-bottom: 32px !important;
+}
+
+section.section .rail-card:last-child {
+  margin-bottom: 0 !important;
+}
+
+section.section .rail-title {
+  font-size: 0.55rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase !important;
+  color: var(--muted) !important;
+  margin-bottom: 16px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+section.section .rail-item {
+  padding: 14px 0 !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+
+section.section .rail-item:last-child {
+  border-bottom: none !important;
+}
+
+section.section .rail-item-title {
+  font-family: var(--font-serif) !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  letter-spacing: 0 !important;
+  color: var(--text) !important;
+  margin-bottom: 4px !important;
+}
+
+section.section .rail-item-title a {
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+section.section .rail-item-title a:hover {
+  color: var(--purple-deep) !important;
+}
+
+section.section .rail-meta {
+  font-size: 0.6rem !important;
+  color: var(--muted) !important;
+  letter-spacing: 0.03em !important;
+}
+
+/* Quote box in rail */
+section.section .quote-box .quote {
+  font-family: var(--font-serif) !important;
+  font-size: 0.82rem !important;
+  font-style: italic !important;
+  line-height: 1.6 !important;
+  color: var(--text-soft) !important;
+  margin-bottom: 8px !important;
+}
+
+section.section .quote-box .quote-name {
+  font-size: 0.55rem !important;
+  letter-spacing: 0.16em !important;
+  color: var(--muted) !important;
+}
+
+/* ── Fix 6: Section overall — reduce bottom padding ── */
+
+section.section {
+  padding-bottom: 56px !important;
+}

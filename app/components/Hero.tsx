@@ -22,7 +22,6 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
     return () => window.clearInterval(timer);
   }, [slides.length]);
 
-  // Copy — editable via settings, defaults below
   const copyStrong = settings?.hero_copy_strong
     || "Written from below the surface — and everywhere it leads.";
   const copySoft = settings?.hero_copy_soft
@@ -33,11 +32,9 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
       <div className="hero-v2-media">
         {slides.length > 0
           ? slides.map((slide, i) => (
-              <div
-                key={`${slide.image}-${i}`}
+              <div key={`${slide.image}-${i}`}
                 className={`hero-v2-slide ${i === activeIndex ? "is-active" : ""}`}
-                style={{ backgroundImage: `url(${slide.image})` }}
-              />
+                style={{ backgroundImage: `url(${slide.image})` }} />
             ))
           : <div className="hero-v2-placeholder" />
         }
@@ -64,7 +61,6 @@ export default function Hero({ settings }: { settings: Record<string, any> | nul
           )}
         </div>
       </div>
-
       <div className="hero-v2-strip">
         <div className="hero-v2-strip-inner">
           <div className="hero-v2-strip-copy">
